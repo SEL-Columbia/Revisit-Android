@@ -8,6 +8,8 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="19" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -16,6 +18,10 @@
         <activity
             android:name="org.columbia.sel.facilitator.MainActivity"
             android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="org.columbia.sel.facilitator.FacilityListActivity"
+            android:label="@string/title_activity_facility_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

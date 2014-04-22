@@ -16,6 +16,9 @@ gen/
 .gradle/
 build/
 
+# libs are populated via gradle
+libs/
+
 # Local configuration file (sdk path, etc)
 local.properties
 

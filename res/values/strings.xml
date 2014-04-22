@@ -4,5 +4,11 @@
     <string name="app_name">Facilitator</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_facility_list">FacilityListActivity</string>
+    <string name="id_label">The ID is</string>
+    <string name="id_value">[id]</string>
+    <string name="name_label">The Name is</string>	
+    <string name="name_value">[name]</string>
+    <string name="action_refresh">Refresh</string>
 
 </resources>
