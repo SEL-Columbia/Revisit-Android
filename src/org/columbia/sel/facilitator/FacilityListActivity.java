@@ -1,10 +1,16 @@
 package org.columbia.sel.facilitator;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
+import android.app.ListActivity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +21,7 @@ import android.os.Build;
 
 import org.columbia.sel.facilitator.model.Facility;
 
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.AsyncTask;
@@ -23,26 +30,37 @@ import android.util.Log;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-public class FacilityListActivity extends ActionBarActivity {
+public class FacilityListActivity extends ListActivity {
+
+	public ArrayAdapter mAdapter;
+	
+	String[] names = {"Facility A", "Facility B", "Facility C"};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_facility_list);
+		// setContentView(R.layout.activity_facility_list);
 
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
+		// For the cursor adapter, specify which columns go into which views
+		String[] fromColumns = {};
+		int[] toViews = { android.R.id.text1 }; // The TextView in
+												// simple_list_item_1
+
+		// Create an empty adapter we will use to display the loaded data.
+		// We pass null for the cursor, then update it in onLoadFinished()
+//		mAdapter = new FacilityArrayAdapter(this, android.R.id.text1, null);
+		mAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1);
+		setListAdapter(mAdapter);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		Toast.makeText(getApplication(), "Fetching Facilities...", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplication(), "Fetching Facilities...",
+				Toast.LENGTH_SHORT).show();
 		new HttpRequestTask().execute();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -65,55 +83,67 @@ public class FacilityListActivity extends ActionBarActivity {
 	}
 
 	/**
-	 * A placeholder fragment containing a simple view.
+	 * An internal class for handling of the asyncronous REST service
+	 * interaction.
+	 * 
+	 * @author jmw
 	 */
-	public static class PlaceholderFragment extends Fragment {
+	private class HttpRequestTask extends AsyncTask<Void, Void, Facility[]> {
+		@Override
+		protected Facility[] doInBackground(Void... params) {
+			try {
+				// final String url =
+				// "http://rest-service.guides.spring.io/greeting";
+				final String url = "http://10.88.0.108:3000/api/v1/Facilities/";
+				RestTemplate restTemplate = new RestTemplate();
+				restTemplate.getMessageConverters().add(
+						new MappingJackson2HttpMessageConverter());
+				
+				Facility[] facilities = restTemplate.getForObject(url,
+						Facility[].class);
 
-		public PlaceholderFragment() {
+				return facilities;
+			} catch (Exception e) {
+				Log.e("FacilityListActivity", e.getMessage(), e);
+			}
+
+			return null;
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_facility_list,
-					container, false);
-			return rootView;
+		protected void onPostExecute(Facility[] facilities) {
+			Log.i("FacilityListActivity", ""+facilities.length);
+			Log.i("FacilityListActivity", ""+facilities[0].getName());
+			mAdapter.clear();
+			mAdapter.addAll(facilities);
+			mAdapter.notifyDataSetChanged();
 		}
+
 	}
-	
-	/**
-	 * An internal class for handling of the asyncronous REST service interaction.
-	 * @author jmw
-	 */
-	private class HttpRequestTask extends AsyncTask<Void, Void, Map> {
-        @Override
-        protected Map doInBackground(Void... params) {
-            try {
-//                final String url = "http://rest-service.guides.spring.io/greeting";
-                final String url = "http://10.88.0.108:3000/api/v1/Facilities/53557c1fbb69d3f28ac05979";
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-//                Facility facility = restTemplate.getForObject(url, Facility.class);
-                Map<String,Object> facility = restTemplate.getForObject(url, Map.class);
-                return facility;
-            } catch (Exception e) {
-                Log.e("FacilityListActivity", e.getMessage(), e);
-            }
 
-            return null;
-        }
+	private class FacilityArrayAdapter extends ArrayAdapter<String> {
 
-        @Override
-        protected void onPostExecute(Map facility) {
-            TextView facilityIdText = (TextView) findViewById(R.id.id_value);
-            TextView facilityNameText = (TextView) findViewById(R.id.name_value);
-//            facilityIdText.setText(facility.getId());
-            facilityIdText.setText((String) facility.get("_id"));
-//            facilityNameText.setText(facility.getName());
-            facilityNameText.setText((String) facility.get("name"));
-            Log.e("FacilityListActivity", facility.toString());
-        }
+		HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
 
-    }
+		public FacilityArrayAdapter(Context context, int textViewResourceId,
+				List<String> objects) {
+			super(context, textViewResourceId, objects);
+			for (int i = 0; i < objects.size(); ++i) {
+				mIdMap.put(objects.get(i), i);
+			}
+		}
+
+		@Override
+		public long getItemId(int position) {
+			String item = getItem(position);
+			return mIdMap.get(item);
+		}
+
+		@Override
+		public boolean hasStableIds() {
+			return true;
+		}
+
+	}
 
 }
