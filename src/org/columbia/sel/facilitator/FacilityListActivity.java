@@ -34,21 +34,10 @@ public class FacilityListActivity extends ListActivity {
 
 	public ArrayAdapter mAdapter;
 	
-	String[] names = {"Facility A", "Facility B", "Facility C"};
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// setContentView(R.layout.activity_facility_list);
-
-		// For the cursor adapter, specify which columns go into which views
-		String[] fromColumns = {};
-		int[] toViews = { android.R.id.text1 }; // The TextView in
-												// simple_list_item_1
-
 		// Create an empty adapter we will use to display the loaded data.
-		// We pass null for the cursor, then update it in onLoadFinished()
-//		mAdapter = new FacilityArrayAdapter(this, android.R.id.text1, null);
 		mAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1);
 		setListAdapter(mAdapter);
 	}
@@ -121,6 +110,11 @@ public class FacilityListActivity extends ListActivity {
 
 	}
 
+	/**
+	 * Example of custom adaptor - will need to look at how best to do this.
+	 * @author jmw
+	 *
+	 */
 	private class FacilityArrayAdapter extends ArrayAdapter<String> {
 
 		HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
