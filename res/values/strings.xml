@@ -7,5 +7,6 @@
     <string name="title_activity_facility_list">Facilities</string>
     <string name="action_refresh">Refresh</string>
     <string name="facility_icon_desc">Facility Type</string>
+    <string name="title_activity_map">MapActivity</string>
 
 </resources>

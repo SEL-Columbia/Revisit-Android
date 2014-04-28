@@ -1,12 +1,20 @@
-package org.columbia.sel.facilitator;
+package org.columbia.sel.facilitator.activity;
 
+import org.columbia.sel.facilitator.R;
+import org.columbia.sel.facilitator.R.drawable;
+import org.columbia.sel.facilitator.R.id;
+import org.columbia.sel.facilitator.R.layout;
+import org.columbia.sel.facilitator.R.menu;
 import org.columbia.sel.facilitator.model.Facility;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import android.app.ListActivity;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +43,11 @@ import com.google.android.gms.location.LocationClient;
 public class FacilityListActivity extends ListActivity implements
 	GooglePlayServicesClient.ConnectionCallbacks,
 	GooglePlayServicesClient.OnConnectionFailedListener {
+	
+	@Inject LocationManager locationManager;
+	
+	// TAG for logging
+	private final String TAG = this.getClass().getCanonicalName();
 
 	// A container class for a collection of Facility POJOs
 	static class FacilityList extends ArrayList<Facility> {}
@@ -102,10 +115,10 @@ public class FacilityListActivity extends ListActivity implements
 			try {
 				// final String url =
 				// "http://rest-service.guides.spring.io/greeting";
-				final String url = "http://192.168.1.86:3000/api/test/facilities/geowithin?lat=" 
+				final String url = "http://fac.wohllabs.com/api/test/facilities/geowithin?lat=" 
 						+ this.lat + "&lng=" + this.lng + "&rad=" + this.rad;
 				
-				Log.i("FacilityListActivity", url);
+				Log.i(TAG, url);
 				
 				RestTemplate restTemplate = new RestTemplate();
 				restTemplate.getMessageConverters().add(
@@ -116,7 +129,7 @@ public class FacilityListActivity extends ListActivity implements
 
 				return facilities;
 			} catch (Exception e) {
-				Log.e("FacilityListActivity", e.getMessage(), e);
+				Log.e(TAG, e.getMessage(), e);
 			}
 
 			return null;
@@ -124,8 +137,8 @@ public class FacilityListActivity extends ListActivity implements
 
 		@Override
 		protected void onPostExecute(List<Facility> facilities) {
-			Log.i("FacilityListActivity", ""+facilities.size());
-//			Log.i("FacilityListActivity", ""+facilities[0].getName());
+			Log.i(TAG, ""+facilities.size());
+//			Log.i(TAG, ""+facilities[0].getName());
 			mAdapter.clear();
 			mAdapter.addAll(facilities);
 			mAdapter.notifyDataSetChanged();
@@ -172,8 +185,8 @@ public class FacilityListActivity extends ListActivity implements
 //			TextView created = (TextView) baseView.findViewById(R.id.facility_list_created);
 //			created.setText("Facility added: " + f.createdAt.toString());
 			
-			Log.i("FacilityListActivity", f.properties.get("type")+"");
-			Log.i("FacilityListActivity", f.name);
+			Log.i(TAG, f.properties.get("type")+"");
+			Log.i(TAG, f.name);
 			
 			return baseView;
 			
@@ -181,15 +194,10 @@ public class FacilityListActivity extends ListActivity implements
 	}
 	
 	
-	
-	/********
-	 * EVENT HANDLERS
-	 ********/
-
 	@Override 
     public void onListItemClick(ListView l, View v, int position, long id) {
         Facility f = (Facility) getListView().getItemAtPosition(position);
-        Log.i("FacilityListActivity", "clicked " + f.name);
+        Log.i(TAG, "clicked " + f.name);
     }
 	
 	@Override
