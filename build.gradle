@@ -64,6 +64,10 @@ dependencies {
 	compile 'com.squareup.dagger:dagger-compiler:1.2.0'
 	compile 'com.squareup.dagger:dagger:1.2.0'
 	
+	// osmdroid
+	compile "org.osmdroid:osmdroid-android:4.1"
+	compile "org.slf4j:slf4j-android:1.6.1-RC1"
+	
 	// utility libs
 	compile 'com.jakewharton:butterknife:5.0.0'
 //	compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'

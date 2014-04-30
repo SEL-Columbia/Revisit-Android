@@ -1,72 +1,144 @@
 package org.columbia.sel.facilitator.activity;
 
+import java.util.ArrayList;
+import javax.inject.Inject;
+
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.R.id;
 import org.columbia.sel.facilitator.R.layout;
 import org.columbia.sel.facilitator.R.menu;
+import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
+import org.columbia.sel.facilitator.model.Facility;
+import org.columbia.sel.facilitator.model.FacilityList;
+import org.columbia.sel.facilitator.model.FacilityRepository;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.content.Intent;
+import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
+
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import android.widget.Toast;
 
 
 public class MapActivity extends BaseActivity {
-	private final String TAG = this.getClass().getCanonicalName();
 	
-	private GoogleMap facilityMap;
+	@Inject Bus bus;
 	
+	@Inject FacilityRepository fr;
+	
+	@Inject LocationManager lm;
+	
+	private MapView mMapView;
+	private MapController mMapCon;
+	private ItemizedOverlay<OverlayItem> mMyLocationOverlay;
+	private DefaultResourceProxyImpl mResourceProxy;
+	
+	// TODO each activity probably doesn't need a reference to the facilities?
+	// Centralize in FacilityRepository or the like?
+	private FacilityList facilities;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
+		
+		bus.register(this);
+		
+		mMapView = (MapView) this.findViewById(R.id.mapview);
+		mMapView.setBuiltInZoomControls(true);
+		mMapView.setMultiTouchControls(true);
 
-		facilityMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.facility_map)).getMap();
-
-		facilityMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
-			public void onInfoWindowClick(Marker marker){
-				Log.i(TAG, "clicked marker");
-//				Intent i = new Intent(MapActivity.this, facilityInfo.class);
-//				i.putExtra("facility", facilityMarkers.get(marker));
-//				i.putExtra("type", type);
-//				startActivity(i);
-			}
-		});
+		mMapView.getController().setZoom(15);
+		mMapCon = (MapController) mMapView.getController();
+		
+		mResourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
+		
+		this.zoomToMyLocation();
+		
+		fr.loadFacilities();
 	}
-
+	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.map, menu);
-		return true;
+	protected void onPause() {
+		super.onPause();
+		bus.unregister(this);
 	}
-
+	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+	protected void onResume() {
+		super.onResume();
+		bus.register(this);
+	}
+	
+	private void zoomToMyLocation() {
+		Log.i(TAG, "zoomToMyLocation");
+		
+		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		if (loc == null) {
+			loc = new Location(LocationManager.GPS_PROVIDER);
+			loc.setLatitude(41.0);
+			loc.setLongitude(-79.0);
 		}
-		return super.onOptionsItemSelected(item);
+
+		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+		mMapCon.animateTo(point);
+	}
+	
+	private void addFacilitiesToMap(FacilityList facilities) {
+		Log.i(TAG, "addFacilitiesToMap");
+		
+		// List of markers
+		ArrayList<OverlayItem> markers = new ArrayList<OverlayItem>();
+		
+		// Create a marker for each facilitiy
+		for (Facility facility: facilities) {
+			Log.i(TAG, facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
+			GeoPoint point = new GeoPoint(facility.coordinates.get(0), facility.coordinates.get(1));
+			markers.add(new OverlayItem(facility.name, "SampleDescription", point));
+		}
+		
+		/* OnTapListener for the Markers, shows a simple Toast. */
+        this.mMyLocationOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    
+        			@Override
+                    public boolean onItemSingleTapUp(final int index,
+                            final OverlayItem item) {
+                        Toast.makeText(
+                                MapActivity.this,
+                                item.getTitle(), Toast.LENGTH_SHORT).show();
+                        return true; // We 'handled' this event.
+                    }
+                    
+                    @Override
+                    public boolean onItemLongPress(final int index,
+                            final OverlayItem item) {
+                        Toast.makeText(
+                        		MapActivity.this, 
+                                item.getSnippet() ,Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    
+                }, mResourceProxy);
+        
+        // Add the overlays to the map
+        this.mMapView.getOverlays().add(this.mMyLocationOverlay);
+        mMapView.invalidate();
+	}
+	
+	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
+		Log.i(TAG, "handleFacilitiesLoaded");
+		addFacilitiesToMap(event.getFacilities());
 	}
 }

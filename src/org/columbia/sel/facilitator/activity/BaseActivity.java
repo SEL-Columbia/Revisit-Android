@@ -28,7 +28,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		
 		// Set the tag to the class name of the instance.
-		 TAG = this.getClass().getSimpleName();
+		 TAG = this.getClass().getCanonicalName();
 		
 		// Perform injection so that when this call returns all dependencies
 		// will be available for use.

@@ -3,9 +3,9 @@ package org.columbia.sel.facilitator;
 import java.util.Arrays;
 import java.util.List;
 
-import org.columbia.sel.facilitator.di.ContainerModule;
+import org.columbia.sel.facilitator.di.DIModule;
 import org.columbia.sel.facilitator.model.*;
-import org.columbia.sel.facilitator.tasks.HttpRequestTask;
+import org.columbia.sel.facilitator.task.HttpRequestTask;
 
 import android.app.Application;
 import android.content.Context;
@@ -51,7 +51,7 @@ public class FacilitatorApplication extends Application {
 	 * @return
 	 */
 	protected List<?> getModules() {
-		return Arrays.asList(new ContainerModule(this));
+		return Arrays.asList(new DIModule(this));
 	}
 
 	/**

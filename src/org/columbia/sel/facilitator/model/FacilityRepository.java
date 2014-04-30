@@ -5,8 +5,11 @@ import javax.inject.Singleton;
 
 import org.columbia.sel.facilitator.FacilitatorApplication;
 import org.columbia.sel.facilitator.annotation.ForApplication;
-import org.columbia.sel.facilitator.di.Injector;
-import org.columbia.sel.facilitator.tasks.HttpRequestTask;
+import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
+import org.columbia.sel.facilitator.task.HttpRequestTask;
+
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import dagger.ObjectGraph;
 import android.content.Context;
@@ -16,22 +19,27 @@ import android.util.Log;
 
 @Singleton
 public class FacilityRepository {
+	private String TAG = this.getClass().getCanonicalName();
 	
 	@Inject LocationManager lm;
 	
+	@Inject Bus bus;
+	
 	@Inject @ForApplication FacilitatorApplication app;
 	
-	private FacilityList facilities;
+	private FacilityList mFacilities;
 	
 	@Inject
 	public FacilityRepository() {
-		Log.i("FacilityRepository", "constructing...");
-		
+		Log.i(TAG, "constructing...");
+//		bus.register(this);
 	}
 	
 	public void loadFacilities() {
-		Log.i("FacilityRepository", "loading facilities...");
+		Log.i(TAG, "loading facilities...");
 		if (lm != null) {
+			Log.i(TAG, "using lm");
+			
 			Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			
 			if (loc == null) {
@@ -39,6 +47,7 @@ public class FacilityRepository {
 				loc.setLatitude(41.0);
 				loc.setLongitude(-79.0);
 			}
+			
 			String url = "http://fac.wohllabs.com/api/test/facilities/geowithin";
 			
 			ObjectGraph og = app.getObjectGraph();
@@ -51,8 +60,17 @@ public class FacilityRepository {
 			req.setRad(100.0);
 			
 			req.execute();			
+		} else {
+			Log.i(TAG, "lm null.");
 		}
 	}
-
-
+	
+	public FacilityList getFacilities() {
+		return mFacilities;
+	}
+	
+//	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
+//		Log.i(TAG, "Facilities Loaded!");
+//		mFacilities = event.getFacilities();
+//	}
 }

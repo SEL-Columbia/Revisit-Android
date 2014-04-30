@@ -7,6 +7,10 @@ import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.R.id;
 import org.columbia.sel.facilitator.R.layout;
 import org.columbia.sel.facilitator.R.menu;
+import org.columbia.sel.facilitator.model.Facility;
+import org.columbia.sel.facilitator.model.FacilityList;
+import org.columbia.sel.facilitator.adapter.FacilityArrayAdapter;
+import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.HttpRequestSuccessEvent;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 
@@ -25,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.os.Build;
 
 public class MainActivity extends BaseActivity {
@@ -36,33 +41,43 @@ public class MainActivity extends BaseActivity {
 	
 	@Inject FacilityRepository fr;
 	
+	public FacilityArrayAdapter mAdapter;
+	
+	private ListView listView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-//		FacilitatorApplication app = (FacilitatorApplication) getApplicationContext();
-		
+//		setContentView(R.layout.activity_main);
+				
 		// register this class to receive events through the bus. 
 		bus.register(this);
 		
 		Log.i(TAG, "Loading Facilities...");
 		
-		fr.loadFacilities();
 		
-//		Log.i("MainActivity", "What's my tag? " + TAG);
-//		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//		Log.i(TAG, loc.toString());
+		listView = new ListView(this);
+		mAdapter = new FacilityArrayAdapter(this, R.layout.facility_list_item);
+		listView.setAdapter(mAdapter);
+		
+		setContentView(listView);
 
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
+//		if (savedInstanceState == null) {
+//			getSupportFragmentManager().beginTransaction()
+//					.add(R.id.container, new PlaceholderFragment()).commit();
+//		}
 	}
 	
-	@Subscribe public void requestSuccess(HttpRequestSuccessEvent event) {
-		Log.i(TAG, event.getBody());
+	@Override
+	protected void onStart() {
+		super.onStart();
+		fr.loadFacilities();
 	}
+	
+//	@Override
+//	protected void onResume() {
+//		fr.loadFacilities();
+//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -99,6 +114,22 @@ public class MainActivity extends BaseActivity {
 					false);
 			return rootView;
 		}
+	}
+	
+	/**
+	 * Handle event indicating that the Facilities have been loaded successfully.
+	 * @param event
+	 */
+	@Subscribe public void requestSuccess(FacilitiesLoadedEvent event) {
+		FacilityList facilities = event.getFacilities();
+		
+		for (Facility facility: facilities) {
+			Log.i(TAG, facility.name);
+		}
+		
+		mAdapter.clear();
+		mAdapter.addAll(event.getFacilities());
+		mAdapter.notifyDataSetChanged();
 	}
 
 }

@@ -1,5 +1,6 @@
 package org.columbia.sel.facilitator.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public class Facility implements Parcelable {
     
     public Map<String, Object> properties;
     
+    public ArrayList<Double> coordinates;
     
     
     // Dummy constructor so that the Parcel constructor isn't used by default
