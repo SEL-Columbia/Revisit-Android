@@ -14,7 +14,9 @@ import com.squareup.otto.Subscribe;
 import dagger.ObjectGraph;
 import android.content.Context;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 
 @Singleton
@@ -32,7 +34,6 @@ public class FacilityRepository {
 	@Inject
 	public FacilityRepository() {
 		Log.i(TAG, "constructing...");
-//		bus.register(this);
 	}
 	
 	public void loadFacilities() {
@@ -41,11 +42,13 @@ public class FacilityRepository {
 			Log.i(TAG, "using lm");
 			
 			Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			
 			if (loc == null) {
 				loc = new Location(LocationManager.GPS_PROVIDER);
 				loc.setLatitude(41.0);
 				loc.setLongitude(-79.0);
+				Log.i(TAG, "-------- " + loc.toString());
+			} else {				
+				Log.i(TAG, "+++++++++ " + loc.toString());
 			}
 			
 			String url = "http://fac.wohllabs.com/api/test/facilities/geowithin";

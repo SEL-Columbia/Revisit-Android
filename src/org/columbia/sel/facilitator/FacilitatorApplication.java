@@ -3,6 +3,10 @@ package org.columbia.sel.facilitator;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.columbia.sel.facilitator.annotation.ForApplication;
+import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.di.DIModule;
 import org.columbia.sel.facilitator.model.*;
 import org.columbia.sel.facilitator.task.HttpRequestTask;
@@ -25,26 +29,14 @@ import dagger.ObjectGraph;
 
 public class FacilitatorApplication extends Application {
 	// TAG for logging
-	private final String TAG = this.getClass().getSimpleName();
-
-	// Application context for use in activities, if necessary
-	private static Context context;
+	private final String TAG = this.getClass().getCanonicalName();
 
 	// Dependency Injection Object Graph
 	private ObjectGraph graph;
-
-	// Collection of Facility POJOs, populated via HttpRequestTask
-	// (RestTemplate)
-	private FacilityList facilities;
-
-	// Location management
-	private Location currentLocation;
-	LocationManager locationManager;
-	LocationListener locationListener;
-
-	public static Context getAppContext() {
-		return FacilitatorApplication.context;
-	}
+	
+	@Inject LocationManager lm;
+	
+	@Inject @ForLogging String APP_TAG;
 
 	/**
 	 * Get a List of DI modules
@@ -70,19 +62,11 @@ public class FacilitatorApplication extends Application {
 		super.onCreate();
 		
 		graph = ObjectGraph.create(getModules().toArray());
-	}
-
-	public void onResume() {
-
+		
+		graph.inject(this);
 	}
 	
     public ObjectGraph getObjectGraph() {
         return graph;
     }
-	
-	public void setLocation(Location location) {
-		Log.i(TAG, "setting location");
-		Log.i(TAG, location.toString());
-		currentLocation = location;
-	}
 }

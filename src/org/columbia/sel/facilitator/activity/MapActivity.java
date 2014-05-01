@@ -1,6 +1,7 @@
 package org.columbia.sel.facilitator.activity;
 
 import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
@@ -11,7 +12,6 @@ import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
-
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -24,6 +24,7 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,11 +33,11 @@ import android.widget.Toast;
 
 public class MapActivity extends BaseActivity {
 	
-	@Inject Bus bus;
-	
 	@Inject FacilityRepository fr;
 	
 	@Inject LocationManager lm;
+	
+	private Location mMyLocation;
 	
 	private MapView mMapView;
 	private MapController mMapCon;
@@ -52,7 +53,8 @@ public class MapActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 		
-		bus.register(this);
+		Log.i(APP_TAG, "_+_+_+_+_+_+_+_+_+_+_ THE TAG");
+		
 		
 		mMapView = (MapView) this.findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
@@ -63,21 +65,38 @@ public class MapActivity extends BaseActivity {
 		
 		mResourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
 		
+		this.setupLocationListener();
+		
 		this.zoomToMyLocation();
 		
 		fr.loadFacilities();
 	}
 	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		bus.unregister(this);
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		bus.register(this);
+	private void setupLocationListener() {
+		Log.i(TAG, "setupLocationListener");
+		// Define a listener that responds to location updates
+		LocationListener locationListener = new LocationListener() {
+		    public void onLocationChanged(Location location) {
+		    	Log.i(TAG, "=============> LOCATION UPDATED: " + location.toString());
+		    	mMyLocation = location;
+		    	zoomToLocation(location);
+		    }
+
+		    public void onStatusChanged(String provider, int status, Bundle extras) {
+		    	Log.i(TAG, "=============> STATUS CHANGES: " + provider);
+		    }
+
+		    public void onProviderEnabled(String provider) {
+		    	Log.i(TAG, "=============> PROVIDER ENABLED: " + provider);
+		    }
+
+		    public void onProviderDisabled(String provider) {
+		    	Log.i(TAG, "=============> PROVIDER DISABLED: " + provider);
+		    }
+		  };
+
+		// Register the listener with the Location Manager to receive location updates
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 	}
 	
 	private void zoomToMyLocation() {
@@ -89,6 +108,16 @@ public class MapActivity extends BaseActivity {
 			loc = new Location(LocationManager.GPS_PROVIDER);
 			loc.setLatitude(41.0);
 			loc.setLongitude(-79.0);
+		}
+
+		this.zoomToLocation(loc);
+	}
+	
+	private void zoomToLocation(Location loc) {
+		Log.i(TAG, "zoomToLocation");
+		
+		if (loc == null) {
+			throw new RuntimeException("Location can not be null.");
 		}
 
 		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());

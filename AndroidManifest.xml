@@ -28,15 +28,19 @@
         <activity
             android:name="org.columbia.sel.facilitator.activity.FacilityListActivity"
             android:label="@string/title_activity_facility_list" >
-        </activity>
-        <activity
-            android:name="org.columbia.sel.facilitator.activity.MapActivity"
-            android:label="@string/title_activity_map" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="org.columbia.sel.facilitator.activity.MapActivity"
+            android:label="@string/title_activity_map" >
+        </activity>
+        <activity
+            android:name="org.columbia.sel.facilitator.activity.FacilityDetailActivity"
+            android:label="@string/title_facility_detail" >
         </activity>
     </application>
 

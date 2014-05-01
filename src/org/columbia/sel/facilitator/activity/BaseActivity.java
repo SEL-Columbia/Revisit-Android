@@ -3,6 +3,8 @@ package org.columbia.sel.facilitator.activity;
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.FacilitatorApplication;
+import org.columbia.sel.facilitator.annotation.ForApplication;
+import org.columbia.sel.facilitator.annotation.ForLogging;
 
 import com.squareup.otto.Bus;
 
@@ -23,6 +25,12 @@ public abstract class BaseActivity extends ActionBarActivity {
 	// TAG for logging
 	protected String TAG;
 	
+	// All activities should have access to the Event Bus
+	@Inject Bus bus;
+	
+	// All activities should have access to the APP_TAG for logging 
+	@Inject @ForLogging String APP_TAG;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,5 +41,19 @@ public abstract class BaseActivity extends ActionBarActivity {
 		// Perform injection so that when this call returns all dependencies
 		// will be available for use.
 		((FacilitatorApplication) getApplication()).inject(this);
+		
+		bus.register(this);
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		bus.unregister(this);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		bus.register(this);
 	}
 }
