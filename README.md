@@ -33,12 +33,15 @@ After some chugging, it should finish with a success. If an error occurs, fix th
 ### Debugging / Logging
 Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. org.columbia.sel.facilitators.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
 
+```
 $ adb logcat | grep --line-buffered ".*org.columbia.sel.facilitator.*"
+```
 
 I'd recommend using [pidcat](https://github.com/JakeWharton/pidcat) or [coloredlogcat](http://jsharkey.org/blog/2009/04/22/modifying-the-android-logcat-stream-for-full-color-debugging/) for a much nicer log viewing experience. For me, pidcat wasn't working consistently, so I used coloredlogcat (renamed logcatc) and added an alias in my .bash_profile for convenience:
 
+```
 alias logfac='adb logcat | grep --line-buffered ".*org.columbia.sel.facilitator*" | logcatc'
-
+```
 Additionally, an `APP_TAG` member is injected in all activities and the application itself with a value of FacilitatorApplication. You can log to this tag, and filter on it to view only these log entries.
 
 ## TODO
