@@ -23,8 +23,6 @@ import android.util.Log;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.android.gms.location.LocationClient;
-
 import dagger.ObjectGraph;
 
 public class FacilitatorApplication extends Application {
