@@ -4,10 +4,7 @@ Facilitator
 An android application that facilitates facility selection.
 
 ## Setup and Build
-This project is being developed in Eclipse (ADT), but using gradle for dependency management and builds. In order for this to work correctly, you'll need both maven and gradle installed locally. (Though we're not using maven directly, the Google Play and Android support repositories install to the local maven repo, which then gets picked up by gradle... as far as I understand.)
-
-### Install Maven
-Follow the directions here: http://maven.apache.org/download.cgi
+This project is being developed in Eclipse (ADT), but using gradle for dependency management and builds.
 
 ### Install Gradle
 Follow the directions here: http://www.gradle.org/installation
@@ -21,11 +18,9 @@ If you clean the project through ADT, you'll get tons of errors. This is because
 $ gradle copyDeps
 ```
 
-This is better, but Eclipse is probably still complaining about a few missing dependencies. We need to add the appsupport-v7 library project and google play library project. Follow the directions here: http://developer.android.com/tools/support-library/setup.html
+This is better, but Eclipse is probably still complaining about a few missing dependencies. We need to add the appsupport-v7 library project. Follow the directions here: http://developer.android.com/tools/support-library/setup.html
 
-*Tip: When importing these two libraries from the Extras directory, don't forget to check the "copy Projects into workspace" box. This seems to matter.*
-
-Once you've added these two libraries 
+*Tip: When importing this library from the Extras directory, don't forget to check the "copy Projects into workspace" box. This seems to matter.*
 
 ### Build and Deploy the Application
 We'll be building and deploying the application from the command line using gradle, NOT through eclipse (though it will likely still work through eclipse once we've used gradle to grab the dependencies). To build and deploy, plug in the development device (or enable to emulated device), and run:
