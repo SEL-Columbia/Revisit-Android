@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,8 +40,6 @@ import com.squareup.otto.Subscribe;
 public class FacilityListActivity extends BaseActivity {
 	
 	@Inject FacilityRepository fr;
-	
-	@Inject Bus bus;
 
 	// TAG for logging
 	private final String TAG = this.getClass().getCanonicalName();
@@ -52,11 +51,7 @@ public class FacilityListActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		Log.i(TAG, "onCreate");
-		
-		// register this class to receive events through the bus. 
-		bus.register(this);
 		
 		listView = new ListView(this);
 		mAdapter = new FacilityArrayAdapter(this, R.layout.facility_list_item);
@@ -65,10 +60,12 @@ public class FacilityListActivity extends BaseActivity {
 		OnItemClickListener myListViewClicked = new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Toast.makeText(FacilityListActivity.this, "Clicked at positon = " + position, Toast.LENGTH_SHORT).show();
+				Facility f = (Facility) parent.getAdapter().getItem(position);
+				Intent i = new Intent(FacilityListActivity.this, FacilityDetailActivity.class);
+				i.putExtra("facility", f);
+				startActivity(i);
 			}
 		};
-		
 		
 		listView.setOnItemClickListener(  myListViewClicked );
 		
