@@ -71,6 +71,6 @@ public class Facility implements Parcelable {
 		coordinates = new ArrayList<Double>();
 		in.readList(coordinates, null);
 		
-		properties = (HashMap) in.readSerializable();
+		properties = (HashMap<String, String>) in.readSerializable();
 	}
 }

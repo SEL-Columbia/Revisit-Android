@@ -5,23 +5,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.di.DIModule;
-import org.columbia.sel.facilitator.model.*;
-import org.columbia.sel.facilitator.task.HttpRequestTask;
 
 import android.app.Application;
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import dagger.ObjectGraph;
 

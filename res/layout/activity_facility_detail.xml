@@ -7,6 +7,7 @@
     <ImageView
         android:id="@+id/detail_image"
         android:layout_width="wrap_content"
+        android:scaleType="fitCenter"
         android:layout_height="120dp" />
 
     <TextView
@@ -14,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/detail_image"
-        android:text="Large Text"
+        android:text="Facility Name"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
@@ -22,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/detail_facility_name"
-        android:text="Medium Text"
+        android:text="Facility Sector"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     
     <TextView
@@ -30,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/detail_facility_sector"
-        android:text="Small Text"
+        android:text="Facility Type"
         android:textAppearance="?android:attr/textAppearanceSmall" />
     
     <TextView
@@ -38,7 +39,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/detail_facility_type"
-        android:text="Small Text"
+        android:text="Location (lat,lng)"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+    <TextView
+        android:id="@+id/detail_facility_checkins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detail_facility_location"
+        android:text="Checkins"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 

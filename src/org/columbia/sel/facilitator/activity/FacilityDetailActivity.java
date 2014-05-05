@@ -10,14 +10,18 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FacilityDetailActivity extends BaseActivity {
 	
 	// Use ButterKnife to inject views
+	@InjectView (R.id.detail_image) ImageView mFacilityImageView;
 	@InjectView (R.id.detail_facility_name) TextView mFacilityNameView;
 	@InjectView (R.id.detail_facility_sector) TextView mFacilitySectorView;
 	@InjectView (R.id.detail_facility_type) TextView mFacilityTypeView;
+	@InjectView (R.id.detail_facility_location) TextView mFacilityLocationView;
+	@InjectView (R.id.detail_facility_checkins) TextView mFacilityCheckinsView;
 
 	// Inject facility repo
 	@Inject FacilityRepository fr;
@@ -36,8 +40,11 @@ public class FacilityDetailActivity extends BaseActivity {
 	}
 
 	private void displayFacility(Facility facility) {
+		this.mFacilityImageView.setImageResource(R.drawable.facility);				
 		this.mFacilityNameView.setText(facility.name);
-		this.mFacilitySectorView.setText((String)facility.properties.get("type"));
-		this.mFacilityTypeView.setText((String)facility.properties.get("type"));
+		this.mFacilitySectorView.setText(facility.properties.get("type"));
+		this.mFacilityTypeView.setText(facility.properties.get("type"));
+		this.mFacilityLocationView.setText(facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
+		this.mFacilityCheckinsView.setText(facility.properties.get("checkins"));
 	}
 }

@@ -13,13 +13,19 @@ Follow the directions here: http://maven.apache.org/download.cgi
 Follow the directions here: http://www.gradle.org/installation
 
 ### Setup the Project in ADT
-Use the Android SDK Manager (in ADT, it's under the Window menu) to install Google Repository and Android Support Repository. Once these have been installed, clone this project to your computer and import it as an Android project into your ADT workspace.
+Use the Android SDK Manager (in ADT, it's under the Window menu) to install Google Repository and Android Support Repository. Once these have been installed, clone this project and import it as an Android project into your ADT workspace.
 
-If you clean the project through ADT, you'll get tons of errors. This is because we're using gradle to pull in dependencies, so from Eclipse's perspective they are all missing. The build.gradle file includes a task that will copy the dependencies into the libs directory, which will make Eclipse happy. Navigate to the project directory, and run the gradle task:
+If you clean the project through ADT, you'll get tons of errors. This is because we're using gradle to pull in dependencies, so from Eclipse's perspective they are all missing. The build.gradle file includes a task that will copy the dependencies into the libs directory, which will make Eclipse happier. Navigate to the project directory, and run the gradle task:
 
 ```
 $ gradle copyDeps
 ```
+
+This is better, but Eclipse is probably still complaining about a few missing dependencies. We need to add the appsupport-v7 library project and google play library project. Follow the directions here: http://developer.android.com/tools/support-library/setup.html
+
+*Tip: When importing these two libraries from the Extras directory, don't forget to check the "copy Projects into workspace" box. This seems to matter.*
+
+Once you've added these two libraries 
 
 ### Build and Deploy the Application
 We'll be building and deploying the application from the command line using gradle, NOT through eclipse (though it will likely still work through eclipse once we've used gradle to grab the dependencies). To build and deploy, plug in the development device (or enable to emulated device), and run:
