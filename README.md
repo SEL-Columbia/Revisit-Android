@@ -12,7 +12,7 @@ Follow the directions here: http://maven.apache.org/download.cgi
 ### Install Gradle
 Follow the directions here: http://www.gradle.org/installation
 
-## Setup the Project in ADT
+### Setup the Project in ADT
 Use the Android SDK Manager (in ADT, it's under the Window menu) to install Google Repository and Android Support Repository. Once these have been installed, clone this project to your computer and import it as an Android project into your ADT workspace.
 
 If you clean the project through ADT, you'll get tons of errors. This is because we're using gradle to pull in dependencies, so from Eclipse's perspective they are all missing. The build.gradle file includes a task that will copy the dependencies into the libs directory, which will make Eclipse happy. Navigate to the project directory, and run the gradle task:
@@ -21,7 +21,7 @@ If you clean the project through ADT, you'll get tons of errors. This is because
 $ gradle copyDeps
 ```
 
-## Build and Deploy the Application
+### Build and Deploy the Application
 We'll be building and deploying the application from the command line using gradle, NOT through eclipse (though it will likely still work through eclipse once we've used gradle to grab the dependencies). To build and deploy, plug in the development device (or enable to emulated device), and run:
 
 ```
@@ -30,7 +30,7 @@ $ gradle installDebug
 
 After some chugging, it should finish with a success. If an error occurs, fix the problem and try again.
 
-## Debugging / Logging
+### Debugging / Logging
 Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. org.columbia.sel.facilitators.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
 
 $ adb logcat | grep --line-buffered ".*org.columbia.sel.facilitator.*"
