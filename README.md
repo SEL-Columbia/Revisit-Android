@@ -23,13 +23,13 @@ This is better, but Eclipse is probably still complaining about a few missing de
 *Tip: When importing this library from the Extras directory, don't forget to check the "copy Projects into workspace" box. This seems to matter.*
 
 ### Build and Deploy the Application
-We'll be building and deploying the application from the command line using gradle, NOT through eclipse (though it will likely still work through eclipse once we've used gradle to grab the dependencies). To build and deploy, plug in the development device (or enable to emulated device), and run:
+We'll be building and deploying the application from the command line using gradle, NOT through eclipse (though it will likely still work through eclipse once we've used gradle to grab the dependencies). To build and deploy, plug in the development device (or enable an emulated device), and run:
 
 ```
 $ gradle installDebug
 ```
 
-After some chugging, it should finish with a success. If an error occurs, fix the problem and try again.
+After some chugging, it should finish with a success message. If an error occurs, fix the problem and try again.
 
 ### Debugging / Logging
 Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. org.columbia.sel.facilitators.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
