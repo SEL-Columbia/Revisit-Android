@@ -56,7 +56,7 @@ public class FacilityMapFragment extends BaseFragment {
 		ButterKnife.inject(this, view);
 		
 		// TODO Setup map
-		mMapView.setBuiltInZoomControls(true);
+//		mMapView.setBuiltInZoomControls(false);
 		mMapView.setMultiTouchControls(true);
 
 		mMapView.getController().setZoom(15);
