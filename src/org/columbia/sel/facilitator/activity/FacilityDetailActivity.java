@@ -12,6 +12,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ public class FacilityDetailActivity extends BaseActivity {
 	@InjectView (R.id.detail_image) ImageView mFacilityImageView;
 	@InjectView (R.id.detail_facility_name) TextView mFacilityNameView;
 	@InjectView (R.id.detail_facility_sector) TextView mFacilitySectorView;
+	@InjectView (R.id.facility_sector_icon) ImageView mFacilitySectorIconView;
 	@InjectView (R.id.detail_facility_type) TextView mFacilityTypeView;
 	@InjectView (R.id.detail_facility_location) TextView mFacilityLocationView;
 	@InjectView (R.id.detail_facility_checkins) TextView mFacilityCheckinsView;
@@ -48,9 +50,25 @@ public class FacilityDetailActivity extends BaseActivity {
 			.into(this.mFacilityImageView);
 		
 		this.mFacilityNameView.setText(facility.name);
-		this.mFacilitySectorView.setText(facility.properties.get("type"));
+		
+		String sector = facility.properties.get("sector");
+		
+		Log.i(TAG, "sector -----------> " + sector + " <-----------");
+		
+		if (sector.equals("health")) {
+			Log.i(TAG, " -----------> health! <-----------");
+			this.mFacilitySectorIconView.setImageResource(R.drawable.hospital);				
+		} else if (sector.equals("power")) {
+			Log.i(TAG, " -----------> power! <-----------");
+			this.mFacilitySectorIconView.setImageResource(R.drawable.power);
+		} else if (sector.equals("education")) {
+			Log.i(TAG, " -----------> education! <-----------");
+			this.mFacilitySectorIconView.setImageResource(R.drawable.education);
+		}
+		this.mFacilityImageView.invalidate();
 		this.mFacilityTypeView.setText(facility.properties.get("type"));
-		this.mFacilityLocationView.setText(facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
+		this.mFacilitySectorView.setText(facility.properties.get("sector").toUpperCase());
+		this.mFacilityLocationView.setText("Location: " + facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
 		this.mFacilityCheckinsView.setText("Checkins: " + facility.properties.get("checkins"));
 	}
 }

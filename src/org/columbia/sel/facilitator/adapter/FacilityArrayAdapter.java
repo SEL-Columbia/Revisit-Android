@@ -40,14 +40,14 @@ public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 		
 		Facility f = getItem(pos);
 		
-		String type = (String) f.properties.get("type");
+		String sector = (String) f.properties.get("sector");
 		
 		ImageView icon = (ImageView) itemView.findViewById(R.id.facility_type_icon);
-		if (type.equals("health")) {
+		if (sector.equals("health")) {
 			icon.setImageResource(R.drawable.hospital);				
-		} else if (type.equals("power")) {
+		} else if (sector.equals("power")) {
 			icon.setImageResource(R.drawable.power);
-		} else if (type.equals("education")) {
+		} else if (sector.equals("education")) {
 			icon.setImageResource(R.drawable.education);
 		}
 		
