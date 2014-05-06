@@ -6,6 +6,7 @@
     <string name="title_activity_facility_list">Facilities</string>
     <string name="title_activity_map">Facility Map</string>
     <string name="title_facility_detail">Facility Detail</string>
+    <string name="title_facility_map_list">Select a Facility</string>
     
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>

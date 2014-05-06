@@ -22,7 +22,7 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/facility_type_icon"
         android:gravity="center_vertical"
-        android:textSize="18sp" />
+        android:textSize="14sp" />
     
     <TextView
         android:id="@+id/facility_list_item_description"
@@ -33,7 +33,7 @@
         android:layout_below="@id/facility_list_item_title"
         android:ellipsize="marquee"
         android:singleLine="true"
-        android:textSize="12sp" />
+        android:textSize="10sp" />
 
     <!-- <TextView
         android:id="@+id/facility_list_created"

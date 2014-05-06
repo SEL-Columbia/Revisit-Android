@@ -60,7 +60,7 @@ public class FacilityRepository {
 			req.setUrl(url);
 			req.setLat(loc.getLatitude());
 			req.setLng(loc.getLongitude());
-			req.setRad(100.0);
+			req.setRad(0.5);
 			
 			req.execute();			
 		} else {

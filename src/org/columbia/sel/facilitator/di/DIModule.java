@@ -11,10 +11,13 @@ import org.columbia.sel.facilitator.FacilitatorApplication;
 import org.columbia.sel.facilitator.activity.BaseActivity;
 import org.columbia.sel.facilitator.activity.FacilityDetailActivity;
 import org.columbia.sel.facilitator.activity.FacilityListActivity;
+import org.columbia.sel.facilitator.activity.FacilityMapListActivity;
 import org.columbia.sel.facilitator.activity.MainActivity;
 import org.columbia.sel.facilitator.activity.MapActivity;
 import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.annotation.ForLogging;
+import org.columbia.sel.facilitator.fragment.BaseFragment;
+import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 import org.columbia.sel.facilitator.task.HttpRequestTask;
 
@@ -31,11 +34,20 @@ import static android.content.Context.LOCATION_SERVICE;
 	complete = false,
 	injects = {
 		FacilitatorApplication.class,
+		
+		// Activities
 		BaseActivity.class,
 		MainActivity.class,
 		FacilityListActivity.class,
 		MapActivity.class,
 		FacilityDetailActivity.class,
+		FacilityMapListActivity.class,
+		
+		// Fragments
+		BaseFragment.class,
+		FacilityMapFragment.class,
+		
+		// Other Components
 		HttpRequestTask.class,
 		FacilityRepository.class
 	}

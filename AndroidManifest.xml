@@ -28,11 +28,6 @@
         <activity
             android:name="org.columbia.sel.facilitator.activity.FacilityListActivity"
             android:label="@string/title_activity_facility_list" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="org.columbia.sel.facilitator.activity.MapActivity"
@@ -41,6 +36,14 @@
         <activity
             android:name="org.columbia.sel.facilitator.activity.FacilityDetailActivity"
             android:label="@string/title_facility_detail" >
+        </activity>
+        <activity
+            android:name="org.columbia.sel.facilitator.activity.FacilityMapListActivity"
+            android:label="@string/title_facility_map_list" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
