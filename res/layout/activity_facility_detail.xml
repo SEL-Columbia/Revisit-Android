@@ -56,7 +56,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/detail_image"
         android:text="@string/checkin_button" />
     	
 </RelativeLayout>

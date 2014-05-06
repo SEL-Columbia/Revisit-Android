@@ -63,6 +63,7 @@ dependencies {
 	compile 'com.squareup.retrofit:retrofit:1.5.0'
 	compile 'com.squareup.dagger:dagger-compiler:1.2.0'
 	compile 'com.squareup.dagger:dagger:1.2.0'
+	compile 'com.squareup.picasso:picasso:2.2.0'
 	
 	// osmdroid
 	compile "org.osmdroid:osmdroid-android:4.1"

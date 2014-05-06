@@ -6,6 +6,8 @@ import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 
+import com.squareup.picasso.Picasso;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import android.content.Intent;
@@ -40,11 +42,15 @@ public class FacilityDetailActivity extends BaseActivity {
 	}
 
 	private void displayFacility(Facility facility) {
-		this.mFacilityImageView.setImageResource(R.drawable.facility);				
+		// Picasso is a nifty library for downloading and caching images.
+		Picasso.with(this)
+			.load("http://sel.columbia.edu/wp-content/uploads/2013/05/sharedSolar.jpg")
+			.into(this.mFacilityImageView);
+		
 		this.mFacilityNameView.setText(facility.name);
 		this.mFacilitySectorView.setText(facility.properties.get("type"));
 		this.mFacilityTypeView.setText(facility.properties.get("type"));
 		this.mFacilityLocationView.setText(facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
-		this.mFacilityCheckinsView.setText(facility.properties.get("checkins"));
+		this.mFacilityCheckinsView.setText("Checkins: " + facility.properties.get("checkins"));
 	}
 }
