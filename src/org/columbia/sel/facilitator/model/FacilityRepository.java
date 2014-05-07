@@ -6,7 +6,9 @@ import javax.inject.Singleton;
 import org.columbia.sel.facilitator.FacilitatorApplication;
 import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
+import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.task.HttpRequestTask;
+import org.osmdroid.util.GeoPoint;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -37,11 +39,14 @@ public class FacilityRepository {
 	}
 	
 	public void loadFacilities() {
+		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		this.loadFacilities(loc);
+	}
+	
+	public void loadFacilities(Location loc) {
 		Log.i(TAG, "loading facilities...");
 		if (lm != null) {
 			Log.i(TAG, "using lm");
-			
-			Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			if (loc == null) {
 				loc = new Location(LocationManager.GPS_PROVIDER);
 				loc.setLatitude(41.0);
@@ -51,7 +56,7 @@ public class FacilityRepository {
 				Log.i(TAG, "+++++++++ " + loc.toString());
 			}
 			
-			String url = "http://fac.wohllabs.com/api/test/facilities/geowithin";
+			String url = "http://ec2-54-86-63-25.compute-1.amazonaws.com/api/test/facilities/geowithin";
 			
 			ObjectGraph og = app.getObjectGraph();
 			
@@ -72,8 +77,12 @@ public class FacilityRepository {
 		return mFacilities;
 	}
 	
-//	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
-//		Log.i(TAG, "Facilities Loaded!");
-//		mFacilities = event.getFacilities();
-//	}
+	@Subscribe public void handleMapChanged(MapChangedEvent event) {
+		Log.i(TAG, "Map Changed Location!");
+		GeoPoint gp = event.getBoundingBox().getCenter();
+		Location loc = new Location(LocationManager.GPS_PROVIDER);
+		loc.setLatitude(gp.getLatitude());
+		loc.setLongitude(gp.getLongitude());
+		this.loadFacilities(loc);
+	}
 }

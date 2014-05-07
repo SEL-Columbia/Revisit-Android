@@ -69,7 +69,7 @@ public class MapActivity extends BaseActivity {
 		
 		this.zoomToMyLocation();
 		
-		fr.loadFacilities();
+//		fr.loadFacilities();
 	}
 	
 	private void setupLocationListener() {

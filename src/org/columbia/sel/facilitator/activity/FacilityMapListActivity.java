@@ -75,7 +75,12 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		this.zoomToMyLocation();
 		
-		fr.loadFacilities();
+		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		fr.loadFacilities(loc);
+		
+		// TODO: This doesn't belong here Ñ figure out how to register the FR on its own. 
+		bus.register(fr);
 	}
 	
 	/**
@@ -88,7 +93,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		    public void onLocationChanged(Location location) {
 		    	Log.i(TAG, "=============> LOCATION UPDATED: " + location.toString());
 		    	mMyLocation = location;
-		    	mMapFragment.zoomToLocation(location);
+//		    	mMapFragment.zoomToLocation(location);
 		    }
 
 		    public void onStatusChanged(String provider, int status, Bundle extras) {

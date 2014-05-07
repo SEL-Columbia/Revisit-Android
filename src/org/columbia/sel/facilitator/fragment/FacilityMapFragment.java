@@ -6,9 +6,15 @@ import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.activity.MapActivity;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
+import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.events.DelayedMapListener;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
@@ -54,15 +60,13 @@ public class FacilityMapFragment extends BaseFragment {
 		
 		// Inflate the layout for this fragment
 		ButterKnife.inject(this, view);
-		
-		// TODO Setup map
-//		mMapView.setBuiltInZoomControls(false);
-		mMapView.setMultiTouchControls(true);
 
-		mMapView.getController().setZoom(15);
 		mMapCon = (MapController) mMapView.getController();
+		mMapView.getController().setZoom(15);
 		
 		mResourceProxy = new DefaultResourceProxyImpl(this.getActivity().getApplication());
+		
+		this.setupMapEvents();
 		
 		return view;
     }
@@ -76,6 +80,29 @@ public class FacilityMapFragment extends BaseFragment {
 
 		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
 		mMapCon.animateTo(point);
+	}
+	
+	public void setupMapEvents() {
+		// Enable touch controls
+		mMapView.setMultiTouchControls(true);
+		mMapView.setBuiltInZoomControls(true);
+		
+		// Set map event listeners
+		mMapView.setMapListener(new DelayedMapListener(new MapListener() {  
+		    public boolean onZoom(final ZoomEvent e) {
+		        //do something
+		    	BoundingBoxE6 bb = mMapView.getBoundingBox();
+		        bus.post(new MapChangedEvent(bb));
+		        return true;
+		    }
+
+		    public boolean onScroll(final ScrollEvent e) {
+		        Log.i(TAG, e.toString());
+		        BoundingBoxE6 bb = mMapView.getBoundingBox();
+		        bus.post(new MapChangedEvent(bb));
+		        return true;
+		    }
+		    }, 1000 ));
 	}
 	
 	public void addFacilitiesToMap(FacilityList facilities) {

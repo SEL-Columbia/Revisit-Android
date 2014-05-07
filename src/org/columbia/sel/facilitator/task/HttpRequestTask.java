@@ -40,6 +40,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, FacilityList> {
 	@Inject
 	public HttpRequestTask() {
 		super();
+		Log.i(TAG, "-=-=-=-=- HttpRequestTask() -=-=-=-=-");
 	}
 	
 	public HttpRequestTask(String url, Double lat, Double lng, Double rad) {
@@ -73,6 +74,8 @@ public class HttpRequestTask extends AsyncTask<Void, Void, FacilityList> {
 			final String url = this.url + "?lat="
 					+ this.lat + "&lng=" + this.lng + "&rad=" + this.rad;
 
+			Log.e(TAG, url);
+
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(
 					new MappingJackson2HttpMessageConverter());
@@ -91,7 +94,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, FacilityList> {
 	@Override
 	protected void onPostExecute(FacilityList facilities) {
 		Log.i(TAG, "" + facilities.size());
-		bus.post(new HttpRequestSuccessEvent(facilities.toString()));
+//		bus.post(new HttpRequestSuccessEvent(facilities.toString()));
 		bus.post(new FacilitiesLoadedEvent(facilities));
 	}
 
