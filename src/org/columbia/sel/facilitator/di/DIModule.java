@@ -19,7 +19,7 @@ import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.fragment.BaseFragment;
 import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import org.columbia.sel.facilitator.model.FacilityRepository;
-import org.columbia.sel.facilitator.task.HttpRequestTask;
+import org.columbia.sel.facilitator.task.FacilityRequestTask;
 
 import com.squareup.otto.Bus;
 
@@ -48,7 +48,7 @@ import static android.content.Context.LOCATION_SERVICE;
 		FacilityMapFragment.class,
 		
 		// Other Components
-		HttpRequestTask.class,
+		FacilityRequestTask.class,
 		FacilityRepository.class
 	}
 )

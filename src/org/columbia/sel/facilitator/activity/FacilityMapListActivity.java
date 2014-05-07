@@ -79,8 +79,8 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		fr.loadFacilities(loc);
 		
-		// TODO: This doesn't belong here Ñ figure out how to register the FR on its own. 
-		bus.register(fr);
+		// TODO: This doesn't belong here - figure out how to register the FR on its own. 
+//		bus.register(fr);
 	}
 	
 	/**
@@ -93,6 +93,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		    public void onLocationChanged(Location location) {
 		    	Log.i(TAG, "=============> LOCATION UPDATED: " + location.toString());
 		    	mMyLocation = location;
+		    	
 //		    	mMapFragment.zoomToLocation(location);
 		    }
 

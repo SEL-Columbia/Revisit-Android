@@ -7,7 +7,7 @@ import org.columbia.sel.facilitator.FacilitatorApplication;
 import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
-import org.columbia.sel.facilitator.task.HttpRequestTask;
+import org.columbia.sel.facilitator.task.FacilityRequestTask;
 import org.osmdroid.util.GeoPoint;
 
 import com.squareup.otto.Bus;
@@ -27,15 +27,21 @@ public class FacilityRepository {
 	
 	@Inject LocationManager lm;
 	
-	@Inject Bus bus;
-	
 	@Inject @ForApplication FacilitatorApplication app;
 	
 	private FacilityList mFacilities;
 	
+	/**
+	 * Injectable constructor. 
+	 * 
+	 * Note: Bus argument is injected upon construction via the DIModule's provideBus method.
+	 * @param bus
+	 */
 	@Inject
-	public FacilityRepository() {
+	public FacilityRepository(Bus bus) {
 		Log.i(TAG, "constructing...");
+		// TODO - where to unregister? The app onTerminate()?
+		bus.register(this);
 	}
 	
 	public void loadFacilities() {
@@ -56,11 +62,11 @@ public class FacilityRepository {
 				Log.i(TAG, "+++++++++ " + loc.toString());
 			}
 			
-			String url = "http://ec2-54-86-63-25.compute-1.amazonaws.com/api/test/facilities/geowithin";
+			String url = "http://23.21.86.131:3000/api/test/facilities/geowithin";
 			
 			ObjectGraph og = app.getObjectGraph();
 			
-			HttpRequestTask req = og.get(HttpRequestTask.class);
+			FacilityRequestTask req = og.get(FacilityRequestTask.class);
 			
 			req.setUrl(url);
 			req.setLat(loc.getLatitude());

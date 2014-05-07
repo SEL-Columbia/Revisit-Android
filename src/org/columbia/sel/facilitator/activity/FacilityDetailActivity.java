@@ -10,6 +10,7 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -70,5 +71,10 @@ public class FacilityDetailActivity extends BaseActivity {
 		this.mFacilitySectorView.setText(facility.properties.get("sector").toUpperCase());
 		this.mFacilityLocationView.setText("Location: " + facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
 		this.mFacilityCheckinsView.setText("Checkins: " + facility.properties.get("checkins"));
+	}
+	
+	@OnClick(R.id.finish_button)
+	public void submit() {
+		this.finish();
 	}
 }

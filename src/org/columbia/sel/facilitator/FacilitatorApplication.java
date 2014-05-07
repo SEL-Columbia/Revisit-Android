@@ -7,10 +7,11 @@ import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.di.DIModule;
+import org.columbia.sel.facilitator.model.FacilityRepository;
+
+import com.squareup.otto.Bus;
 
 import android.app.Application;
-import android.location.LocationManager;
-
 import dagger.ObjectGraph;
 
 public class FacilitatorApplication extends Application {
@@ -19,8 +20,6 @@ public class FacilitatorApplication extends Application {
 
 	// Dependency Injection Object Graph
 	private ObjectGraph graph;
-	
-	@Inject LocationManager lm;
 	
 	@Inject @ForLogging String APP_TAG;
 
@@ -33,7 +32,7 @@ public class FacilitatorApplication extends Application {
 	}
 
 	/**
-	 * Used to bootstrap classes that want to use DI graph? 
+	 * Inject an object into the object graph.
 	 * @param object
 	 */
 	public void inject(Object object) {
@@ -41,7 +40,7 @@ public class FacilitatorApplication extends Application {
 	}
 
 	/**
-	 * Application initialization
+	 * Application initialization. Creates the DI object graph.
 	 */
 	@Override
 	public void onCreate() {
@@ -52,6 +51,22 @@ public class FacilitatorApplication extends Application {
 		graph.inject(this);
 	}
 	
+	/**
+	 * Cleanup. At the moment, we need to unregister the FacilityRepository here
+	 * because it has no lifecycle methods of it's own.
+	 */
+	@Override
+	public void onTerminate() {
+		super.onTerminate();
+		FacilityRepository fr = graph.get(FacilityRepository.class);
+		Bus bus = graph.get(Bus.class);
+		bus.unregister(fr);
+	}
+	
+	/**
+	 * Retrieve the Dependency Injection object graph.
+	 * @return
+	 */
     public ObjectGraph getObjectGraph() {
         return graph;
     }

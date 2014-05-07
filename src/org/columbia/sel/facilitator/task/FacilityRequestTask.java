@@ -24,7 +24,7 @@ import android.util.Log;
  * 
  * @author jmw
  */
-public class HttpRequestTask extends AsyncTask<Void, Void, FacilityList> {
+public class FacilityRequestTask extends AsyncTask<Void, Void, FacilityList> {
 	private String TAG = this.getClass().getCanonicalName();
 	
 	@Inject Bus bus;
@@ -38,12 +38,12 @@ public class HttpRequestTask extends AsyncTask<Void, Void, FacilityList> {
 	private FacilitatorApplication app;
 
 	@Inject
-	public HttpRequestTask() {
+	public FacilityRequestTask() {
 		super();
 		Log.i(TAG, "-=-=-=-=- HttpRequestTask() -=-=-=-=-");
 	}
 	
-	public HttpRequestTask(String url, Double lat, Double lng, Double rad) {
+	public FacilityRequestTask(String url, Double lat, Double lng, Double rad) {
 		super();
 		
 		this.url = url;

@@ -71,6 +71,12 @@ public class FacilityMapFragment extends BaseFragment {
 		return view;
     }
 	
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		ButterKnife.reset(this);
+	}
+	
 	public void zoomToLocation(Location loc) {
 		Log.i(TAG, "zoomToLocation");
 		
