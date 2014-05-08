@@ -80,7 +80,7 @@ public class FacilityDetailActivity extends BaseActivity {
 		Intent i = new Intent();
 		i.putExtra("facilityName", facility.name);
 		i.putExtra("facilityType", facility.properties.get("type"));
-		i.putExtra("facilityLocation", facility.coordinates.get(0) + ", " + facility.coordinates.get(1));		
+		i.putExtra("facilityLocation", facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
 		this.setResult(RESULT_OK, i);
 		this.finish();
 	}

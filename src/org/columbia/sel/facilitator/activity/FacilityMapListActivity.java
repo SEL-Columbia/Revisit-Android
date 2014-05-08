@@ -30,6 +30,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -48,20 +51,32 @@ public class FacilityMapListActivity extends BaseActivity {
 	private ListFragment mListFragment;
 	private FacilityArrayAdapter mAdapter;
 	
+	private Boolean isLaunchedFromOdk = true;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map_list);
 		
+		// This is just to test the incoming data passed from ODK, leaving it here
+		// for reference.
 		Intent i = getIntent();
-		if (i != null) {
-			Bundle extras = i.getExtras();
-			Log.i(TAG, "bundle up -------> " + extras.get("facilityName"));
+		String action = i.getAction();
+		if (action == Intent.ACTION_MAIN) {
+			// launched directly, not from ODK
+			isLaunchedFromOdk = false;
+		} else if (action == "org.columbia.sel.facilitator.COLLECT") {
+			// launched from ODK Collect
+			// here we could inspect contents of Intent in case we want to 
+			// perform any kind of setup based on values from ODK
 		}
 		
+		// Grab a reference to the map fragment.
 		FragmentManager fragmentManager = getFragmentManager();
 		mMapFragment = (FacilityMapFragment) fragmentManager.findFragmentById(R.id.fragment_map);
 		
+		// Dynamically create a list fragment and setup onItemClick listener. 
+		// Could create a ListFragment subclass instead?
 		mListFragment = (ListFragment) fragmentManager.findFragmentById(R.id.fragment_list);
 		mAdapter = new FacilityArrayAdapter(this, R.layout.facility_list_item);
 		mListFragment.setListAdapter(mAdapter);
@@ -74,23 +89,42 @@ public class FacilityMapListActivity extends BaseActivity {
 				bus.post(new FacilitySelectedEvent(f));
 			}
 		};
-		
 		listView.setOnItemClickListener(  myListViewClicked );
 		
-		this.setupLocationListener();
 		
+		this.setupLocationListener();
 		this.zoomToMyLocation();
 		
 		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		
 		fr.loadFacilities(loc);
-		
-		// TODO: This doesn't belong here - figure out how to register the FR on its own. 
-//		bus.register(fr);
+	}
+	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    // Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.maplist_menu, menu);
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle presses on the action bar items
+	    switch (item.getItemId()) {
+	        case R.id.action_mylocation:
+	        	zoomToMyLocation();
+	            return true;
+	        case R.id.action_settings:
+//	            openSettings();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 	
 	/**
-	 * TODO: Move location listening to its own class, use application events to communicate changes
+	 * TODO: Move location listening to its own class, use event bus to communicate changes?
 	 */
 	private void setupLocationListener() {
 		Log.i(TAG, "setupLocationListener");
@@ -99,8 +133,6 @@ public class FacilityMapListActivity extends BaseActivity {
 		    public void onLocationChanged(Location location) {
 		    	Log.i(TAG, "=============> LOCATION UPDATED: " + location.toString());
 		    	mMyLocation = location;
-		    	
-//		    	mMapFragment.zoomToLocation(location);
 		    }
 
 		    public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -120,6 +152,10 @@ public class FacilityMapListActivity extends BaseActivity {
 		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 	}
 	
+	/**
+	 * Center the map on my last known location.
+	 * TODO: Remove the hard-coded defaults.
+	 */
 	private void zoomToMyLocation() {
 		Log.i(TAG, "zoomToMyLocation");
 		
@@ -134,6 +170,10 @@ public class FacilityMapListActivity extends BaseActivity {
 		mMapFragment.zoomToLocation(loc);
 	}
 	
+	/**
+	 * Handle FacilitiesLoadedEvent, fired when the facilities are ready for display.
+	 * @param event
+	 */
 	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
 		Log.i(TAG, "handleFacilitiesLoaded");
 		
@@ -144,6 +184,11 @@ public class FacilityMapListActivity extends BaseActivity {
 		mAdapter.notifyDataSetChanged();
 	}
 	
+	/**
+	 * Handle FacilitySelectedEvent, fired when the user selects a facility from the
+	 * list or map.
+	 * @param event
+	 */
 	@Subscribe public void handleFacilitySelected(FacilitySelectedEvent event) {
 		Log.i(TAG, "handleFacilitySelected");
 		Facility f = event.getFacility();
@@ -151,6 +196,8 @@ public class FacilityMapListActivity extends BaseActivity {
 		i.putExtra("facility", f);
 		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 		startActivity(i);
-		this.finish();
+		if (isLaunchedFromOdk) {
+			this.finish();			
+		}
 	}
 }

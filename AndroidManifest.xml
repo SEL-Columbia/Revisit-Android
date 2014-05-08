@@ -45,7 +45,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="ex:org.columbia.sel.facilitator.COLLECT" />
+                <action android:name="org.columbia.sel.facilitator.COLLECT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
