@@ -53,6 +53,12 @@ public class FacilityMapListActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map_list);
 		
+		Intent i = getIntent();
+		if (i != null) {
+			Bundle extras = i.getExtras();
+			Log.i(TAG, "bundle up -------> " + extras.get("facilityName"));
+		}
+		
 		FragmentManager fragmentManager = getFragmentManager();
 		mMapFragment = (FacilityMapFragment) fragmentManager.findFragmentById(R.id.fragment_map);
 		
@@ -121,8 +127,8 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		if (loc == null) {
 			loc = new Location(LocationManager.GPS_PROVIDER);
-			loc.setLatitude(41.0);
-			loc.setLongitude(-79.0);
+			loc.setLatitude(40.73614);
+			loc.setLongitude(-73.98354);
 		}
 
 		mMapFragment.zoomToLocation(loc);
@@ -143,6 +149,8 @@ public class FacilityMapListActivity extends BaseActivity {
 		Facility f = event.getFacility();
 		Intent i = new Intent(FacilityMapListActivity.this, FacilityDetailActivity.class);
 		i.putExtra("facility", f);
+		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 		startActivity(i);
+		this.finish();
 	}
 }

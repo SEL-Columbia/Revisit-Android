@@ -31,6 +31,8 @@ public class FacilityDetailActivity extends BaseActivity {
 	// Inject facility repo
 	@Inject FacilityRepository fr;
 	
+	Facility facility;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,7 +42,7 @@ public class FacilityDetailActivity extends BaseActivity {
 		ButterKnife.inject(this);
 		
 		Intent i = this.getIntent();
-		Facility facility = i.getParcelableExtra("facility");
+		facility = i.getParcelableExtra("facility");
 		this.displayFacility(facility);
 	}
 
@@ -75,6 +77,11 @@ public class FacilityDetailActivity extends BaseActivity {
 	
 	@OnClick(R.id.finish_button)
 	public void submit() {
+		Intent i = new Intent();
+		i.putExtra("facilityName", facility.name);
+		i.putExtra("facilityType", facility.properties.get("type"));
+		i.putExtra("facilityLocation", facility.coordinates.get(0) + ", " + facility.coordinates.get(1));		
+		this.setResult(RESULT_OK, i);
 		this.finish();
 	}
 }
