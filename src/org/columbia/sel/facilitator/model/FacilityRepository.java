@@ -83,12 +83,12 @@ public class FacilityRepository {
 		return mFacilities;
 	}
 	
-	@Subscribe public void handleMapChanged(MapChangedEvent event) {
-		Log.i(TAG, "Map Changed Location!");
-		GeoPoint gp = event.getBoundingBox().getCenter();
-		Location loc = new Location(LocationManager.GPS_PROVIDER);
-		loc.setLatitude(gp.getLatitude());
-		loc.setLongitude(gp.getLongitude());
-		this.loadFacilities(loc);
-	}
+//	@Subscribe public void handleMapChanged(MapChangedEvent event) {
+//		Log.i(TAG, "Map Changed Location!");
+//		GeoPoint gp = event.getBoundingBox().getCenter();
+//		Location loc = new Location(LocationManager.GPS_PROVIDER);
+//		loc.setLatitude(gp.getLatitude());
+//		loc.setLongitude(gp.getLongitude());
+//		this.loadFacilities(loc);
+//	}
 }

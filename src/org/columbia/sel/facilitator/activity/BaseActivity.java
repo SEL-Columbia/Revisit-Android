@@ -5,7 +5,9 @@ import javax.inject.Inject;
 import org.columbia.sel.facilitator.FacilitatorApplication;
 import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.annotation.ForLogging;
+import org.columbia.sel.facilitator.api.FacilityRetrofitSpiceService;
 
+import com.octo.android.robospice.SpiceManager;
 import com.squareup.otto.Bus;
 
 import android.os.Bundle;
@@ -33,6 +35,9 @@ public abstract class BaseActivity extends ActionBarActivity {
 	@Inject
 	@ForLogging
 	String APP_TAG;
+	
+	// TODO - move this to DI
+	private SpiceManager spiceManager = new SpiceManager(FacilityRetrofitSpiceService.class);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,18 @@ public abstract class BaseActivity extends ActionBarActivity {
 
 		bus.register(this);
 	}
+	
+	@Override
+    protected void onStart() {
+        spiceManager.start(this);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        spiceManager.shouldStop();
+        super.onStop();
+    }
 
 	@Override
 	protected void onPause() {
@@ -59,4 +76,8 @@ public abstract class BaseActivity extends ActionBarActivity {
 		super.onResume();
 		bus.register(this);
 	}
+	
+    protected SpiceManager getSpiceManager() {
+        return spiceManager;
+    }
 }

@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.adapter.FacilityArrayAdapter;
+import org.columbia.sel.facilitator.api.FacilityRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
 import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
@@ -20,6 +21,9 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.otto.Subscribe;
 
 import android.app.FragmentManager;
@@ -52,6 +56,14 @@ public class FacilityMapListActivity extends BaseActivity {
 	private FacilityArrayAdapter mAdapter;
 	
 	private Boolean isLaunchedFromOdk = true;
+	
+	private FacilityRetrofitSpiceRequest facilityRequest;
+	
+	@Override
+    protected void onStart() {
+        super.onStart();
+        getSpiceManager().execute(facilityRequest, "facilities", DurationInMillis.ONE_MINUTE, new ListContributorRequestListener());
+    }
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +108,10 @@ public class FacilityMapListActivity extends BaseActivity {
 		this.zoomToMyLocation();
 		
 		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		fr.loadFacilities(loc);
+		
+		facilityRequest = new FacilityRetrofitSpiceRequest(String.valueOf(loc.getLatitude()), String.valueOf(loc.getLongitude()), "10");
+		
+//		fr.loadFacilities(loc);
 	}
 	
 	
@@ -200,4 +215,24 @@ public class FacilityMapListActivity extends BaseActivity {
 			this.finish();			
 		}
 	}
+	
+	// ============================================================================================
+    // INNER CLASSES
+    // ============================================================================================
+
+    public final class ListContributorRequestListener implements RequestListener<FacilityList> {
+
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            Toast.makeText(FacilityMapListActivity.this, "failure", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onRequestSuccess(final FacilityList result) {
+            Toast.makeText(FacilityMapListActivity.this, "success", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "                   Facilities Loaded: " + result.size());
+            bus.post(new FacilitiesLoadedEvent(result));
+//            updateContributors(result);
+        }
+    }
 }

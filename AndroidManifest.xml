@@ -49,6 +49,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
+        
+        <service
+            android:name="org.columbia.sel.facilitator.api.FacilityRetrofitSpiceService"
+            android:exported="false" />
     </application>
 
 </manifest>
