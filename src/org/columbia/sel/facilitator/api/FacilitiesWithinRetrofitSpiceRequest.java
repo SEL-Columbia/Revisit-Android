@@ -10,23 +10,24 @@ import android.util.Log;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
-public class FacilityRetrofitSpiceRequest extends RetrofitSpiceRequest {
+public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest {
 	private String TAG = this.getClass().getCanonicalName();
 	
-	private String lat;
-    private String lng;
-    private String rad;
+	private String swlat;
+    private String swlng;
+    private String nelat;
+    private String nelng;
 
-    public FacilityRetrofitSpiceRequest(String lat, String lng, String rad) {
+    public FacilitiesWithinRetrofitSpiceRequest(String swlat, String swlng, String nelat, String nelng) {
         super(FacilityList.class, FacilitatorApi.class);
-        this.lat = lat;
-        this.lng = lng;
-        this.rad = rad;
+        this.swlat = swlat;
+        this.swlng = swlng;
+        this.nelat = nelat;
+        this.nelng = nelng;        
     }
 
     @Override
     public FacilityList loadDataFromNetwork() {
-        Log.i(TAG, "+++++++ Loading from Network +++++++");
-        return ((FacilitatorApi) getService()).facilitiesNear(lat, lng, rad);
+        return ((FacilitatorApi) getService()).facilitiesWithin(swlat, swlng, nelat, nelng);
     }
 }

@@ -6,20 +6,17 @@ import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.adapter.FacilityArrayAdapter;
-import org.columbia.sel.facilitator.api.FacilityRetrofitSpiceRequest;
+import org.columbia.sel.facilitator.api.FacilitiesNearRetrofitSpiceRequest;
+import org.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
+import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlay;
-import org.osmdroid.views.overlay.OverlayItem;
 
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -57,13 +54,8 @@ public class FacilityMapListActivity extends BaseActivity {
 	
 	private Boolean isLaunchedFromOdk = true;
 	
-	private FacilityRetrofitSpiceRequest facilityRequest;
-	
-	@Override
-    protected void onStart() {
-        super.onStart();
-        getSpiceManager().execute(facilityRequest, "facilities", DurationInMillis.ONE_MINUTE, new ListContributorRequestListener());
-    }
+	private FacilitiesNearRetrofitSpiceRequest facilitiesNearRequest;
+	private FacilitiesWithinRetrofitSpiceRequest facilitiesWithinRequest;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,10 +101,19 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		
-		facilityRequest = new FacilityRetrofitSpiceRequest(String.valueOf(loc.getLatitude()), String.valueOf(loc.getLongitude()), "10");
+		// TODO: Do we need to perform an initial call to fetch facilities or will the MapChangedEvent always fire?
+		
+//		facilitiesNearRequest = new FacilitiesNearRetrofitSpiceRequest(String.valueOf(loc.getLatitude()), String.valueOf(loc.getLongitude()), "10");
+//		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e));
 		
 //		fr.loadFacilities(loc);
 	}
+	
+	@Override
+    protected void onStart() {
+        super.onStart();
+//        getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
+    }
 	
 	
 	@Override
@@ -216,23 +217,39 @@ public class FacilityMapListActivity extends BaseActivity {
 		}
 	}
 	
+	/**
+	 * Handle MapChangedEvent, fired when the user zooms or scrolls (after 1s delay)
+	 * @param event
+	 */
+	@Subscribe public void handleMapChanged(MapChangedEvent event) {
+		Log.i(TAG, "handleMapChanged");
+		BoundingBoxE6 bb = event.getBoundingBox();
+		double n = (bb.getLatNorthE6() / 1E6);
+		double s = (bb.getLatSouthE6() / 1E6);
+		double e = (bb.getLonEastE6() / 1E6);
+		double w = (bb.getLonWestE6() / 1E6);
+		Log.i(TAG, n + ", " + w + ", " + s + ", " + e);
+		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e));
+		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
+	}
+	
+	
 	// ============================================================================================
     // INNER CLASSES
     // ============================================================================================
 
-    public final class ListContributorRequestListener implements RequestListener<FacilityList> {
+    public final class FacilitiesRequestListener implements RequestListener<FacilityList> {
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            Toast.makeText(FacilityMapListActivity.this, "failure", Toast.LENGTH_SHORT).show();
+        	Log.e(TAG, spiceException.toString());
+            Toast.makeText(FacilityMapListActivity.this, "Failed to load facilities.", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onRequestSuccess(final FacilityList result) {
-            Toast.makeText(FacilityMapListActivity.this, "success", Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "                   Facilities Loaded: " + result.size());
+            Log.i(TAG, "Facilities Loaded: " + result.size());
             bus.post(new FacilitiesLoadedEvent(result));
-//            updateContributors(result);
         }
     }
 }

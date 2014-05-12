@@ -31,6 +31,11 @@ $ gradle installDebug
 
 After some chugging, it should finish with a success message. If an error occurs, fix the problem and try again.
 
+## Application Notes
+
+### Coordinates
+*NOTE: At this time, facility coordinates are in the form `coordinates: [longitude, latitude]`.* This is because the data is being served from a simple node/mongo server, and geospatial indices in mongo expect coordinates in the order (longitude, latitude). In order not to confuse future developers, this sillyness will likely be abstracted out on the server.
+
 ### Debugging / Logging
 Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. org.columbia.sel.facilitators.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
 

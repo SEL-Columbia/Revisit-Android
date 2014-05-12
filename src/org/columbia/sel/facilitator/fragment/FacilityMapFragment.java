@@ -9,6 +9,7 @@ import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
+import org.columbia.sel.facilitator.resource.FacilityMarker;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
@@ -26,6 +27,10 @@ import com.squareup.otto.Subscribe;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,7 +49,7 @@ public class FacilityMapFragment extends BaseFragment {
 	@InjectView (R.id.facilities_map) MapView mMapView;
 	
 	private MapController mMapCon;
-	private ItemizedOverlay<OverlayItem> mMyLocationOverlay;
+	private ItemizedOverlay<OverlayItem> mFacilitiesOverlay;
 	private DefaultResourceProxyImpl mResourceProxy;
 	
 	@Override
@@ -108,7 +113,11 @@ public class FacilityMapFragment extends BaseFragment {
 		        bus.post(new MapChangedEvent(bb));
 		        return true;
 		    }
-		    }, 1000 ));
+		    }, 250 ));
+	}
+	
+	public void clearFacilitiesFromMap() {
+		this.mMapView.getOverlays().remove(this.mFacilitiesOverlay);
 	}
 	
 	public void addFacilitiesToMap(FacilityList facilities) {
@@ -117,17 +126,22 @@ public class FacilityMapFragment extends BaseFragment {
 		// List of markers
 		ArrayList<OverlayItem> markers = new ArrayList<OverlayItem>();
 		
-		// Create a marker for each facilitiy
-		for (Facility facility: facilities) {
-			Log.i(TAG, facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
-			GeoPoint point = new GeoPoint(facility.coordinates.get(0), facility.coordinates.get(1));
-
-			// Casting to OverlayItem, we'll need to cast back in the event handlers.
-			markers.add((OverlayItem) new FacilityOverlayItem(facility, point));
+		// Create a marker for each facility
+		int arraySize = facilities.size();
+		for (int i = 0; i < arraySize; i ++) {
+			Facility facility = facilities.get(i);
+			Log.i(TAG, facility.coordinates.get(1) + ", " + facility.coordinates.get(0));
+			GeoPoint point = new GeoPoint(facility.coordinates.get(1), facility.coordinates.get(0));
+			FacilityOverlayItem item = new FacilityOverlayItem(facility, point, i);
+//			Drawable newMarker = this.getResources().getDrawable(R.drawable.ic_action_place);
+			Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_place);
+			FacilityMarker bmd = new FacilityMarker(getResources(), bm, String.valueOf(i));
+			item.setMarker(bmd);
+			markers.add(item);
 		}
 		
 		/* OnTapListener for the Markers, shows a simple Toast. */
-        this.mMyLocationOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
+        this.mFacilitiesOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     
         			@Override
@@ -157,12 +171,13 @@ public class FacilityMapFragment extends BaseFragment {
                 }, mResourceProxy);
         
         // Add the overlays to the map
-        this.mMapView.getOverlays().add(this.mMyLocationOverlay);
+        this.mMapView.getOverlays().add(this.mFacilitiesOverlay);
         this.mMapView.invalidate();
 	}
 	
 	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
 		Log.i(TAG, "handleFacilitiesLoaded");
-		addFacilitiesToMap(event.getFacilities());
+		this.clearFacilitiesFromMap();
+		this.addFacilitiesToMap(event.getFacilities());
 	}
 }
