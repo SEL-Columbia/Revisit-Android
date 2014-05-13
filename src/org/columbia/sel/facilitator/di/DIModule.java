@@ -8,6 +8,7 @@ import dagger.Provides;
 import javax.inject.Singleton;
 
 import org.columbia.sel.facilitator.FacilitatorApplication;
+import org.columbia.sel.facilitator.activity.AddFacilityActivity;
 import org.columbia.sel.facilitator.activity.BaseActivity;
 import org.columbia.sel.facilitator.activity.FacilityDetailActivity;
 import org.columbia.sel.facilitator.activity.FacilityListActivity;
@@ -42,6 +43,7 @@ import static android.content.Context.LOCATION_SERVICE;
 		MapActivity.class,
 		FacilityDetailActivity.class,
 		FacilityMapListActivity.class,
+		AddFacilityActivity.class,
 		
 		// Fragments
 		BaseFragment.class,

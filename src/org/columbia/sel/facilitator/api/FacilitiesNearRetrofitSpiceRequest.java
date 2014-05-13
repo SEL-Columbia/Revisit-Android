@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
-public class FacilitiesNearRetrofitSpiceRequest extends RetrofitSpiceRequest {
+public class FacilitiesNearRetrofitSpiceRequest extends RetrofitSpiceRequest<FacilityList, FacilitatorApi> {
 	private String TAG = this.getClass().getCanonicalName();
 	
 	private String lat;

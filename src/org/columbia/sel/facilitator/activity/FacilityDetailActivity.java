@@ -58,13 +58,11 @@ public class FacilityDetailActivity extends BaseActivity {
 
 				@Override
 				public void onError() {
-					// TODO Auto-generated method stub
-					
+					Log.e(TAG, "error loading image");
 				}
 
 				@Override
 				public void onSuccess() {
-					// TODO Auto-generated method stub
 					mFacilityImageProgressView.setVisibility(View.INVISIBLE);
 					mFacilityImageView.setVisibility(View.VISIBLE);
 				}

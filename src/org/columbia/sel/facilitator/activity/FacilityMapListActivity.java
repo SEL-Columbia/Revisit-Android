@@ -196,6 +196,16 @@ public class FacilityMapListActivity extends BaseActivity {
 	}
 	
 	/**
+	 * Click handler for "Add New Facility" Button
+	 * @param view
+	 */
+	public void onAddNewFacility(View view) {
+		Log.i(TAG, "Begin add new Facility...");
+		Intent i = new Intent(FacilityMapListActivity.this, AddFacilityActivity.class);
+		startActivity(i);
+	}
+	
+	/**
 	 * Handle FacilitiesLoadedEvent, fired when the facilities are ready for display.
 	 * @param event
 	 */

@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
-public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest {
+public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest<FacilityList, FacilitatorApi> {
 	private String TAG = this.getClass().getCanonicalName();
 	
 	private String swlat;
@@ -23,7 +23,7 @@ public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest {
         this.swlat = swlat;
         this.swlng = swlng;
         this.nelat = nelat;
-        this.nelng = nelng;        
+        this.nelng = nelng;
     }
 
     @Override

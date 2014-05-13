@@ -38,3 +38,4 @@ proguard/
 
 # OSX
 .DS_Store
+/.apt_generated

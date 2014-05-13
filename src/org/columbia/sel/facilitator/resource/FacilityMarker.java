@@ -47,9 +47,10 @@ public class FacilityMarker extends Drawable {
 	}
 	
 	/**
-	 * This is where the magic happens.
+	 * This is where the icon magic happens.
+	 * 
 	 * TODO: Probably doesn't make much difference as long as we're not drawing many facilities,
-	 * but it would probably be a bit better to move calculations out of here so they aren't 
+	 * but it would be a bit better to move static calculations out of here so they aren't 
 	 * being done on every draw.
 	 */
 	@Override
@@ -77,7 +78,6 @@ public class FacilityMarker extends Drawable {
 
 	@Override
 	public int getOpacity() {
-		// TODO Auto-generated method stub
 		return PixelFormat.TRANSLUCENT;
 	}
 
@@ -89,7 +89,6 @@ public class FacilityMarker extends Drawable {
 	@Override
 	public void setColorFilter(ColorFilter arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

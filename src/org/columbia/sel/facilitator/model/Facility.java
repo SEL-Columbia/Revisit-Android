@@ -39,7 +39,13 @@ public class Facility implements Parcelable {
     public ArrayList<Double> coordinates;
     
     // Dummy constructor so that the Parcel constructor isn't used by default
-    private Facility() {
+    public Facility() {
+    }
+    
+    public Facility(String name, HashMap<String, String> properties, ArrayList<Double> coordinates) {
+    	this.name = name;
+    	this.properties = properties;
+    	this.coordinates = coordinates;
     }
     
     public int describeContents() {

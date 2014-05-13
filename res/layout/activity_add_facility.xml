@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <fragment
+        android:id="@+id/fragment_map"
+        android:name="org.columbia.sel.facilitator.fragment.FacilityMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/add_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/add_facility_title"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/add_title"
+            android:layout_marginBottom="10dp"
+            android:hint="@string/add_facility_name"
+            android:inputType="textCapWords"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/name"
+            android:layout_marginBottom="10dp"
+            android:hint="@string/add_facility_type"
+            android:inputType="text"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout 
+            android:id="@+id/location_wrap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/type"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/location"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/add_facility_location"
+                android:inputType="text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <ImageButton
+                android:id="@+id/get_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Use current location"
+                android:src="@drawable/ic_action_location_found"
+                android:onClick="onPopulateLocationClick" />
+            
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/location_wrap"
+            android:background="@android:drawable/btn_default"
+            android:onClick="onAddNewFacility"
+            android:text="@string/add_button_text" />
+    </RelativeLayout>
+
+</LinearLayout>

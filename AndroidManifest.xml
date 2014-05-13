@@ -49,6 +49,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="org.columbia.sel.facilitator.activity.AddFacilityActivity"
+            android:label="@string/title_add_facility"
+            android:windowSoftInputMode="stateHidden|adjustPan" >
+        </activity>
         
         
         <service
