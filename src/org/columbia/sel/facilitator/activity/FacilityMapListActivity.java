@@ -149,7 +149,7 @@ public class FacilityMapListActivity extends BaseActivity {
 	}
 	
 	/**
-	 * TODO: Move location listening to its own class, use event bus to communicate changes?
+	 * TODO: Consider moving location listening to its own class, use event bus to communicate changes.
 	 */
 	private void setupLocationListener() {
 		Log.i(TAG, "setupLocationListener");
@@ -174,7 +174,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		  };
 
 		// Register the listener with the Location Manager to receive location updates
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
 	}
 	
 	/**
@@ -206,8 +206,8 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		FacilityList facilities = event.getFacilities();
 		
-		// if no facilities were found, notify user
 		if (facilities.size() == 0) {
+			// no facilities were found, notify user
 			if (noFacilitiesToast == null) {
 				noFacilitiesToast = Toast.makeText(this, "No facilites found in this location.", Toast.LENGTH_LONG);
 			}
@@ -243,7 +243,10 @@ public class FacilityMapListActivity extends BaseActivity {
 	}
 	
 	/**
-	 * Handle MapChangedEvent, fired when the user zooms or scrolls (after 1s delay)
+	 * Handle MapChangedEvent, fired when the user zooms or scrolls (after defined delay).
+	 * 
+	 * When the map is changed, request facilities within the new map bounds.
+	 * 
 	 * @param event
 	 */
 	@Subscribe public void handleMapChanged(MapChangedEvent event) {

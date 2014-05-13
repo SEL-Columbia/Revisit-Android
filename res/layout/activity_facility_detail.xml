@@ -24,6 +24,7 @@
             android:layout_height="120dp"
             android:scaleType="fitCenter"
             android:visibility="invisible" />
+        
     </RelativeLayout>
 
     <TextView
