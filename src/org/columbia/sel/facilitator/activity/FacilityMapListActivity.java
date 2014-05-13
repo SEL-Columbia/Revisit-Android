@@ -23,6 +23,7 @@ import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.otto.Subscribe;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
@@ -56,6 +57,7 @@ public class FacilityMapListActivity extends BaseActivity {
 	private Boolean isLaunchedFromOdk = true;
 	
 	private ProgressDialog progressDialog;
+	private Toast noFacilitiesToast;
 	
 	private FacilitiesNearRetrofitSpiceRequest facilitiesNearRequest;
 	private FacilitiesWithinRetrofitSpiceRequest facilitiesWithinRequest;
@@ -97,7 +99,6 @@ public class FacilityMapListActivity extends BaseActivity {
 			}
 		};
 		listView.setOnItemClickListener(  myListViewClicked );
-		
 		
 		this.setupLocationListener();
 		this.zoomToMyLocation();
@@ -205,6 +206,20 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		FacilityList facilities = event.getFacilities();
 		
+		// if no facilities were found, notify user
+		if (facilities.size() == 0) {
+			if (noFacilitiesToast == null) {
+				noFacilitiesToast = Toast.makeText(this, "No facilites found in this location.", Toast.LENGTH_LONG);
+			}
+			noFacilitiesToast.show();
+		} else {
+			// facilities found, hide the toast if it's visible.
+			if (noFacilitiesToast != null) {
+				noFacilitiesToast.cancel();
+			}
+		}
+		
+		// this reloads the facility list via the FacilityArrayAdaptor
 		mAdapter.clear();
 		mAdapter.addAll(event.getFacilities());
 		mAdapter.notifyDataSetChanged();
