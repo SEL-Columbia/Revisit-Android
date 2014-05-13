@@ -6,6 +6,7 @@ import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import butterknife.ButterKnife;
@@ -14,12 +15,15 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class FacilityDetailActivity extends BaseActivity {
 	
 	// Use ButterKnife to inject views
+	@InjectView (R.id.detail_image_progress) ProgressBar mFacilityImageProgressView;
 	@InjectView (R.id.detail_image) ImageView mFacilityImageView;
 	@InjectView (R.id.detail_facility_name) TextView mFacilityNameView;
 	@InjectView (R.id.detail_facility_sector) TextView mFacilitySectorView;
@@ -50,7 +54,22 @@ public class FacilityDetailActivity extends BaseActivity {
 		// Picasso is a nifty library for downloading and caching images.
 		Picasso.with(this)
 			.load("http://sel.columbia.edu/wp-content/uploads/2013/05/sharedSolar.jpg")
-			.into(this.mFacilityImageView);
+			.into(this.mFacilityImageView, new Callback() {
+
+				@Override
+				public void onError() {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess() {
+					// TODO Auto-generated method stub
+					mFacilityImageProgressView.setVisibility(View.INVISIBLE);
+					mFacilityImageView.setVisibility(View.VISIBLE);
+				}
+				
+			});
 		
 		this.mFacilityNameView.setText(facility.name);
 		

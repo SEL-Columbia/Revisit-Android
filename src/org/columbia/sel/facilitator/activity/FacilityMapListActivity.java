@@ -25,6 +25,7 @@ import com.squareup.otto.Subscribe;
 
 import android.app.FragmentManager;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -53,6 +54,8 @@ public class FacilityMapListActivity extends BaseActivity {
 	private FacilityArrayAdapter mAdapter;
 	
 	private Boolean isLaunchedFromOdk = true;
+	
+	private ProgressDialog progressDialog;
 	
 	private FacilitiesNearRetrofitSpiceRequest facilitiesNearRequest;
 	private FacilitiesWithinRetrofitSpiceRequest facilitiesWithinRequest;
@@ -100,6 +103,11 @@ public class FacilityMapListActivity extends BaseActivity {
 		this.zoomToMyLocation();
 		
 		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		progressDialog = new ProgressDialog(this);
+		progressDialog.setTitle("Loading");
+		progressDialog.setMessage("Finding nearby facilities...");
+		progressDialog.show();
 		
 		// TODO: Do we need to perform an initial call to fetch facilities or will the MapChangedEvent always fire?
 		
@@ -192,6 +200,8 @@ public class FacilityMapListActivity extends BaseActivity {
 	 */
 	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
 		Log.i(TAG, "handleFacilitiesLoaded");
+		
+		progressDialog.dismiss();
 		
 		FacilityList facilities = event.getFacilities();
 		
