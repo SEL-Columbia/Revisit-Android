@@ -22,6 +22,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.OverlayItem.HotspotPlace;
 
 import com.squareup.otto.Subscribe;
 
@@ -133,10 +134,13 @@ public class FacilityMapFragment extends BaseFragment {
 			Log.i(TAG, facility.coordinates.get(1) + ", " + facility.coordinates.get(0));
 			GeoPoint point = new GeoPoint(facility.coordinates.get(1), facility.coordinates.get(0));
 			FacilityOverlayItem item = new FacilityOverlayItem(facility, point, i);
-//			Drawable newMarker = this.getResources().getDrawable(R.drawable.ic_action_place);
-			Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_place);
-			FacilityMarker bmd = new FacilityMarker(getResources(), bm, String.valueOf(i));
+			// If we want to use a bitmap marker from the resources...
+			// Drawable newMarker = this.getResources().getDrawable(R.drawable.ic_action_place);
+			
+			// Instead we dynamically draw the marker with a Drawable subclass
+			BitmapDrawable bmd = FacilityMarker.createFacilityMarker(getResources(), String.valueOf(i+1));
 			item.setMarker(bmd);
+			item.setMarkerHotspot(HotspotPlace.CENTER);
 			markers.add(item);
 		}
 		
@@ -162,9 +166,7 @@ public class FacilityMapFragment extends BaseFragment {
                     @Override
                     public boolean onItemLongPress(final int index,
                             final OverlayItem item) {
-//                        Toast.makeText(
-//                        		MapActivity.this, 
-//                                item.getSnippet() ,Toast.LENGTH_SHORT).show();
+                    	// Currently not doing anything with long press...
                         return false;
                     }
                     

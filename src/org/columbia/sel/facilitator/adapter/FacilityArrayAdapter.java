@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Example of custom adaptor - will need to look at how best to do this.
+ * FacilityArrayAdapter is used to populate the ListView of Facilities.
  * @author jmw
  *
  */
@@ -31,6 +31,10 @@ public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 		super(context, viewId);
 	}
 	
+	/**
+	 * Here is where we populate each and return each row in the list's view.
+	 * @return View  
+	 */
 	@Override
 	public View getView(int pos, View itemView, ViewGroup parent) {
 		if (itemView == null) {
@@ -51,17 +55,14 @@ public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 			icon.setImageResource(R.drawable.education);
 		}
 		
+		TextView index = (TextView) itemView.findViewById(R.id.facility_list_item_index);
+		index.setText(String.valueOf(pos+1));
+		
 		TextView title = (TextView) itemView.findViewById(R.id.facility_list_item_title);
 		title.setText(f.name);
 		
 		TextView desc = (TextView) itemView.findViewById(R.id.facility_list_item_description);
 		desc.setText("checkins: " + f.properties.get("checkins"));
-		
-//		TextView created = (TextView) itemView.findViewById(R.id.facility_list_created);
-//		created.setText("Facility added: " + f.createdAt.toString());
-		
-//		Log.i(TAG, f.properties.get("type")+"");
-//		Log.i(TAG, f.name);
 		
 		return itemView;
 		

@@ -4,12 +4,23 @@
     android:layout_height="wrap_content"
     android:padding="6dip" >
     
-    <ImageView
-        android:id="@+id/facility_type_icon"
-        android:layout_width="40dip"
+    <TextView
+        android:id="@+id/facility_list_item_index"
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_centerVertical="true"
-        android:layout_marginRight="6dip"
+        android:gravity="center_vertical"
+        android:textSize="14sp"
+        android:padding="10dip"
+        android:textAlignment="center" />
+    
+    <ImageView
+        android:id="@+id/facility_type_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dip"
+        android:layout_toRightOf="@id/facility_list_item_index"
         android:contentDescription="@string/facility_icon_desc"
         android:src="@drawable/ic_launcher" />
 
