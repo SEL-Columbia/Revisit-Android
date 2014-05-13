@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
@@ -19,8 +20,10 @@ public class FacilityMarker extends Drawable {
 	private Paint mBackgroundPaint;
 	private Paint mTextPaint;
 	private String text;
-	private static int width = 20;
-	private static int height = 20;
+	private static int width = 30;
+	private static int height = 30;
+	private static int radius = 10;
+	private static float textHeight = 12; 
 	
 	public FacilityMarker(Resources resources, String text) {
 		this.mBackgroundPaint = new Paint();
@@ -45,36 +48,37 @@ public class FacilityMarker extends Drawable {
 	
 	/**
 	 * This is where the magic happens.
+	 * TODO: Probably doesn't make much difference as long as we're not drawing many facilities,
+	 * but it would probably be a bit better to move calculations out of here so they aren't 
+	 * being done on every draw.
 	 */
 	@Override
 	public void draw(Canvas canvas) {
 		Log.i(TAG, "\\\\\\\\\\\\\\\\\\     DRAWING     ///////////////////");
-		mBackgroundPaint.setARGB(230, 18, 74, 255);
+		mBackgroundPaint.setARGB(200, 18, 74, 255);
 		mBackgroundPaint.setStrokeWidth(2);
 		mBackgroundPaint.setStyle(Style.FILL);
-//		mBackgroundPaint.setFilterBitmap(true);
 		mBackgroundPaint.setAntiAlias(true);
-//		mBackgroundPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+		mBackgroundPaint.setShadowLayer(5.0f, 0.0f, 0.0f, Color.BLACK);
+		
 		mTextPaint.setARGB(255, 255, 255, 255);
-//		mTextPaint.setStrokeWidth(3);
 		mTextPaint.setTextAlign(Align.CENTER);
 		mTextPaint.setAntiAlias(true);
 		mTextPaint.setFakeBoldText(true);
 		
-		float textHeight = (float) FacilityMarker.width/2;
 		mTextPaint.setTextSize(textHeight);
 		
 		float markerCenterX = FacilityMarker.width/2;
 		float markerCenterY = FacilityMarker.height/2;
 		
-		canvas.drawCircle(markerCenterX, markerCenterY, markerCenterX, mBackgroundPaint);
-		canvas.drawText(text, markerCenterX, markerCenterY+textHeight/2, mTextPaint);
+		canvas.drawCircle(markerCenterX, markerCenterY, FacilityMarker.radius, mBackgroundPaint);
+		canvas.drawText(text, markerCenterX, markerCenterY+textHeight/2-2, mTextPaint);
 	}
 
 	@Override
 	public int getOpacity() {
 		// TODO Auto-generated method stub
-		return PixelFormat.OPAQUE;
+		return PixelFormat.TRANSLUCENT;
 	}
 
 	@Override
