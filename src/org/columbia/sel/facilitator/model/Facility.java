@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({ "_id", "name", "uuid", "active", "coordinates", "__v",
+@JsonPropertyOrder({ "_id", "name", "uuid", "active", "coordinates",
 		"properties", "updatedAt", "createdAt" })
 public class Facility implements Parcelable {
 
@@ -36,7 +36,7 @@ public class Facility implements Parcelable {
 	@JsonProperty("uuid")
 	private String uuid = "-1";
 	@JsonProperty("active")
-	private Boolean active;
+	private Boolean active = false;
 	@JsonProperty("coordinates")
 	private List<Double> coordinates = new ArrayList<Double>();
 	@JsonProperty("properties")
@@ -159,10 +159,15 @@ public class Facility implements Parcelable {
 
 	public void writeToParcel(Parcel out, int flags) {
 		// out.writeInt();
+		Properties props = this.getProperties();
+		out.writeString(_id);
+		out.writeString(uuid);
 		out.writeString(name);
+		out.writeByte((byte) (active ? 1 : 0));
+		out.writeString(props.getType());
+		out.writeString(props.getSector());
+		out.writeInt(props.getCheckins());
 		out.writeList(coordinates);
-		// out.writeSerializable(properties);
-		// out.writeMap(properties);
 	}
 
 	public static final Parcelable.Creator<Facility> CREATOR = new Parcelable.Creator<Facility>() {
@@ -177,12 +182,24 @@ public class Facility implements Parcelable {
 
 	private Facility(Parcel in) {
 		// Log.i(TAG, in.toString());
+//		Properties props = this.getProperties();
+//		out.writeString(_id);
+//		out.writeString(uuid);
+//		out.writeString(name);
+//		out.writeByte((byte) (active ? 1 : 0));
+//		out.writeString(props.getType());
+//		out.writeString(props.getSector());
+//		out.writeInt(props.getCheckins());
+//		out.writeList(coordinates);
+		
+		_id = in.readString();
+		uuid = in.readString();
 		name = in.readString();
-
-		coordinates = new ArrayList<Double>();
+		active = in.readByte() != 0;
+		this.properties.setType(in.readString());
+		this.properties.setSector(in.readString());
+		this.properties.setCheckins(in.readInt());
 		in.readList(coordinates, null);
-
-		// properties = (HashMap<String, String>) in.readSerializable();
 	}
 
 }
