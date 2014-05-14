@@ -17,7 +17,10 @@ import org.columbia.sel.facilitator.activity.MainActivity;
 import org.columbia.sel.facilitator.activity.MapActivity;
 import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.annotation.ForLogging;
+import org.columbia.sel.facilitator.fragment.AddFacilityItemizedIconOverlay;
+import org.columbia.sel.facilitator.fragment.AddFacilityMapFragment;
 import org.columbia.sel.facilitator.fragment.BaseFragment;
+import org.columbia.sel.facilitator.fragment.BaseMapFragment;
 import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 import org.columbia.sel.facilitator.task.FacilityRequestTask;
@@ -47,11 +50,14 @@ import static android.content.Context.LOCATION_SERVICE;
 		
 		// Fragments
 		BaseFragment.class,
+		BaseMapFragment.class,
 		FacilityMapFragment.class,
+		AddFacilityMapFragment.class,
 		
 		// Other Components
 		FacilityRequestTask.class,
-		FacilityRepository.class
+		FacilityRepository.class,
+		AddFacilityItemizedIconOverlay.class
 	}
 )
 public class DIModule {

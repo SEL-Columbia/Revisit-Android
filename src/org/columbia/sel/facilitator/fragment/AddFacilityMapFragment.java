@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.activity.MapActivity;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
+import org.columbia.sel.facilitator.event.FacilityPlacedEvent;
 import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.model.Facility;
@@ -19,8 +20,10 @@ import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.OverlayItem.HotspotPlace;
 
@@ -30,75 +33,98 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 /**
  * A fragment for displaying the OSM Map with Facilities.
+ * 
  * @author jmw
- *
+ * 
  */
-public class FacilityMapFragment extends BaseMapFragment {
+public class AddFacilityMapFragment extends BaseMapFragment {
 
 //	@InjectView (R.id.facilities_map) MapView mMapView;
 	
-	private ItemizedOverlay<OverlayItem> mFacilitiesOverlay;
-	
+	private Overlay mEventOverlay;
+	private Overlay mFacilityOverlay;
+
+	// In the case of this map, markers will always contain only a single item.
+	private ArrayList<OverlayItem> markers = new ArrayList<OverlayItem>();
+
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-		return super.onCreateView(inflater, container, savedInstanceState);
+		View view = super.onCreateView(inflater, container, savedInstanceState);
+		
+		mMapCon.setZoom(17);
+		
+		this.setupMapEventOverlay();
+		
+		return view;
     }
-	
-	public void clearFacilitiesFromMap() {
-		this.mMapView.getOverlays().remove(this.mFacilitiesOverlay);
+
+	public void setupMapEventOverlay() {
+		this.mEventOverlay = new Overlay(mResourceProxy) {
+			
+			@Override
+			public boolean onSingleTapConfirmed(MotionEvent event, MapView mapView) {
+				float x = event.getX();
+				float y = event.getY();
+				Projection projection = mapView.getProjection();
+				GeoPoint tappedGeoPoint = (GeoPoint) projection.fromPixels(x, y);
+				bus.post(new FacilityPlacedEvent(tappedGeoPoint));
+				addFacilityToMap(tappedGeoPoint);
+				return true;
+			}
+
+			@Override
+			protected void draw(Canvas arg0, MapView arg1, boolean arg2) {
+				// TODO Auto-generated method stub
+				// Nothing to draw
+			}
+		};
+		
+		// Add the overlays to the map
+		this.mMapView.getOverlays().add(this.mEventOverlay);
+		this.mMapView.invalidate();
 	}
-	
-	public void addFacilitiesToMap(FacilityList facilities) {
+
+	public void clearFacilitiesFromMap() {
+		this.mMapView.getOverlays().remove(this.mFacilityOverlay);
+	}
+
+	public void addFacilityToMap(GeoPoint point) {
 		Log.i(TAG, "addFacilitiesToMap");
 		
-		// List of markers
-		ArrayList<OverlayItem> markers = new ArrayList<OverlayItem>();
+		this.mMapView.getOverlays().remove(this.mFacilityOverlay);
 		
-		// Create a marker for each facility
-		int arraySize = facilities.size();
-		for (int i = 0; i < arraySize; i ++) {
-			Facility facility = facilities.get(i);
-			Log.i(TAG, facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
-			GeoPoint point = new GeoPoint(facility.getCoordinates().get(1), facility.getCoordinates().get(0));
-			FacilityOverlayItem item = new FacilityOverlayItem(facility, point, i);
-			// If we want to use a bitmap marker from the resources...
-			// Drawable newMarker = this.getResources().getDrawable(R.drawable.ic_action_place);
-			
-			// Instead we dynamically draw the marker with a Drawable subclass
-			BitmapDrawable bmd = FacilityMarker.createFacilityMarker(getResources(), String.valueOf(i+1));
-			item.setMarker(bmd);
-			item.setMarkerHotspot(HotspotPlace.CENTER);
-			markers.add(item);
-		}
+		OverlayItem item = new OverlayItem("New Facility", "Description", point);
+
+		BitmapDrawable bmd = FacilityMarker.createFacilityMarker(
+				getResources(), "+");
+		item.setMarker(bmd);
+		item.setMarkerHotspot(HotspotPlace.CENTER);
+		markers.clear();
+		markers.add(item);
 		
 		/* OnTapListener for the Markers, shows a simple Toast. */
-        this.mFacilitiesOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
+        this.mFacilityOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     
         			@Override
                     public boolean onItemSingleTapUp(final int index,
                             final OverlayItem item) {
-        				
-        				// Grab the Facility associated with this marker
-        				FacilityOverlayItem facItem = (FacilityOverlayItem) item;
-        				Log.i(TAG, "CLICKED -------> " + facItem.getFacility().getName());
-        				
-        				// Post an event containing the clicked facility
-        				bus.post(new FacilitySelectedEvent(facItem.getFacility()));
-        				
+
         				// handled true
                         return true;
                     }
@@ -113,13 +139,7 @@ public class FacilityMapFragment extends BaseMapFragment {
                 }, mResourceProxy);
         
         // Add the overlays to the map
-        this.mMapView.getOverlays().add(this.mFacilitiesOverlay);
+        this.mMapView.getOverlays().add(this.mFacilityOverlay);
         this.mMapView.invalidate();
-	}
-	
-	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
-		Log.i(TAG, "handleFacilitiesLoaded");
-		this.clearFacilitiesFromMap();
-		this.addFacilitiesToMap(event.getFacilities());
 	}
 }

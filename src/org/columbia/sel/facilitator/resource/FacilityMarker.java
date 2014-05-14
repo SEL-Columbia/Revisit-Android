@@ -55,7 +55,7 @@ public class FacilityMarker extends Drawable {
 	 */
 	@Override
 	public void draw(Canvas canvas) {
-		Log.i(TAG, "\\\\\\\\\\\\\\\\\\     DRAWING     ///////////////////");
+		Log.i(TAG, "\\\\\\\\\\\\\\\\\\     DRAWING     //////////////////");
 		mBackgroundPaint.setARGB(200, 18, 74, 255);
 		mBackgroundPaint.setStrokeWidth(2);
 		mBackgroundPaint.setStyle(Style.FILL);

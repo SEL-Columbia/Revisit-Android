@@ -1,32 +1,18 @@
 package org.columbia.sel.facilitator.activity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
-import org.columbia.sel.facilitator.activity.FacilityMapListActivity.FacilitiesRequestListener;
 import org.columbia.sel.facilitator.api.AddFacilityRetrofitSpiceRequest;
-import org.columbia.sel.facilitator.api.FacilitatorApi;
-import org.columbia.sel.facilitator.api.FacilitiesNearRetrofitSpiceRequest;
-import org.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
-import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
+import org.columbia.sel.facilitator.event.FacilityPlacedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
-import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
+import org.columbia.sel.facilitator.fragment.AddFacilityMapFragment;
 import org.columbia.sel.facilitator.model.Facility;
-import org.columbia.sel.facilitator.model.FacilityList;
+import org.osmdroid.util.GeoPoint;
 
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.converter.JacksonConverter;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -49,18 +35,20 @@ import android.widget.Toast;
 public class AddFacilityActivity extends BaseActivity {
 	@InjectView(R.id.name)
 	EditText mNameEditText;
+	
 	@InjectView(R.id.type)
 	EditText mTypeEditText;
+	
 	@InjectView(R.id.location)
 	EditText mLocationEditText;
 
 	@Inject
 	LocationManager lm;
 
-	private Location mFacilityLocation;
+	private GeoPoint mFacilityGeoPoint;
 	private Location mMyLocation;
 
-	private FacilityMapFragment mMapFragment;
+	private AddFacilityMapFragment mMapFragment;
 
 	private AddFacilityRetrofitSpiceRequest mAddFacilityRequest;
 
@@ -71,15 +59,9 @@ public class AddFacilityActivity extends BaseActivity {
 
 		ButterKnife.inject(this);
 
-		// This is just to test the incoming data passed from ODK, leaving it
-		// here
-		// for reference.
-		Intent i = getIntent();
-		String action = i.getAction();
-
 		// Grab a reference to the map fragment.
 		FragmentManager fragmentManager = getFragmentManager();
-		mMapFragment = (FacilityMapFragment) fragmentManager
+		mMapFragment = (AddFacilityMapFragment) fragmentManager
 				.findFragmentById(R.id.fragment_map);
 
 		this.setupLocationListener();
@@ -90,8 +72,6 @@ public class AddFacilityActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// getSpiceManager().execute(facilitiesWithinRequest, "facilities",
-		// DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
 	}
 
 	@Override
@@ -228,7 +208,7 @@ public class AddFacilityActivity extends BaseActivity {
 		 String type = this.mTypeEditText.getText().toString();
 		
 		 
-		if(mFacilityLocation == null || name.equals("") || type.equals("")) {
+		if(mFacilityGeoPoint == null || name.equals("") || type.equals("")) {
 			Toast.makeText(AddFacilityActivity.this, "Please enter name, type, and location.", Toast.LENGTH_SHORT).show();
 			return;
 		}
@@ -240,8 +220,8 @@ public class AddFacilityActivity extends BaseActivity {
 		 // TODO: THIS IS FAKED... 
 		 facility.getProperties().setSector("health");
 		 facility.getProperties().setCheckins(0);
-		 facility.getCoordinates().add(mFacilityLocation.getLongitude());
-		 facility.getCoordinates().add(mFacilityLocation.getLatitude());
+		 facility.getCoordinates().add(mFacilityGeoPoint.getLongitude());
+		 facility.getCoordinates().add(mFacilityGeoPoint.getLatitude());
 		 mAddFacilityRequest = new AddFacilityRetrofitSpiceRequest(facility);
 		 getSpiceManager().execute(mAddFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
 	}
@@ -251,7 +231,7 @@ public class AddFacilityActivity extends BaseActivity {
 		String locationValue;
 
 		if (loc != null) {
-			mFacilityLocation = loc;
+			mFacilityGeoPoint = new GeoPoint(loc);
 			locationValue = loc.getLatitude() + ", " + loc.getLongitude();
 			mLocationEditText.setText(locationValue);
 		} else {
@@ -271,6 +251,18 @@ public class AddFacilityActivity extends BaseActivity {
 	public void handleMapChanged(MapChangedEvent event) {
 		Log.i(TAG, "handleMapChanged");
 	}
+	
+	/**
+	 * Handle FacilityPlacedEvent, fired when the user places a new Facility on the map.
+	 * 
+	 * @param event
+	 */
+	@Subscribe
+	public void handleFacilityPlaced(FacilityPlacedEvent event) {
+		Log.i(TAG, "handleFacilityPlaced");
+		mFacilityGeoPoint = event.getGeoPoint();
+		mLocationEditText.setText(mFacilityGeoPoint.getLatitude() + ", " + mFacilityGeoPoint.getLongitude());
+	}
 
 	// ============================================================================================
 	// INNER CLASSES
@@ -289,8 +281,13 @@ public class AddFacilityActivity extends BaseActivity {
 		@Override
 		public void onRequestSuccess(final Facility result) {
 			Log.i(TAG, "Facility Added!");
-			Toast.makeText(AddFacilityActivity.this,
-					result.getName() + " added!!!", Toast.LENGTH_SHORT).show();
+			Intent i = new Intent(AddFacilityActivity.this, FacilityDetailActivity.class);
+			i.putExtra("facility", result);
+			i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+			startActivity(i);
+			finish();
+//			Toast.makeText(AddFacilityActivity.this,
+//					result.getName() + " added!!!", Toast.LENGTH_SHORT).show();
 			// bus.post(new FacilitiesLoadedEvent(result));
 		}
 	}

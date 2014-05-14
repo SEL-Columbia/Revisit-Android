@@ -182,15 +182,6 @@ public class Facility implements Parcelable {
 
 	private Facility(Parcel in) {
 		// Log.i(TAG, in.toString());
-//		Properties props = this.getProperties();
-//		out.writeString(_id);
-//		out.writeString(uuid);
-//		out.writeString(name);
-//		out.writeByte((byte) (active ? 1 : 0));
-//		out.writeString(props.getType());
-//		out.writeString(props.getSector());
-//		out.writeInt(props.getCheckins());
-//		out.writeList(coordinates);
 		
 		_id = in.readString();
 		uuid = in.readString();
