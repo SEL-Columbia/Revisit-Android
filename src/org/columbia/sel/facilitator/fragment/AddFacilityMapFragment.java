@@ -34,10 +34,12 @@ import butterknife.InjectView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -55,11 +57,17 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 
 //	@InjectView (R.id.facilities_map) MapView mMapView;
 	
+	// Overlay that only handles events, no drawing 
 	private Overlay mEventOverlay;
+	
+	// Overlay that displays the new Facility being added
 	private Overlay mFacilityOverlay;
+	
+	// Overlay that displays the known facilities
+	private ItemizedIconOverlay<OverlayItem> mFacilitiesOverlay;
 
 	// In the case of this map, markers will always contain only a single item.
-	private ArrayList<OverlayItem> markers = new ArrayList<OverlayItem>();
+	private ArrayList<OverlayItem> newFacilityMarkers = new ArrayList<OverlayItem>();
 
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -83,7 +91,7 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 				Projection projection = mapView.getProjection();
 				GeoPoint tappedGeoPoint = (GeoPoint) projection.fromPixels(x, y);
 				bus.post(new FacilityPlacedEvent(tappedGeoPoint));
-				addFacilityToMap(tappedGeoPoint);
+				addNewFacilityToMap(tappedGeoPoint);
 				return true;
 			}
 
@@ -99,11 +107,12 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 		this.mMapView.invalidate();
 	}
 
-	public void clearFacilitiesFromMap() {
-		this.mMapView.getOverlays().remove(this.mFacilityOverlay);
-	}
-
-	public void addFacilityToMap(GeoPoint point) {
+	/**
+	 * Called when the user single taps the map, this method creates the overlay and marker
+	 * for the new facility being added.
+	 * @param point
+	 */
+	public void addNewFacilityToMap(GeoPoint point) {
 		Log.i(TAG, "addFacilitiesToMap");
 		
 		this.mMapView.getOverlays().remove(this.mFacilityOverlay);
@@ -111,14 +120,14 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 		OverlayItem item = new OverlayItem("New Facility", "Description", point);
 
 		BitmapDrawable bmd = FacilityMarker.createFacilityMarker(
-				getResources(), "+");
+				getResources(), "+", Color.argb(200, 18, 74, 255));
 		item.setMarker(bmd);
 		item.setMarkerHotspot(HotspotPlace.CENTER);
-		markers.clear();
-		markers.add(item);
+		newFacilityMarkers.clear();
+		newFacilityMarkers.add(item);
 		
 		/* OnTapListener for the Markers, shows a simple Toast. */
-        this.mFacilityOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
+        this.mFacilityOverlay = new ItemizedIconOverlay<OverlayItem>(newFacilityMarkers,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     
         			@Override
@@ -141,5 +150,77 @@ public class AddFacilityMapFragment extends BaseMapFragment {
         // Add the overlays to the map
         this.mMapView.getOverlays().add(this.mFacilityOverlay);
         this.mMapView.invalidate();
+	}
+	
+	/**
+	 * Clears the overlay containing known facilities.
+	 */
+	public void clearFacilitiesFromMap() {
+		this.mMapView.getOverlays().remove(this.mFacilitiesOverlay);
+	}
+	
+	/**
+	 * Adds the markers to an overlay for the known facilities.
+	 * @param facilities
+	 */
+	public void addFacilitiesToMap(FacilityList facilities) {
+		Log.i(TAG, "addFacilitiesToMap");
+		
+		// List of markers
+		ArrayList<OverlayItem> markers = new ArrayList<OverlayItem>();
+		
+		// Create a marker for each facility
+		int arraySize = facilities.size();
+		for (int i = 0; i < arraySize; i ++) {
+			Facility facility = facilities.get(i);
+			Log.i(TAG, facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
+			GeoPoint point = new GeoPoint(facility.getCoordinates().get(1), facility.getCoordinates().get(0));
+			FacilityOverlayItem item = new FacilityOverlayItem(facility, point, i);
+			BitmapDrawable bmd = FacilityMarker.createFacilityMarker(getResources(), "", Color.argb(127, 18, 255, 74));
+			item.setMarker(bmd);
+			item.setMarkerHotspot(HotspotPlace.CENTER);
+			markers.add(item);
+		}
+		
+		/* OnTapListener for the Markers, shows a simple Toast. */
+        this.mFacilitiesOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    
+        			@Override
+                    public boolean onItemSingleTapUp(final int index,
+                            final OverlayItem item) {
+        				
+        				// Haptic response... added because it's hard to tell exactly when your finger
+        				// hits the marker.
+        				Vibrator myVib = (Vibrator) getActivity().getSystemService(getActivity().VIBRATOR_SERVICE);
+        				myVib.vibrate(50);
+        				
+        				// Grab the Facility associated with this marker
+        				FacilityOverlayItem facItem = (FacilityOverlayItem) item;
+        				Log.i(TAG, "CLICKED -------> " + facItem.getFacility().getName());
+        				
+        				Toast.makeText(getActivity(), facItem.getFacility().getName(), Toast.LENGTH_SHORT).show();
+        				
+                        return true;
+                    }
+                    
+                    @Override
+                    public boolean onItemLongPress(final int index,
+                            final OverlayItem item) {
+                    	// Currently not doing anything with long press...
+                        return false;
+                    }
+                    
+                }, mResourceProxy);
+        
+        // Add the overlays to the map
+        this.mMapView.getOverlays().add(this.mFacilitiesOverlay);
+        this.mMapView.invalidate();
+	}
+	
+	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
+		Log.i(TAG, "handleFacilitiesLoaded");
+		this.clearFacilitiesFromMap();
+		this.addFacilitiesToMap(event.getFacilities());
 	}
 }

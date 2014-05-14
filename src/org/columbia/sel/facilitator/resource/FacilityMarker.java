@@ -20,6 +20,7 @@ public class FacilityMarker extends Drawable {
 	private Paint mBackgroundPaint;
 	private Paint mTextPaint;
 	private String text;
+	private int backgroundColor = Color.argb(200, 18, 74, 255);
 	private static int width = 30;
 	private static int height = 30;
 	private static int radius = 10;
@@ -47,6 +48,22 @@ public class FacilityMarker extends Drawable {
 	}
 	
 	/**
+	 * Factory method for generating new FacilityMarkers.
+	 * @param resources
+	 * @param text
+	 * @return BitmapDrawable
+	 */
+	public static BitmapDrawable createFacilityMarker(Resources resources, String text, int backgroundColor) {
+		FacilityMarker fm = new FacilityMarker(resources, text);
+		Bitmap bmp = Bitmap.createBitmap(FacilityMarker.width, FacilityMarker.height, Config.ARGB_8888); 
+	    Canvas canvas = new Canvas(bmp);
+	    fm.setBounds(0, 0, FacilityMarker.width, FacilityMarker.height);
+	    fm.backgroundColor = backgroundColor;
+	    fm.draw(canvas);
+	    return new BitmapDrawable(resources, bmp);
+	}
+	
+	/**
 	 * This is where the icon magic happens.
 	 * 
 	 * TODO: Probably doesn't make much difference as long as we're not drawing many facilities,
@@ -56,7 +73,8 @@ public class FacilityMarker extends Drawable {
 	@Override
 	public void draw(Canvas canvas) {
 		Log.i(TAG, "\\\\\\\\\\\\\\\\\\     DRAWING     //////////////////");
-		mBackgroundPaint.setARGB(200, 18, 74, 255);
+//		mBackgroundPaint.setARGB(200, 18, 74, 255);
+		mBackgroundPaint.setColor(backgroundColor);
 		mBackgroundPaint.setStrokeWidth(2);
 		mBackgroundPaint.setStyle(Style.FILL);
 		mBackgroundPaint.setAntiAlias(true);

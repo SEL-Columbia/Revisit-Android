@@ -202,7 +202,11 @@ public class FacilityMapListActivity extends BaseActivity {
 	public void onAddNewFacility(View view) {
 		Log.i(TAG, "Begin add new Facility...");
 		Intent i = new Intent(FacilityMapListActivity.this, AddFacilityActivity.class);
+		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 		startActivity(i);
+		if (isLaunchedFromOdk) {
+			this.finish();
+		}
 	}
 	
 	/**

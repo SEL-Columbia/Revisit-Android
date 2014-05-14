@@ -3,11 +3,16 @@ package org.columbia.sel.facilitator.activity;
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
+import org.columbia.sel.facilitator.activity.FacilityMapListActivity.FacilitiesRequestListener;
 import org.columbia.sel.facilitator.api.AddFacilityRetrofitSpiceRequest;
+import org.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
+import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilityPlacedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.fragment.AddFacilityMapFragment;
 import org.columbia.sel.facilitator.model.Facility;
+import org.columbia.sel.facilitator.model.FacilityList;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 
 import butterknife.ButterKnife;
@@ -51,6 +56,7 @@ public class AddFacilityActivity extends BaseActivity {
 	private AddFacilityMapFragment mMapFragment;
 
 	private AddFacilityRetrofitSpiceRequest mAddFacilityRequest;
+	private FacilitiesWithinRetrofitSpiceRequest facilitiesWithinRequest;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -223,7 +229,7 @@ public class AddFacilityActivity extends BaseActivity {
 		 facility.getCoordinates().add(mFacilityGeoPoint.getLongitude());
 		 facility.getCoordinates().add(mFacilityGeoPoint.getLatitude());
 		 mAddFacilityRequest = new AddFacilityRetrofitSpiceRequest(facility);
-		 getSpiceManager().execute(mAddFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
+		 getSpiceManager().execute(mAddFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND, new AddFacilityRequestListener());
 	}
 
 	public void onPopulateLocationClick(View view) {
@@ -242,14 +248,22 @@ public class AddFacilityActivity extends BaseActivity {
 	}
 
 	/**
-	 * Handle MapChangedEvent, fired when the user zooms or scrolls (after
-	 * defined delay).
+	 * Handle MapChangedEvent, fired when the user zooms or scrolls (after defined delay).
+	 * 
+	 * When the map is changed, request facilities within the new map bounds.
 	 * 
 	 * @param event
 	 */
-	@Subscribe
-	public void handleMapChanged(MapChangedEvent event) {
+	@Subscribe public void handleMapChanged(MapChangedEvent event) {
 		Log.i(TAG, "handleMapChanged");
+		BoundingBoxE6 bb = event.getBoundingBox();
+		double n = (bb.getLatNorthE6() / 1E6);
+		double s = (bb.getLatSouthE6() / 1E6);
+		double e = (bb.getLonEastE6() / 1E6);
+		double w = (bb.getLonWestE6() / 1E6);
+		Log.i(TAG, n + ", " + w + ", " + s + ", " + e);
+		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e));
+		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
 	}
 	
 	/**
@@ -268,7 +282,23 @@ public class AddFacilityActivity extends BaseActivity {
 	// INNER CLASSES
 	// ============================================================================================
 
-	public final class FacilitiesRequestListener implements
+	
+	public final class FacilitiesRequestListener implements RequestListener<FacilityList> {
+
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+        	Log.e(TAG, spiceException.toString());
+            Toast.makeText(AddFacilityActivity.this, "Failed to load facilities.", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onRequestSuccess(final FacilityList result) {
+            Log.i(TAG, "Facilities Loaded: " + result.size());
+            bus.post(new FacilitiesLoadedEvent(result));
+        }
+    }
+	
+	public final class AddFacilityRequestListener implements
 			RequestListener<Facility> {
 
 		@Override
