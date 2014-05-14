@@ -22,24 +22,22 @@ public class AddFacilityRetrofitSpiceRequest extends RetrofitSpiceRequest<Facili
     @Override
     public Facility loadDataFromNetwork() {
     	Log.i(TAG, "POSTing a new Facility");
-        ((FacilitatorApi) getService()).addFacility(facility, new Callback<Facility>() {
-
-			@Override
-			public void failure(RetrofitError arg0) {
-				// TODO Auto-generated method stub
-				Log.e(TAG, "??????????????????      " + arg0.getMessage());
-				throw arg0;
-			}
-
-			@Override
-			public void success(Facility arg0, Response arg1) {
-				// TODO Auto-generated method stub
-				
-			}
-        	
-        });
-        Facility fac = new Facility();
-        fac.name = "Nope";
-        return fac;
+    	return ((FacilitatorApi) getService()).addFacility(facility);
+//        ((FacilitatorApi) getService()).addFacility(facility, new Callback<Facility>() {
+//
+//			@Override
+//			public void failure(RetrofitError arg0) {
+//				// TODO Auto-generated method stub
+//				Log.e(TAG, "??????????????????      " + arg0.getMessage());
+//				throw arg0;
+//			}
+//
+//			@Override
+//			public void success(Facility arg0, Response arg1) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//        	
+//        });
     }
 }

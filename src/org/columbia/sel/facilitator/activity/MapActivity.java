@@ -132,9 +132,9 @@ public class MapActivity extends BaseActivity {
 		
 		// Create a marker for each facilitiy
 		for (Facility facility: facilities) {
-			Log.i(TAG, facility.coordinates.get(0) + ", " + facility.coordinates.get(1));
-			GeoPoint point = new GeoPoint(facility.coordinates.get(0), facility.coordinates.get(1));
-			markers.add(new OverlayItem(facility.name, "SampleDescription", point));
+			Log.i(TAG, facility.getCoordinates().get(0) + ", " + facility.getCoordinates().get(1));
+			GeoPoint point = new GeoPoint(facility.getCoordinates().get(0), facility.getCoordinates().get(1));
+			markers.add(new OverlayItem(facility.getName(), "SampleDescription", point));
 		}
 		
 		/* OnTapListener for the Markers, shows a simple Toast. */

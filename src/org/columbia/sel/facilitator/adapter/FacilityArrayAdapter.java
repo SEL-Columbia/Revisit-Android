@@ -44,7 +44,7 @@ public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 		
 		Facility f = getItem(pos);
 		
-		String sector = (String) f.properties.get("sector");
+		String sector = (String) f.getProperties().getSector();
 		
 		ImageView icon = (ImageView) itemView.findViewById(R.id.facility_type_icon);
 		if (sector.equals("health")) {
@@ -59,10 +59,10 @@ public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 		index.setText(String.valueOf(pos+1));
 		
 		TextView title = (TextView) itemView.findViewById(R.id.facility_list_item_title);
-		title.setText(f.name);
+		title.setText(f.getName());
 		
 		TextView desc = (TextView) itemView.findViewById(R.id.facility_list_item_description);
-		desc.setText("checkins: " + f.properties.get("checkins"));
+		desc.setText("checkins: " + f.getProperties().getCheckins());
 		
 		return itemView;
 		

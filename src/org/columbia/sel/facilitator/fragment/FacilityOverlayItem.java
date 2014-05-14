@@ -13,12 +13,12 @@ public class FacilityOverlayItem extends OverlayItem {
 	private int index;
 
 	public FacilityOverlayItem(Facility facility, GeoPoint point) {
-		super(facility.name, facility.properties.get("type"), point);
+		super(facility.getName(), facility.getProperties().getType(), point);
 		this.facility = facility;
 	}
 
 	public FacilityOverlayItem(Facility facility, GeoPoint point, int index) {
-		super(facility.name, facility.properties.get("type"), point);
+		super(facility.getName(), facility.getProperties().getType(), point);
 		this.facility = facility;
 		this.index = index;
 	}

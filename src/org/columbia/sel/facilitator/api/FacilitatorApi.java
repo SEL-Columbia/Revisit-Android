@@ -18,5 +18,6 @@ public interface FacilitatorApi {
 	FacilityList facilitiesWithin(@Path("swlat") String swlat, @Path("swlng") String swlng, @Path("nelat") String nelat, @Path("nelng") String nelng);
 	
 	@POST("/facilities")
-	void addFacility(@Body Facility facility, Callback<Facility> cb);
+//	void addFacility(@Body Facility facility, Callback<Facility> cb);
+	Facility addFacility(@Body Facility facility);
 }

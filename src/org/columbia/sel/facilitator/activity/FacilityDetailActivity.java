@@ -69,9 +69,9 @@ public class FacilityDetailActivity extends BaseActivity {
 				
 			});
 		
-		this.mFacilityNameView.setText(facility.name);
+		this.mFacilityNameView.setText(facility.getName());
 		
-		String sector = facility.properties.get("sector");
+		String sector = facility.getProperties().getSector();
 		
 		Log.i(TAG, "sector -----------> " + sector + " <-----------");
 		
@@ -86,18 +86,18 @@ public class FacilityDetailActivity extends BaseActivity {
 			this.mFacilitySectorIconView.setImageResource(R.drawable.education);
 		}
 		this.mFacilityImageView.invalidate();
-		this.mFacilityTypeView.setText(facility.properties.get("type"));
-		this.mFacilitySectorView.setText(facility.properties.get("sector").toUpperCase());
-		this.mFacilityLocationView.setText("Location: " + facility.coordinates.get(1) + ", " + facility.coordinates.get(0));
-		this.mFacilityCheckinsView.setText("Checkins: " + facility.properties.get("checkins"));
+		this.mFacilityTypeView.setText(facility.getProperties().getType());
+		this.mFacilitySectorView.setText(sector.toUpperCase());
+		this.mFacilityLocationView.setText("Location: " + facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
+		this.mFacilityCheckinsView.setText("Checkins: " + facility.getProperties().getCheckins());
 	}
 	
 	@OnClick(R.id.finish_button)
 	public void submit() {
 		Intent i = new Intent();
-		i.putExtra("facilityName", facility.name);
-		i.putExtra("facilityType", facility.properties.get("type"));
-		i.putExtra("facilityLocation", facility.coordinates.get(1) + ", " + facility.coordinates.get(0));
+		i.putExtra("facilityName", facility.getName());
+		i.putExtra("facilityType", facility.getProperties().getType());
+		i.putExtra("facilityLocation", facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
 		this.setResult(RESULT_OK, i);
 		this.finish();
 	}

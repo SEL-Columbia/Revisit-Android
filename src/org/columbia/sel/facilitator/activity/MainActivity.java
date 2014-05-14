@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity {
 		FacilityList facilities = event.getFacilities();
 		
 		for (Facility facility: facilities) {
-			Log.i(TAG, facility.name);
+			Log.i(TAG, facility.getName());
 		}
 		
 		mAdapter.clear();

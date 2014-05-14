@@ -131,8 +131,8 @@ public class FacilityMapFragment extends BaseFragment {
 		int arraySize = facilities.size();
 		for (int i = 0; i < arraySize; i ++) {
 			Facility facility = facilities.get(i);
-			Log.i(TAG, facility.coordinates.get(1) + ", " + facility.coordinates.get(0));
-			GeoPoint point = new GeoPoint(facility.coordinates.get(1), facility.coordinates.get(0));
+			Log.i(TAG, facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
+			GeoPoint point = new GeoPoint(facility.getCoordinates().get(1), facility.getCoordinates().get(0));
 			FacilityOverlayItem item = new FacilityOverlayItem(facility, point, i);
 			// If we want to use a bitmap marker from the resources...
 			// Drawable newMarker = this.getResources().getDrawable(R.drawable.ic_action_place);
@@ -154,7 +154,7 @@ public class FacilityMapFragment extends BaseFragment {
         				
         				// Grab the Facility associated with this marker
         				FacilityOverlayItem facItem = (FacilityOverlayItem) item;
-        				Log.i(TAG, "CLICKED -------> " + facItem.getFacility().name);
+        				Log.i(TAG, "CLICKED -------> " + facItem.getFacility().getName());
         				
         				// Post an event containing the clicked facility
         				bus.post(new FacilitySelectedEvent(facItem.getFacility()));
