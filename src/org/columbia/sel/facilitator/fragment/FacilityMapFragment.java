@@ -9,6 +9,7 @@ import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
+import org.columbia.sel.facilitator.osm.FacilityOverlayItem;
 import org.columbia.sel.facilitator.resource.FacilityMarker;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.events.DelayedMapListener;

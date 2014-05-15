@@ -1,4 +1,4 @@
-package org.columbia.sel.facilitator.fragment;
+package org.columbia.sel.facilitator.osm;
 
 import java.util.List;
 

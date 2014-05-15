@@ -1,4 +1,4 @@
-package org.columbia.sel.facilitator.fragment;
+package org.columbia.sel.facilitator.osm;
 
 import org.columbia.sel.facilitator.model.Facility;
 import org.osmdroid.util.GeoPoint;
