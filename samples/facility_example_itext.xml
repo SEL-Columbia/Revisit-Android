@@ -6,7 +6,7 @@
   xmlns:orx="http://openrosa.org/xforms/" 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <h:head>
-    <h:title>External Intent - Facility</h:title>
+    <h:title>External Intent - Facility - C</h:title>
     <model>
       <instance>
         <facilitytest id="facilitytest" version="20140508">
@@ -27,6 +27,14 @@
           </meta>
         </facilitytest>
       </instance>
+      <itext>
+        <translation default="" lang="English">
+          <text id="yourTextID">
+            <value form="buttonText">Find Facility</value>
+            <value form="noAppErrorString">Sorry, an appropriate app could not be found.</value>
+          </text>
+        </translation>
+      </itext>
       <bind jr:preload="timestamp" 
             jr:preloadParams="start" nodeset="/facilitytest/starttime" type="dateTime"/>
       <bind jr:preload="timestamp" 
@@ -41,7 +49,9 @@
             jr:preloadParams="phonenumber" nodeset="/facilitytest/devicephonenum" type="string"/>
       <bind nodeset="/facilitytest/noteField" 
             type="string" readonly="true()"/>
+
       <bind nodeset="/facilitytest/facility"/>
+
       <bind nodeset="/facilitytest/facility/facilityName" 
             required="true()" type="string"/>
       <bind nodeset="/facilitytest/facility/facilityType"
@@ -61,7 +71,8 @@
             intent="org.columbia.sel.facilitator.COLLECT(uuid=/facilitytest/meta/instanceID, 
                                       deviceid=/facilitytest/deviceid)" >
       
-      <label>Please populate these:</label>
+      <label ref="jr:itext('facilityText')"/>
+
       <input ref="/facilitytest/facility/facilityName">
         <label>Facility Name</label>
       </input>
