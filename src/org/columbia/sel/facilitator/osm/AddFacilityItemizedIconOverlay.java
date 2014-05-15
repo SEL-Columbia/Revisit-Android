@@ -23,33 +23,28 @@ import android.view.MotionEvent;
  * TODO: Where to unregister bus? Application termination? It's currently in onDetach, 
  * but it's unclear if this always gets called.
  * 
- * @author jon
+ * TODO: THIS IS NOT CURRENTLY USED. An anonymous inner class is used instead.
+ * 
+ * @author Jonathan Wohl
  */
 public class AddFacilityItemizedIconOverlay extends ItemizedIconOverlay<OverlayItem> {
 	private String TAG = this.getClass().getCanonicalName();
-	
-//	@Inject
-//	Bus bus;
 
 	public AddFacilityItemizedIconOverlay(List<OverlayItem> pList, Drawable pDefaultMarker,
 			OnItemGestureListener<OverlayItem> pOnItemGestureListener,
 			ResourceProxy pResourceProxy) {
 		super(pList, pDefaultMarker, pOnItemGestureListener, pResourceProxy);
-		
-//		bus.register(this);
 	}
 	
 	public AddFacilityItemizedIconOverlay(List<OverlayItem> pList,
 			OnItemGestureListener<OverlayItem> pOnItemGestureListener,
 			ResourceProxy pResourceProxy) {
 		super(pList, pOnItemGestureListener, pResourceProxy);
-		
-//		bus.register(this);
 	}
 	
 	@Override
 	public void onDetach(final MapView mapView) {
-//		bus.unregister(this);
+
     }
 	
 	@Override
@@ -61,9 +56,13 @@ public class AddFacilityItemizedIconOverlay extends ItemizedIconOverlay<OverlayI
 		double lat = tappedGeoPoint.getLatitude();
 		double lng = tappedGeoPoint.getLongitude();
 		Log.i(TAG, "Map Single Tapped at: " + lat + ", " + lng);
-//		bus.post(new FacilityPlacedEvent());
 		return true;
 	}
+	
+	/*
+	 * All of this stuff below was copied directly from a post about creating draggable markers.
+	 * Might be useful if we decide to go that route. 
+	 */
 	
 //	public boolean onTouchEvent(MotionEvent event, MapView mapView) {
 //

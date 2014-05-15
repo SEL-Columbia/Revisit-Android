@@ -34,7 +34,10 @@ import com.squareup.otto.Subscribe;
 
 /**
  * The FacilityListActivity displays a list of facilities pulled from the API.
- * @author jmw
+ * 
+ * TODO: THIS ACTIVITY WAS AN INITIAL TEST, NOT CURRENTLY USED
+ *
+ * @author Jonathan Wohl
  *
  */
 public class FacilityListActivity extends BaseActivity {

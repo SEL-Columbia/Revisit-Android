@@ -20,6 +20,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * The FacilityDetailActivity shows all details of a single Facility for review
+ * before selecting the Facility.
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 public class FacilityDetailActivity extends BaseActivity {
 	
 	// Use ButterKnife to inject views
@@ -35,6 +42,7 @@ public class FacilityDetailActivity extends BaseActivity {
 	// Inject facility repo
 	@Inject FacilityRepository fr;
 	
+	// The current facility being viewed
 	Facility facility;
 	
 	@Override
@@ -45,11 +53,16 @@ public class FacilityDetailActivity extends BaseActivity {
 		// Injection for views and onclick handlers
 		ButterKnife.inject(this);
 		
+		// Facility is received upon creation in the Intent
 		Intent i = this.getIntent();
 		facility = i.getParcelableExtra("facility");
 		this.displayFacility(facility);
 	}
 
+	/**
+	 * Populate the views with the Facility info.
+	 * @param facility
+	 */
 	private void displayFacility(Facility facility) {
 		// Picasso is a nifty library for downloading and caching images.
 		Picasso.with(this)

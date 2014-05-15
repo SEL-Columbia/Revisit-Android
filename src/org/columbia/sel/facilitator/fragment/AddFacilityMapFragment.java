@@ -2,43 +2,25 @@ package org.columbia.sel.facilitator.fragment;
 
 import java.util.ArrayList;
 
-import org.columbia.sel.facilitator.R;
-import org.columbia.sel.facilitator.activity.MapActivity;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilityPlacedEvent;
-import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
-import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.osm.FacilityOverlayItem;
 import org.columbia.sel.facilitator.resource.FacilityMarker;
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.events.DelayedMapListener;
-import org.osmdroid.events.MapListener;
-import org.osmdroid.events.ScrollEvent;
-import org.osmdroid.events.ZoomEvent;
-import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.OverlayItem.HotspotPlace;
 
 import com.squareup.otto.Subscribe;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -51,12 +33,10 @@ import android.widget.Toast;
 /**
  * A fragment for displaying the OSM Map with Facilities.
  * 
- * @author jmw
+ * @author Jonathan Wohl
  * 
  */
 public class AddFacilityMapFragment extends BaseMapFragment {
-
-//	@InjectView (R.id.facilities_map) MapView mMapView;
 	
 	// Overlay that only handles events, no drawing 
 	private Overlay mEventOverlay;
@@ -82,6 +62,9 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 		return view;
     }
 
+	/**
+	 * Adds the overlay that handles user events on the map.
+	 */
 	public void setupMapEventOverlay() {
 		this.mEventOverlay = new Overlay(mResourceProxy) {
 			
@@ -99,7 +82,7 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 			@Override
 			protected void draw(Canvas arg0, MapView arg1, boolean arg2) {
 				// TODO Auto-generated method stub
-				// Nothing to draw
+				// Nothing to draw, but this method is required by abstract class Overlay
 			}
 		};
 		
@@ -183,7 +166,7 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 			markers.add(item);
 		}
 		
-		/* OnTapListener for the Markers, shows a simple Toast. */
+		// OnTapListener for the known facility markers, shows a simple Toast displaying the name
         this.mFacilitiesOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     
@@ -219,6 +202,10 @@ public class AddFacilityMapFragment extends BaseMapFragment {
         this.mMapView.invalidate();
 	}
 	
+	/**
+	 * When the known facilities have loaded, clear the map then draw them. 
+	 * @param event
+	 */
 	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
 		Log.i(TAG, "handleFacilitiesLoaded");
 		this.clearFacilitiesFromMap();

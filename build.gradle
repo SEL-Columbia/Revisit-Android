@@ -80,12 +80,12 @@ dependencies {
 	compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
 	
 	// android / support libs
-    compile 'com.google.android.gms:play-services:3.2.65'
-//	compile 'com.android.support:support-v4:18.0.+'
+    // compile 'com.google.android.gms:play-services:3.2.65'
+	// compile 'com.android.support:support-v4:18.0.+'
     compile 'com.android.support:appcompat-v7:+'
     
 	
-    //compile fileTree(dir: 'libs', include: ['*.jar'])
+    // compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 configurations.compile {

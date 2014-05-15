@@ -18,7 +18,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * A POJO representing a Facility.
+ * A POJO representing a Facility. Implements Parcelable so that it can
+ * be passed around between Activities.
  * 
  * @author jmw
  */

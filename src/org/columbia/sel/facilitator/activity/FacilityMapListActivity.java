@@ -1,12 +1,9 @@
 package org.columbia.sel.facilitator.activity;
 
-import java.util.ArrayList;
-
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.adapter.FacilityArrayAdapter;
-import org.columbia.sel.facilitator.api.FacilitiesNearRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
@@ -16,14 +13,12 @@ import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 import org.osmdroid.util.BoundingBoxE6;
-import org.osmdroid.views.MapView;
 
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.otto.Subscribe;
 
-import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
@@ -42,6 +37,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * The FacilityMapListActivity is the initial Activity displayed when a user enters the 
+ * application via ODK Collect. It displays a map as well as a list of nearby facilities,
+ * allowing the user to select a Facility.
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 public class FacilityMapListActivity extends BaseActivity {
 	
 	@Inject FacilityRepository fr;
@@ -50,16 +53,27 @@ public class FacilityMapListActivity extends BaseActivity {
 	
 	private Location mMyLocation;
 	
+	// Provides the map view and associated functionality
 	private FacilityMapFragment mMapFragment;
+	
+	// Provides the list view, created and defined in this Activity
 	private ListFragment mListFragment;
+	
+	// Provides the binding between the list of Facilities and the ListFragment
 	private FacilityArrayAdapter mAdapter;
 	
+	// TODO: This is probably temporary? Currently used as a flag to indicate whether or not
+	// the activity should be finished when starting the next activity.
 	private Boolean isLaunchedFromOdk = true;
 	
+	// These two both provide user feedback
 	private ProgressDialog progressDialog;
 	private Toast noFacilitiesToast;
 	
-	private FacilitiesNearRetrofitSpiceRequest facilitiesNearRequest;
+	// Not currently used
+//	private FacilitiesNearRetrofitSpiceRequest facilitiesNearRequest;
+	
+	// RoboSpice request object to handle fetching of facilities within the bounds of the map view
 	private FacilitiesWithinRetrofitSpiceRequest facilitiesWithinRequest;
 	
 	@Override
@@ -67,8 +81,6 @@ public class FacilityMapListActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map_list);
 		
-		// This is just to test the incoming data passed from ODK, leaving it here
-		// for reference.
 		Intent i = getIntent();
 		String action = i.getAction();
 		if (action == Intent.ACTION_MAIN) {
@@ -77,7 +89,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		} else if (action == "org.columbia.sel.facilitator.COLLECT") {
 			// launched from ODK Collect
 			// here we could inspect contents of Intent in case we want to 
-			// perform any kind of setup based on values from ODK
+			// perform any kind of setup based on values from ODK, e.g. filtering on Sector
 		}
 		
 		// Grab a reference to the map fragment.
@@ -85,11 +97,13 @@ public class FacilityMapListActivity extends BaseActivity {
 		mMapFragment = (FacilityMapFragment) fragmentManager.findFragmentById(R.id.fragment_map);
 		
 		// Dynamically create a list fragment and setup onItemClick listener. 
-		// Could create a ListFragment subclass instead?
+		// Could create a ListFragment subclass instead if it's going to be reused?
 		mListFragment = (ListFragment) fragmentManager.findFragmentById(R.id.fragment_list);
 		mAdapter = new FacilityArrayAdapter(this, R.layout.facility_list_item);
 		mListFragment.setListAdapter(mAdapter);
 		ListView listView = mListFragment.getListView();
+		
+		// Setup click listener for items in the ListView
 		OnItemClickListener myListViewClicked = new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -102,8 +116,6 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		this.setupLocationListener();
 		this.zoomToMyLocation();
-		
-		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		
 		progressDialog = new ProgressDialog(this);
 		progressDialog.setTitle("Loading");
@@ -121,6 +133,7 @@ public class FacilityMapListActivity extends BaseActivity {
 	@Override
     protected void onStart() {
         super.onStart();
+        // It seems like the MapChangedEvent always fires upon load, but we may end up needing it here.
 //        getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
     }
 	
@@ -179,7 +192,6 @@ public class FacilityMapListActivity extends BaseActivity {
 	
 	/**
 	 * Center the map on my last known location.
-	 * TODO: Remove the hard-coded defaults.
 	 */
 	private void zoomToMyLocation() {
 		Log.i(TAG, "zoomToMyLocation");
@@ -187,16 +199,15 @@ public class FacilityMapListActivity extends BaseActivity {
 		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		
 		if (loc == null) {
-			loc = new Location(LocationManager.GPS_PROVIDER);
-			loc.setLatitude(40.73614);
-			loc.setLongitude(-73.98354);
+			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
+		} else {
+			mMapFragment.scrollToLocation(loc);			
 		}
 
-		mMapFragment.zoomToLocation(loc);
 	}
 	
 	/**
-	 * Click handler for "Add New Facility" Button
+	 * Click handler for "Add New Facility" Button, starts AddFacilityActivity
 	 * @param view
 	 */
 	public void onAddNewFacility(View view) {
@@ -241,7 +252,7 @@ public class FacilityMapListActivity extends BaseActivity {
 	
 	/**
 	 * Handle FacilitySelectedEvent, fired when the user selects a facility from the
-	 * list or map.
+	 * list or map, starting the FacilityDetailActivity.
 	 * @param event
 	 */
 	@Subscribe public void handleFacilitySelected(FacilitySelectedEvent event) {
@@ -265,12 +276,16 @@ public class FacilityMapListActivity extends BaseActivity {
 	 */
 	@Subscribe public void handleMapChanged(MapChangedEvent event) {
 		Log.i(TAG, "handleMapChanged");
+		
+		// We need to convert from E6 lat/lng to degrees
 		BoundingBoxE6 bb = event.getBoundingBox();
 		double n = (bb.getLatNorthE6() / 1E6);
 		double s = (bb.getLatSouthE6() / 1E6);
 		double e = (bb.getLonEastE6() / 1E6);
 		double w = (bb.getLonWestE6() / 1E6);
+		
 		Log.i(TAG, n + ", " + w + ", " + s + ", " + e);
+		
 		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e));
 		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
 	}
@@ -280,6 +295,11 @@ public class FacilityMapListActivity extends BaseActivity {
     // INNER CLASSES
     // ============================================================================================
 
+	/**
+	 * Used by RoboSpice as to handle the response from the facilities "within" request.
+	 * @author Jonathan Wohl
+	 *
+	 */
     public final class FacilitiesRequestListener implements RequestListener<FacilityList> {
 
         @Override

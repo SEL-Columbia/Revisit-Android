@@ -2,7 +2,6 @@ package org.columbia.sel.facilitator.osm;
 
 import java.util.ArrayList;
 
-import org.columbia.sel.facilitator.resource.FacilityMarker;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.ResourceProxy.bitmap;
 import org.osmdroid.api.IMapView;

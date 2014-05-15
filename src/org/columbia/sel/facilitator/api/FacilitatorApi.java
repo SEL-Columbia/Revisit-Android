@@ -10,6 +10,12 @@ import retrofit.http.POST;
 //import retrofit.http.POST;
 import retrofit.http.Path;
 
+/**
+ * Retrofit REST API definitions.
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 public interface FacilitatorApi {
 	@GET("/facilities/near/{lat}/{lng}/{rad}")
 	FacilityList facilitiesNear(@Path("lat") String lat, @Path("lng") String lng, @Path("rad") String rad);
@@ -17,6 +23,7 @@ public interface FacilitatorApi {
 	@GET("/facilities/within/{swlat}/{swlng}/{nelat}/{nelng}")
 	FacilityList facilitiesWithin(@Path("swlat") String swlat, @Path("swlng") String swlng, @Path("nelat") String nelat, @Path("nelng") String nelng);
 	
+	// RoboSpice is taking care of the async/thread management stuff, so we can tell Rotrofit to act synchronously
 	@POST("/facilities")
 //	void addFacility(@Body Facility facility, Callback<Facility> cb);
 	Facility addFacility(@Body Facility facility);

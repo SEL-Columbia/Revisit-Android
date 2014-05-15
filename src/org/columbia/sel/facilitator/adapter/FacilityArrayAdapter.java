@@ -5,7 +5,6 @@ import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.Facility;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,18 +14,20 @@ import android.widget.TextView;
 
 /**
  * FacilityArrayAdapter is used to populate the ListView of Facilities.
- * @author jmw
+ * 
+ * @author Jonathan Wohl
  *
  */
 public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 	
 	private FacilityList facilities;
 	
+	// We need a constructor that accepts a FacilityList
 	public FacilityArrayAdapter(Context context, int viewId, FacilityList facilities) {
 		super(context, viewId, facilities);
 		this.facilities = facilities;
 	}
-
+	
 	public FacilityArrayAdapter(Context context, int viewId) {
 		super(context, viewId);
 	}

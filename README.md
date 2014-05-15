@@ -31,6 +31,33 @@ $ gradle installDebug
 
 After some chugging, it should finish with a success message. If an error occurs, fix the problem and try again.
 
+## Included Libraries
+The Facilitator application depends on several open source libraries, outlined here. This list will be updated as these dependencies change, and more information about their implmentation may be added at a later date.
+
+### osmdroid
+[osmdroid](https://github.com/osmdroid/osmdroid) is used as the map framework, providing a relatively well documented implementation of Open Street Maps.
+
+### Dagger
+[Dagger](http://square.github.io/dagger/) provides [dependency injection](http://en.wikipedia.org/wiki/Dependency_injection).
+
+### Otto
+[Otto](square.github.io/otto/) provides the application-wide event bus, used as a light-weight PubSub mechanism.
+
+### Retrofit
+[Retrofit](http://square.github.io/retrofit/) provides a nice REST client system, used in conjunction with RoboSpice.
+
+### RoboSpice
+[RoboSpice](https://github.com/stephanenicolas/robospice) provides an extra layer of network request niceties (caching, thread management).
+
+### Picasso
+[Picasso](square.github.io/picasso/) provides a useful way to load and cache images asyncronously.
+
+### Jackson
+[Jackson](http://wiki.fasterxml.com/JacksonHome) makes converting between JSON and POJOs super simple (and fast).
+
+### ButterKnife
+[ButterKnife](http://jakewharton.github.io/butterknife/) simplifies injecting views and click handlers into Activities and Fragments.
+
 ## Application Notes
 
 ### Coordinates

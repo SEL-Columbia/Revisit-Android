@@ -43,25 +43,36 @@ import android.widget.Toast;
 
 /**
  * A fragment for displaying the OSM Map with Facilities.
- * @author jmw
+ * 
+ * @author Jonathan Wohl
  *
  */
 public class FacilityMapFragment extends BaseMapFragment {
 
-//	@InjectView (R.id.facilities_map) MapView mMapView;
-	
+	// Overlay for known facilities
 	private ItemizedOverlay<OverlayItem> mFacilitiesOverlay;
 	
+	/**
+	 * Some setup happens in super class.
+	 */
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 		return super.onCreateView(inflater, container, savedInstanceState);
     }
 	
+	/**
+	 * Remove the facilities from the map.
+	 */
 	public void clearFacilitiesFromMap() {
 		this.mMapView.getOverlays().remove(this.mFacilitiesOverlay);
 	}
 	
+	/**
+	 * Add a marker for each facility in FacilityList argument to the overlay,
+	 * and add the overlay to the map. 
+	 * @param facilities
+	 */
 	public void addFacilitiesToMap(FacilityList facilities) {
 		Log.i(TAG, "addFacilitiesToMap");
 		
@@ -75,10 +86,7 @@ public class FacilityMapFragment extends BaseMapFragment {
 			Log.i(TAG, facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
 			GeoPoint point = new GeoPoint(facility.getCoordinates().get(1), facility.getCoordinates().get(0));
 			FacilityOverlayItem item = new FacilityOverlayItem(facility, point, i);
-			// If we want to use a bitmap marker from the resources...
-			// Drawable newMarker = this.getResources().getDrawable(R.drawable.ic_action_place);
 			
-			// Instead we dynamically draw the marker with a Drawable subclass
 			BitmapDrawable bmd = FacilityMarker.createFacilityMarker(getResources(), String.valueOf(i+1));
 			item.setMarker(bmd);
 			item.setMarkerHotspot(HotspotPlace.CENTER);
@@ -118,6 +126,10 @@ public class FacilityMapFragment extends BaseMapFragment {
         this.mMapView.invalidate();
 	}
 	
+	/**
+	 * When the known facilities have loaded, clear the map then draw them. 
+	 * @param event
+	 */
 	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
 		Log.i(TAG, "handleFacilitiesLoaded");
 		this.clearFacilitiesFromMap();

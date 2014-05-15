@@ -5,22 +5,23 @@ import javax.inject.Singleton;
 
 import org.columbia.sel.facilitator.FacilitatorApplication;
 import org.columbia.sel.facilitator.annotation.ForApplication;
-import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
-import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.task.FacilityRequestTask;
-import org.osmdroid.util.GeoPoint;
 
 import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
 
 import dagger.ObjectGraph;
-import android.content.Context;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Data Provider layer for Facilities.
+ * 
+ * TODO: THIS IS NOT CURRENTLY USED. It has been replaced by RoboSpice/Retrofit.
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 @Singleton
 public class FacilityRepository {
 	private String TAG = this.getClass().getCanonicalName();

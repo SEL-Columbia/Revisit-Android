@@ -23,7 +23,8 @@ import android.view.ViewGroup;
 
 /**
  * A base fragment for displaying an OSM Map.
- * @author jmw
+ * 
+ * @author Jonathan Wohl
  *
  */
 public class BaseMapFragment extends BaseFragment {
@@ -32,6 +33,7 @@ public class BaseMapFragment extends BaseFragment {
 	@InjectView (R.id.facilities_map) MapView mMapView;
 	
 	protected MapController mMapCon;
+	
 	protected DefaultResourceProxyImpl mResourceProxy;
 	
 	@Override
@@ -60,8 +62,12 @@ public class BaseMapFragment extends BaseFragment {
 		ButterKnife.reset(this);
 	}
 	
-	public void zoomToLocation(Location loc) {
-		Log.i(TAG, "zoomToLocation");
+	/**
+	 * Scroll the map to the specified location.
+	 * @param loc
+	 */
+	public void scrollToLocation(Location loc) {
+		Log.i(TAG, "scrollToLocation");
 		
 		if (loc == null) {
 			throw new RuntimeException("Location can not be null.");
@@ -71,6 +77,10 @@ public class BaseMapFragment extends BaseFragment {
 		mMapCon.animateTo(point);
 	}
 	
+	/**
+	 * Setup basic map events such as scrolling and zooming. Publishes MapChangedEvent events
+	 * when the user changes the map view.
+	 */
 	public void setupMapEvents() {
 		// Enable touch controls
 		mMapView.setMultiTouchControls(true);

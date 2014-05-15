@@ -3,7 +3,6 @@ package org.columbia.sel.facilitator.activity;
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.FacilitatorApplication;
-import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.api.FacilityRetrofitSpiceService;
 
@@ -20,7 +19,7 @@ import android.support.v7.app.ActionBarActivity;
  * - setup of Dependency Injection - setup of Logging TAG (class name of
  * instance)
  * 
- * @author jmw
+ * @author Jonathan Wohl
  * 
  */
 public abstract class BaseActivity extends ActionBarActivity {
@@ -36,7 +35,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 	@ForLogging
 	String APP_TAG;
 	
-	// TODO - move this to DI
+	// TODO - move this to DI?
 	private SpiceManager spiceManager = new SpiceManager(FacilityRetrofitSpiceService.class);
 
 	@Override

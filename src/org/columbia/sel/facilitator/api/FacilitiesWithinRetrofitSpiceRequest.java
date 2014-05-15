@@ -1,33 +1,32 @@
 package org.columbia.sel.facilitator.api;
 
-import java.util.List;
-
-import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
-
-import roboguice.util.temp.Ln;
-import android.util.Log;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
+/**
+ * Defines RoboSpice Request for fetching facilities near a given point lat,lng in range rad.
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest<FacilityList, FacilitatorApi> {
-	private String TAG = this.getClass().getCanonicalName();
 	
-	private String swlat;
-    private String swlng;
-    private String nelat;
-    private String nelng;
+	private String slat;
+    private String wlng;
+    private String nlat;
+    private String elng;
 
-    public FacilitiesWithinRetrofitSpiceRequest(String swlat, String swlng, String nelat, String nelng) {
+    public FacilitiesWithinRetrofitSpiceRequest(String slat, String wlng, String nlat, String elng) {
         super(FacilityList.class, FacilitatorApi.class);
-        this.swlat = swlat;
-        this.swlng = swlng;
-        this.nelat = nelat;
-        this.nelng = nelng;
+        this.slat = slat;
+        this.wlng = wlng;
+        this.nlat = nlat;
+        this.elng = elng;
     }
 
     @Override
     public FacilityList loadDataFromNetwork() {
-        return ((FacilitatorApi) getService()).facilitiesWithin(swlat, swlng, nelat, nelng);
+        return ((FacilitatorApi) getService()).facilitiesWithin(slat, wlng, nlat, elng);
     }
 }

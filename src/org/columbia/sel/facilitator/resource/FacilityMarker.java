@@ -14,7 +14,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
-
+/**
+ * A Drawable for use as a marker on the facility map.
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 public class FacilityMarker extends Drawable {
 	private String TAG = this.getClass().getCanonicalName();
 	private Paint mBackgroundPaint;
@@ -73,7 +78,6 @@ public class FacilityMarker extends Drawable {
 	@Override
 	public void draw(Canvas canvas) {
 		Log.i(TAG, "\\\\\\\\\\\\\\\\\\     DRAWING     //////////////////");
-//		mBackgroundPaint.setARGB(200, 18, 74, 255);
 		mBackgroundPaint.setColor(backgroundColor);
 		mBackgroundPaint.setStrokeWidth(2);
 		mBackgroundPaint.setStyle(Style.FILL);

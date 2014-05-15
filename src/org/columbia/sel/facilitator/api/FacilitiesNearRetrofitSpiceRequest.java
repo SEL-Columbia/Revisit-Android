@@ -1,17 +1,16 @@
 package org.columbia.sel.facilitator.api;
 
-import java.util.List;
-
-import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
-
-import roboguice.util.temp.Ln;
-import android.util.Log;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
+/**
+ * Defines RoboSpice Request for fetching facilities near a given point lat,lng in range rad.
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 public class FacilitiesNearRetrofitSpiceRequest extends RetrofitSpiceRequest<FacilityList, FacilitatorApi> {
-	private String TAG = this.getClass().getCanonicalName();
 	
 	private String lat;
     private String lng;

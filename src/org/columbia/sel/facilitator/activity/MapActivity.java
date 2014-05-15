@@ -30,7 +30,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-
+/**
+ * TODO: THIS ACTIVITY WAS AN INITIAL TEST, NOT CURRENTLY USED
+ * 
+ * @author Jonathan Wohl
+ *
+ */
 public class MapActivity extends BaseActivity {
 	
 	@Inject FacilityRepository fr;

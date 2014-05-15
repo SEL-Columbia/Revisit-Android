@@ -32,6 +32,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.os.Build;
 
+/**
+ * TODO: THIS ACTIVITY WAS AN INITIAL TEST, NOT CURRENTLY USED
+ * 
+ * @author Jonathan Wohl
+ */
 public class MainActivity extends BaseActivity {
 	private static final Object HttpRequestTask = null;
 

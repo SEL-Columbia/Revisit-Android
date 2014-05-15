@@ -1,5 +1,12 @@
 package org.columbia.sel.facilitator.event;
 
+/**
+ * Event published when an HttpRequestTask completes.
+ * 
+ * @author Jonathan Wohl
+ *
+ * @deprecated
+ */
 public class HttpRequestSuccessEvent {
 	private String body;
 	

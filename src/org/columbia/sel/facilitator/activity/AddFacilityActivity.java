@@ -3,7 +3,6 @@ package org.columbia.sel.facilitator.activity;
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
-import org.columbia.sel.facilitator.activity.FacilityMapListActivity.FacilitiesRequestListener;
 import org.columbia.sel.facilitator.api.AddFacilityRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
@@ -37,6 +36,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+/**
+ * The AddFacilityActivity provides the interface for adding a new Facility.
+ *  
+ * @author Jonathan Wohl
+ *
+ */
 public class AddFacilityActivity extends BaseActivity {
 	@InjectView(R.id.name)
 	EditText mNameEditText;
@@ -50,12 +55,19 @@ public class AddFacilityActivity extends BaseActivity {
 	@Inject
 	LocationManager lm;
 
+	// Stores the location of the new facility
 	private GeoPoint mFacilityGeoPoint;
+	
+	// Stores the user's current location
 	private Location mMyLocation;
 
+	// Provides the map view and related functionality
 	private AddFacilityMapFragment mMapFragment;
 
+	// The POST request that submits the new Facility
 	private AddFacilityRetrofitSpiceRequest mAddFacilityRequest;
+	
+	// The GET request that retrieves known facilities within the map bounds
 	private FacilitiesWithinRetrofitSpiceRequest facilitiesWithinRequest;
 
 	@Override
@@ -63,6 +75,7 @@ public class AddFacilityActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_facility);
 
+		// Inject view member variables
 		ButterKnife.inject(this);
 
 		// Grab a reference to the map fragment.
@@ -139,8 +152,7 @@ public class AddFacilityActivity extends BaseActivity {
 	}
 
 	/**
-	 * Center the map on my last known location. TODO: Remove the hard-coded
-	 * defaults.
+	 * Center the map on my last known location.
 	 */
 	private void zoomToMyLocation() {
 		Log.i(TAG, "zoomToMyLocation");
@@ -148,16 +160,18 @@ public class AddFacilityActivity extends BaseActivity {
 		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
 		if (loc == null) {
-			loc = new Location(LocationManager.GPS_PROVIDER);
-			loc.setLatitude(40.73614);
-			loc.setLongitude(-73.98354);
+			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
+		} else {
+			mMapFragment.scrollToLocation(loc);			
 		}
 
-		mMapFragment.zoomToLocation(loc);
 	}
 
 	/**
-	 * Click handler for "Add New Facility" Button
+	 * Click handler for "Add New Facility" Button.
+	 * 
+	 * For the moment, I'm leaving the large swath of commented code as reference. It shows
+	 * how Jackson and Retrofit are used independent of RoboSpice.
 	 * 
 	 * @param view
 	 */
@@ -165,9 +179,19 @@ public class AddFacilityActivity extends BaseActivity {
 		Log.i(TAG, "Adding new facility.");
 
 		
+		// TESTING Jackson2 conversion... works.
 //		ObjectMapper mapper = new ObjectMapper();
 //		JacksonConverter converter = new JacksonConverter(new ObjectMapper());
 //		
+//		try {
+//			String json = mapper.writeValueAsString(newFacility);
+//			Log.i(TAG, json);
+//		} catch (JsonProcessingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
+		// TESTING Retrofit using JacksonConverter... works!
 //		RestAdapter restAdapter = new RestAdapter.Builder()
 //				.setConverter(converter)
 //				.setEndpoint("http://23.21.86.131:3000/api/v1")
@@ -177,19 +201,7 @@ public class AddFacilityActivity extends BaseActivity {
 //
 //		Facility newFacility = new Facility();
 //		newFacility.setName("Testing");
-		
-		// TESTING Jackson2 conversion... works.
-//		try {
-//			String json = mapper.writeValueAsString(newFacility);
-//			Log.i(TAG, json);
-//		} catch (JsonProcessingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		// Facility facility = service.addFacility(newFacility);
-
-		// TESTING Retrofit using JacksonConverter... works!
+//		
 //		service.addFacility(newFacility, new Callback<Facility>() {
 //
 //			@Override
@@ -210,28 +222,33 @@ public class AddFacilityActivity extends BaseActivity {
 //		});
 		
 
-		 String name = this.mNameEditText.getText().toString();
-		 String type = this.mTypeEditText.getText().toString();
+		String name = this.mNameEditText.getText().toString();
+		String type = this.mTypeEditText.getText().toString();
 		
-		 
 		if(mFacilityGeoPoint == null || name.equals("") || type.equals("")) {
 			Toast.makeText(AddFacilityActivity.this, "Please enter name, type, and location.", Toast.LENGTH_SHORT).show();
 			return;
 		}
 
 		 
-		 Facility facility = new Facility();
-		 facility.setName(name);
-		 facility.getProperties().setType(type);
-		 // TODO: THIS IS FAKED... 
-		 facility.getProperties().setSector("health");
-		 facility.getProperties().setCheckins(0);
-		 facility.getCoordinates().add(mFacilityGeoPoint.getLongitude());
-		 facility.getCoordinates().add(mFacilityGeoPoint.getLatitude());
-		 mAddFacilityRequest = new AddFacilityRetrofitSpiceRequest(facility);
-		 getSpiceManager().execute(mAddFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND, new AddFacilityRequestListener());
+		Facility facility = new Facility();
+		facility.setName(name);
+		facility.getProperties().setType(type);
+		
+		// TODO: THIS IS FAKED. Should we use a drop-down for sector?
+		facility.getProperties().setSector("health");
+		
+		facility.getProperties().setCheckins(0);
+		facility.getCoordinates().add(mFacilityGeoPoint.getLongitude());
+		facility.getCoordinates().add(mFacilityGeoPoint.getLatitude());
+		mAddFacilityRequest = new AddFacilityRetrofitSpiceRequest(facility);
+		getSpiceManager().execute(mAddFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND, new AddFacilityRequestListener());
 	}
 
+	/**
+	 * onClick handler for button which populates Location field with the user's current location.
+	 * @param view
+	 */
 	public void onPopulateLocationClick(View view) {
 		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		String locationValue;
@@ -282,7 +299,11 @@ public class AddFacilityActivity extends BaseActivity {
 	// INNER CLASSES
 	// ============================================================================================
 
-	
+	/**
+	 * Used by RoboSpice to handle the response for known Facilities.
+	 * @author Jonathan Wohl
+	 *
+	 */
 	public final class FacilitiesRequestListener implements RequestListener<FacilityList> {
 
         @Override
@@ -298,16 +319,24 @@ public class AddFacilityActivity extends BaseActivity {
         }
     }
 	
+	/**
+	 * Used by RoboSpice to handle the response for adding a Facility.
+	 * @author Jonathan Wohl
+	 *
+	 */
 	public final class AddFacilityRequestListener implements
 			RequestListener<Facility> {
 
 		@Override
 		public void onRequestFailure(SpiceException spiceException) {
 			Log.e(TAG, spiceException.toString());
-			Toast.makeText(AddFacilityActivity.this, "Failed to addfacility.",
+			Toast.makeText(AddFacilityActivity.this, "Failed to add new facility.",
 					Toast.LENGTH_SHORT).show();
 		}
 
+		/**
+		 * On Success, we finish the activity and start the Detail activity.
+		 */
 		@Override
 		public void onRequestSuccess(final Facility result) {
 			Log.i(TAG, "Facility Added!");
@@ -316,9 +345,6 @@ public class AddFacilityActivity extends BaseActivity {
 			i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 			startActivity(i);
 			finish();
-//			Toast.makeText(AddFacilityActivity.this,
-//					result.getName() + " added!!!", Toast.LENGTH_SHORT).show();
-			// bus.post(new FacilitiesLoadedEvent(result));
 		}
 	}
 }

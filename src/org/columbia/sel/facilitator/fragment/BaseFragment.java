@@ -14,7 +14,7 @@ import android.os.Bundle;
  * 
  * Fragment-common code should go here (Injections, for instance).
  * 
- * @author jmw
+ * @author Jonathan Wohl
  *
  */
 public class BaseFragment extends Fragment {
