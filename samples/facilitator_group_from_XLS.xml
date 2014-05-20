@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Facility Survey</h:title>
+    <model>
+      <instance>
+        <facility_group_field_type id="fac_123">
+          <facility>
+            <facility_name/>
+            <facility_type/>
+            <facility_location/>
+          </facility>
+          <deviceid/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </facility_group_field_type>
+      </instance>
+      <bind nodeset="/facility_group_field_type/facility/facility_name" type="string"/>
+      <bind nodeset="/facility_group_field_type/facility/facility_type" type="string"/>
+      <bind nodeset="/facility_group_field_type/facility/facility_location" type="string"/>
+      <bind jr:preload="property" jr:preloadParams="deviceid" nodeset="/facility_group_field_type/deviceid" type="string"/>
+      <bind calculate="concat('uuid:', uuid())" nodeset="/facility_group_field_type/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group appearance="field-list" intent="org.columbia.sel.facilitator.COLLECT(sector='education')" ref="/facility_group_field_type/facility">
+      <label>Facility</label>
+      <input ref="/facility_group_field_type/facility/facility_name">
+        <label>Name</label>
+      </input>
+      <input ref="/facility_group_field_type/facility/facility_type">
+        <label>Type</label>
+      </input>
+      <input ref="/facility_group_field_type/facility/facility_location">
+        <label>Location</label>
+      </input>
+    </group>
+  </h:body>
+</h:html>
