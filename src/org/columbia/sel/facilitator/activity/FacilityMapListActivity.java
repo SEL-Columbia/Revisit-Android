@@ -70,6 +70,9 @@ public class FacilityMapListActivity extends BaseActivity {
 	private ProgressDialog progressDialog;
 	private Toast noFacilitiesToast;
 	
+	// Filter by sector
+	String sectorFilter = null;
+	
 	// Not currently used
 //	private FacilitiesNearRetrofitSpiceRequest facilitiesNearRequest;
 	
@@ -90,6 +93,9 @@ public class FacilityMapListActivity extends BaseActivity {
 			// launched from ODK Collect
 			// here we could inspect contents of Intent in case we want to 
 			// perform any kind of setup based on values from ODK, e.g. filtering on Sector
+			Bundle extras = i.getExtras();
+			sectorFilter = extras.getString("sector");
+			Log.i(TAG, "------> SECTOR: " + sectorFilter);
 		}
 		
 		// Grab a reference to the map fragment.
@@ -284,9 +290,9 @@ public class FacilityMapListActivity extends BaseActivity {
 		double e = (bb.getLonEastE6() / 1E6);
 		double w = (bb.getLonWestE6() / 1E6);
 		
-		Log.i(TAG, n + ", " + w + ", " + s + ", " + e);
+		Log.i(TAG, n + ", " + w + ", " + s + ", " + e + ": " + sectorFilter);
 		
-		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e));
+		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e), sectorFilter);
 		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
 	}
 	

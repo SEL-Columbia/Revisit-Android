@@ -108,9 +108,12 @@ public class FacilityDetailActivity extends BaseActivity {
 	@OnClick(R.id.finish_button)
 	public void submit() {
 		Intent i = new Intent();
-		i.putExtra("facilityName", facility.getName());
-		i.putExtra("facilityType", facility.getProperties().getType());
-		i.putExtra("facilityLocation", facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
+		i.putExtra("facility_name", facility.getName());
+		i.putExtra("facility_sector", facility.getProperties().getSector());
+		i.putExtra("facility_type", facility.getProperties().getType());
+		i.putExtra("facility_latitude", facility.getCoordinates().get(1));
+		i.putExtra("facility_longitude", facility.getCoordinates().get(0));
+		i.putExtra("facility_location", facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
 		this.setResult(RESULT_OK, i);
 		this.finish();
 	}

@@ -2,6 +2,8 @@ package org.columbia.sel.facilitator.api;
 
 import org.columbia.sel.facilitator.model.FacilityList;
 
+import android.util.Log;
+
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
 /**
@@ -16,7 +18,17 @@ public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest<F
     private String wlng;
     private String nlat;
     private String elng;
+    private String sector = null;
 
+    public FacilitiesWithinRetrofitSpiceRequest(String slat, String wlng, String nlat, String elng, String sector) {
+        super(FacilityList.class, FacilitatorApi.class);
+        this.slat = slat;
+        this.wlng = wlng;
+        this.nlat = nlat;
+        this.elng = elng;
+        this.sector = sector;
+    }
+    
     public FacilitiesWithinRetrofitSpiceRequest(String slat, String wlng, String nlat, String elng) {
         super(FacilityList.class, FacilitatorApi.class);
         this.slat = slat;
@@ -27,6 +39,7 @@ public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest<F
 
     @Override
     public FacilityList loadDataFromNetwork() {
-        return ((FacilitatorApi) getService()).facilitiesWithin(slat, wlng, nlat, elng);
+    	Log.i("org.columbia.sel.facilitator", sector);
+        return ((FacilitatorApi) getService()).facilitiesWithin(slat, wlng, nlat, elng, sector);
     }
 }
