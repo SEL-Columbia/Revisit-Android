@@ -3,6 +3,9 @@ Facilitator
 
 An android application that facilitates facility selection.
 
+## Usage
+The Facilitator application is designed to be used in conjunction with [ODK Collect](http://opendatakit.org/use/collect/). The goal is to streamline the collection of facility information by pulling from a central repository of facility data. Users of the app can quickly select the facility at which they are conducting a survey, reducing manual entry errors and speeding the data entry process. Additionally, users can contribute general facility information (name, sector, location, etc.) and fix incorrect information in order to grow and improve the central repository over time.
+
 ## Setup and Build
 This project is being developed in Eclipse (ADT), but using gradle for dependency management and builds.
 
@@ -79,5 +82,7 @@ Additionally, an `APP_TAG` member is injected in all activities and the applicat
 
 ## TODO
 - Better project description, purpose
+- Offline use
+- Image capture
 - Basic architecture description
 - Documentation
