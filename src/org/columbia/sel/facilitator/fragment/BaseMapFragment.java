@@ -47,7 +47,9 @@ public class BaseMapFragment extends BaseFragment {
 
 		mMapCon = (MapController) mMapView.getController();
 		
-		mMapCon.setZoom(15);
+//		mMapView.setUseDataConnection(false);
+		
+		mMapCon.setZoom(14);
 		
 		mResourceProxy = new DefaultResourceProxyImpl(this.getActivity().getApplication());
 		

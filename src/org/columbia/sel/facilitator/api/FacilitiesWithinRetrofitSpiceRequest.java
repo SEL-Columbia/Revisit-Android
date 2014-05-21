@@ -39,7 +39,9 @@ public class FacilitiesWithinRetrofitSpiceRequest extends RetrofitSpiceRequest<F
 
     @Override
     public FacilityList loadDataFromNetwork() {
-    	Log.i("org.columbia.sel.facilitator", sector);
+    	if (sector != null) {
+    		Log.i("org.columbia.sel.facilitator", sector);    		
+    	}
         return ((FacilitatorApi) getService()).facilitiesWithin(slat, wlng, nlat, elng, sector);
     }
 }

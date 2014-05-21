@@ -73,11 +73,14 @@ dependencies {
 	// osmdroid
 	compile "org.osmdroid:osmdroid-android:4.1"
 	compile "org.slf4j:slf4j-android:1.6.1-RC1"
+	// compile 'org.osmdroid:osmdroid-packager:4.2'
 	
 	// utility libs
 	compile 'com.jakewharton:butterknife:5.0.0'
 //	compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
 	compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
+	// compile 'org.xerial:sqlite-jdbc:3.7.15-M1'
+	
 	
 	// android / support libs
     // compile 'com.google.android.gms:play-services:3.2.65'
