@@ -110,6 +110,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		ListView listView = mListFragment.getListView();
 		
 		// Setup click listener for items in the ListView
+		// TODO: look at how AdapterView<?> might be replaced
 		OnItemClickListener myListViewClicked = new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -118,7 +119,7 @@ public class FacilityMapListActivity extends BaseActivity {
 				bus.post(new FacilitySelectedEvent(f));
 			}
 		};
-		listView.setOnItemClickListener(  myListViewClicked );
+		listView.setOnItemClickListener(myListViewClicked);
 		
 		this.setupLocationListener();
 		this.zoomToMyLocation();

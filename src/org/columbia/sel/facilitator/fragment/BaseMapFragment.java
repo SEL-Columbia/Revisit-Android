@@ -29,7 +29,6 @@ import android.view.ViewGroup;
  */
 public class BaseMapFragment extends BaseFragment {
 	
-	// NOTE: Subclasses must inject their own map view
 	@InjectView (R.id.facilities_map) MapView mMapView;
 	
 	protected MapController mMapCon;
