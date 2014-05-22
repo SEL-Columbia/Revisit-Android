@@ -7,6 +7,7 @@ import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 //import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -27,5 +28,8 @@ public interface FacilitatorApi {
 	// RoboSpice is taking care of the async/thread management stuff, so we can tell Rotrofit to act synchronously
 	@POST("/facilities")
 	Facility addFacility(@Body Facility facility);
+	
+	@PUT("/facilities/{id}")
+	Facility updateFacility(@Body Facility facility, @Path("id") String id);
 //	void addFacility(@Body Facility facility, Callback<Facility> cb);
 }
