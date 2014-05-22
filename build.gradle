@@ -73,7 +73,7 @@ dependencies {
 	// osmdroid
 	compile "org.osmdroid:osmdroid-android:4.1"
 	compile "org.slf4j:slf4j-android:1.6.1-RC1"
-	// compile 'org.osmdroid:osmdroid-packager:4.2'
+	compile 'org.osmdroid:osmdroid-packager:4.1'
 	
 	// utility libs
 	compile 'com.jakewharton:butterknife:5.0.0'
