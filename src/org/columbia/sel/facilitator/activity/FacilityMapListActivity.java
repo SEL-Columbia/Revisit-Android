@@ -82,10 +82,6 @@ public class FacilityMapListActivity extends BaseActivity {
 	// Filter by sector
 	String sectorFilter = null;
 	
-	// Flag indicating whether this is the first load
-	// TODO: this probably isn't necessary... figure out a better way.
-	private boolean mFirstRun = true;
-	
 	// Stores the currently loaded list of facilitites
 	FacilityList mFacilities;
 	
@@ -294,17 +290,9 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		mMyLocation = event.getLocation();
 		
-		if (mFirstRun) {
+		if (mFacilities == null) {
 			// We only want to zoom to our location if this is the first location change
-			mFirstRun = false;
 			this.zoomToMyLocation();			
-		} else {
-			// It's not the first run, so let's just reload the Facilities
-//			mMapFragment.reloadFacilities();
-//			MapView mapView = mMapFragment.getMapView();
-//			BoundingBoxE6 bb = mapView.getBoundingBox();
-//			bus.post(new MapChangedEvent(bb));
-//			getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
 		}
 	}
 	
