@@ -64,6 +64,10 @@ public class BaseMapFragment extends BaseFragment {
 		ButterKnife.reset(this);
 	}
 	
+	public MapView getMapView() {
+		return mMapView;
+	}
+	
 	/**
 	 * Scroll the map to the specified location.
 	 * @param loc
@@ -80,6 +84,21 @@ public class BaseMapFragment extends BaseFragment {
 	}
 	
 	/**
+	 * Change the map to the specified location immediately.
+	 * @param loc
+	 */
+	public void goToLocation(Location loc) {
+		Log.i(TAG, "scrollToLocation");
+		
+		if (loc == null) {
+			throw new RuntimeException("Location can not be null.");
+		}
+
+		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+		mMapCon.setCenter(point);
+	}
+	
+	/**
 	 * Setup basic map events such as scrolling and zooming. Publishes MapChangedEvent events
 	 * when the user changes the map view.
 	 */
@@ -91,18 +110,21 @@ public class BaseMapFragment extends BaseFragment {
 		// Set map event listeners
 		mMapView.setMapListener(new DelayedMapListener(new MapListener() {  
 		    public boolean onZoom(final ZoomEvent e) {
-		        //do something
-		    	BoundingBoxE6 bb = mMapView.getBoundingBox();
-		        bus.post(new MapChangedEvent(bb));
+		    	Log.i(TAG, e.toString());
+		    	postMapChangedEvent();
 		        return true;
 		    }
 
 		    public boolean onScroll(final ScrollEvent e) {
 		        Log.i(TAG, e.toString());
-		        BoundingBoxE6 bb = mMapView.getBoundingBox();
-		        bus.post(new MapChangedEvent(bb));
+		        postMapChangedEvent();
 		        return true;
 		    }
 		    }, 250 ));
+	}
+	
+	public void postMapChangedEvent() {
+		BoundingBoxE6 bb = mMapView.getBoundingBox();
+        bus.post(new MapChangedEvent(bb));
 	}
 }

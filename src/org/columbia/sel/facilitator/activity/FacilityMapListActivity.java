@@ -7,12 +7,15 @@ import org.columbia.sel.facilitator.adapter.FacilityArrayAdapter;
 import org.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
+import org.columbia.sel.facilitator.event.LocationChangedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
+import org.columbia.sel.facilitator.service.LocationService;
 import org.osmdroid.util.BoundingBoxE6;
+import org.osmdroid.views.MapView;
 
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -51,6 +54,8 @@ public class FacilityMapListActivity extends BaseActivity {
 	
 	@Inject LocationManager lm;
 	
+	private LocationService mLocationService;
+	
 	private Location mMyLocation;
 	
 	// Provides the map view and associated functionality
@@ -76,6 +81,9 @@ public class FacilityMapListActivity extends BaseActivity {
 	
 	// Filter by sector
 	String sectorFilter = null;
+	
+	// Stores the currently loaded list of facilitites
+	FacilityList mFacilities;
 	
 	// Not currently used
 //	private FacilitiesNearRetrofitSpiceRequest facilitiesNearRequest;
@@ -125,31 +133,29 @@ public class FacilityMapListActivity extends BaseActivity {
 		};
 		listView.setOnItemClickListener(myListViewClicked);
 		
-		this.setupLocationListener();
-		this.zoomToMyLocation();
-		
 		progressDialog = new ProgressDialog(this);
 		progressDialog.setTitle("Loading");
 		progressDialog.setMessage("Finding nearby facilities...");
 		progressDialog.show();
 		
-		// TODO: Do we need to perform an initial call to fetch facilities or will the MapChangedEvent always fire?
-		// ANSWER: As long as we can establish our current location, when we call zoomToMyLocation, the MapChangedEvent will always fire.
-		// However, if the last known location isn't available, the map will not change and facilities won't be fetched.
-		// TODO: Move location management into its own service
-		
-//		facilitiesNearRequest = new FacilitiesNearRetrofitSpiceRequest(String.valueOf(loc.getLatitude()), String.valueOf(loc.getLongitude()), "10");
-//		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e));
-		
-//		fr.loadFacilities(loc);
+		// As long as we can establish our current location, when we call zoomToMyLocation, the MapChangedEvent 
+		// will always fire, triggering the reloading of facilities. However, if the last known location isn't 
+		// available, the map will not change and facilities won't be fetched.
 	}
 	
 	@Override
     protected void onStart() {
         super.onStart();
-        // It seems like the MapChangedEvent always fires upon load, but we may end up needing it here.
-//        getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
+        startService(new Intent(this, LocationService.class));
+        if (mFacilities != null) {
+        	getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());        	
+        }
     }
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
 	
 	
 	@Override
@@ -176,57 +182,18 @@ public class FacilityMapListActivity extends BaseActivity {
 	}
 	
 	/**
-	 * TODO: Consider moving location listening to its own class, use event bus to communicate changes.
-	 */
-	private void setupLocationListener() {
-		Log.i(TAG, "setupLocationListener");
-		// Define a listener that responds to location updates
-		LocationListener locationListener = new LocationListener() {
-		    public void onLocationChanged(Location location) {
-		    	Log.i(TAG, "=============> LOCATION UPDATED: " + location.toString());
-		    	mMyLocation = location;
-		    }
-
-		    public void onStatusChanged(String provider, int status, Bundle extras) {
-		    	Log.i(TAG, "=============> STATUS CHANGES: " + provider);
-		    }
-
-		    public void onProviderEnabled(String provider) {
-		    	Log.i(TAG, "=============> PROVIDER ENABLED: " + provider);
-		    }
-
-		    public void onProviderDisabled(String provider) {
-		    	Log.i(TAG, "=============> PROVIDER DISABLED: " + provider);
-		    }
-		  };
-
-		// Register the listener with the Location Manager to receive location updates
-//		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-		lm.requestLocationUpdates(mProvider, 0, 10, locationListener);
-	}
-	
-	/**
 	 * Center the map on my last known location.
 	 */
 	private void zoomToMyLocation() {
 		Log.i(TAG, "zoomToMyLocation");
-		Location loc;
-		
-		// TODO: this logic could be simplified.
-		
+
 		if (mMyLocation == null) {
-			loc = lm.getLastKnownLocation(mProvider);
-		} else {
-			loc = mMyLocation;
-		}
-		
-		if (loc == null) {
 			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
 		} else {
-			mMapFragment.scrollToLocation(loc);			
+			mMapFragment.goToLocation(mMyLocation);			
 		}
-
 	}
+
 	
 	/**
 	 * Click handler for "Add New Facility" Button, starts AddFacilityActivity
@@ -251,9 +218,9 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		progressDialog.dismiss();
 		
-		FacilityList facilities = event.getFacilities();
+		mFacilities = event.getFacilities();
 		
-		if (facilities.size() == 0) {
+		if (mFacilities.size() == 0) {
 			// no facilities were found, notify user
 			if (noFacilitiesToast == null) {
 				noFacilitiesToast = Toast.makeText(this, "No facilites found in this location.", Toast.LENGTH_LONG);
@@ -268,7 +235,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		
 		// this reloads the facility list via the FacilityArrayAdaptor
 		mAdapter.clear();
-		mAdapter.addAll(event.getFacilities());
+		mAdapter.addAll(mFacilities);
 		mAdapter.notifyDataSetChanged();
 	}
 	
@@ -313,9 +280,27 @@ public class FacilityMapListActivity extends BaseActivity {
 	}
 	
 	
+	/**
+	 * Handle LocationChangedEvent, fired when the application detects a new user location.
+	 * 
+	 * @param event
+	 */
+	@Subscribe public void handleLocationChanged(LocationChangedEvent event) {
+		Log.i(TAG, "handleLocationChanged");
+		
+		mMyLocation = event.getLocation();
+		
+		if (mFacilities == null) {
+			// We only want to zoom to our location if this is the first location change
+			this.zoomToMyLocation();			
+		}
+	}
+	
+	
 	// ============================================================================================
     // INNER CLASSES
     // ============================================================================================
+
 
 	/**
 	 * Used by RoboSpice as to handle the response from the facilities "within" request.

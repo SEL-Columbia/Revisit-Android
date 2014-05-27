@@ -8,10 +8,12 @@ import javax.inject.Inject;
 import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.di.DIModule;
 import org.columbia.sel.facilitator.model.FacilityRepository;
+import org.columbia.sel.facilitator.service.LocationService;
 
 import com.squareup.otto.Bus;
 
 import android.app.Application;
+import android.content.Intent;
 import dagger.ObjectGraph;
 
 public class FacilitatorApplication extends Application {
@@ -61,6 +63,8 @@ public class FacilitatorApplication extends Application {
 		FacilityRepository fr = graph.get(FacilityRepository.class);
 		Bus bus = graph.get(Bus.class);
 		bus.unregister(fr);
+		Intent serviceIntent = new Intent(this, LocationService.class);
+		stopService(serviceIntent);
 	}
 	
 	/**
