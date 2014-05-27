@@ -21,7 +21,14 @@
     <string name="add_facility_title">Add New Facility</string>
     <string name="add_facility_name">Name</string>
     <string name="add_facility_type">Type</string>
+    <string name="add_facility_sector">Sector</string>
     <string name="add_facility_location">Location</string>
+    
+    <string-array name="sectors_array">
+        <item>health</item>
+        <item>education</item>
+        <item>water and sanitation</item>
+    </string-array>
     
 
 </resources>

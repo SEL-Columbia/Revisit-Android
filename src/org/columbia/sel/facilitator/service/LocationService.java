@@ -169,9 +169,9 @@ public class LocationService extends Service implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		Log.i(TAG, "New Location from " + location.getProvider() + ": " + location.getLatitude() + ", " + location.getLongitude());
-		bus.post(new LocationChangedEvent(location));
 		if (location != null && isBetterLocation(location, this.mCurrentLocation)) {
 			this.mCurrentLocation = location;
+			bus.post(new LocationChangedEvent(location));
 		}
 	}
 

@@ -276,7 +276,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		Log.i(TAG, n + ", " + w + ", " + s + ", " + e + ": " + sectorFilter);
 		
 		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e), sectorFilter);
-		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ALWAYS_EXPIRED, new FacilitiesRequestListener());
+		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND, new FacilitiesRequestListener());
 	}
 	
 	

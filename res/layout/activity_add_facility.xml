@@ -14,35 +14,37 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp" >
-
-        <TextView
-            android:id="@+id/add_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="@string/add_facility_title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:padding="10dp"
+        android:descendantFocusability="beforeDescendants"
+  		android:focusableInTouchMode="true" >
 
         <EditText
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/add_title"
             android:layout_marginBottom="10dp"
             android:hint="@string/add_facility_name"
             android:inputType="textCapWords"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
+        <Spinner
+		    android:id="@+id/sector"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_below="@id/name"
+		    android:layout_marginBottom="10dp"
+            android:hint="@string/add_facility_sector"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        
         <EditText
             android:id="@+id/type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/name"
+            android:layout_below="@id/sector"
             android:layout_marginBottom="10dp"
             android:hint="@string/add_facility_type"
             android:inputType="text"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <LinearLayout 
             android:id="@+id/location_wrap"
@@ -59,7 +61,7 @@
                 android:layout_marginBottom="10dp"
                 android:hint="@string/add_facility_location"
                 android:inputType="text"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <ImageButton
                 android:id="@+id/get_location"
