@@ -5,10 +5,12 @@ import javax.inject.Inject;
 import org.columbia.sel.facilitator.FacilitatorApplication;
 import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.api.FacilityRetrofitSpiceService;
+import org.columbia.sel.facilitator.service.LocationService;
 
 import com.octo.android.robospice.SpiceManager;
 import com.squareup.otto.Bus;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
@@ -61,6 +63,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     protected void onStop() {
         spiceManager.shouldStop();
+        stopService(new Intent(this, LocationService.class));
         super.onStop();
     }
 

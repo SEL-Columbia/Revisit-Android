@@ -23,6 +23,7 @@ import org.columbia.sel.facilitator.fragment.BaseMapFragment;
 import org.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 import org.columbia.sel.facilitator.osm.AddFacilityItemizedIconOverlay;
+import org.columbia.sel.facilitator.service.LocationService;
 import org.columbia.sel.facilitator.task.FacilityRequestTask;
 
 import com.squareup.otto.Bus;
@@ -57,7 +58,8 @@ import static android.content.Context.LOCATION_SERVICE;
 		// Other Components
 		FacilityRequestTask.class,
 		FacilityRepository.class,
-		AddFacilityItemizedIconOverlay.class
+		AddFacilityItemizedIconOverlay.class,
+		LocationService.class
 	}
 )
 public class DIModule {

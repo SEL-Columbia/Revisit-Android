@@ -7,10 +7,12 @@ import org.columbia.sel.facilitator.api.AddFacilityRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilityPlacedEvent;
+import org.columbia.sel.facilitator.event.LocationChangedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.columbia.sel.facilitator.fragment.AddFacilityMapFragment;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
+import org.columbia.sel.facilitator.service.LocationService;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 
@@ -54,7 +56,11 @@ public class AddFacilityActivity extends BaseActivity {
 
 	@Inject
 	LocationManager lm;
+	
+	private LocationService mLocationService;
 
+	private boolean mFirstRun = true;
+	
 	// Stores the location of the new facility
 	private GeoPoint mFacilityGeoPoint;
 	
@@ -82,15 +88,12 @@ public class AddFacilityActivity extends BaseActivity {
 		FragmentManager fragmentManager = getFragmentManager();
 		mMapFragment = (AddFacilityMapFragment) fragmentManager
 				.findFragmentById(R.id.fragment_map);
-
-		this.setupLocationListener();
-		this.zoomToMyLocation();
-
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
+		startService(new Intent(this, LocationService.class));
 	}
 
 	@Override
@@ -117,54 +120,18 @@ public class AddFacilityActivity extends BaseActivity {
 	}
 
 	/**
-	 * TODO: Consider moving location listening to its own class, use event bus
-	 * to communicate changes.
-	 */
-	private void setupLocationListener() {
-		Log.i(TAG, "setupLocationListener");
-		// Define a listener that responds to location updates
-		LocationListener locationListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
-				Log.i(TAG,
-						"=============> LOCATION UPDATED: "
-								+ location.toString());
-				mMyLocation = location;
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-				Log.i(TAG, "=============> STATUS CHANGES: " + provider);
-			}
-
-			public void onProviderEnabled(String provider) {
-				Log.i(TAG, "=============> PROVIDER ENABLED: " + provider);
-			}
-
-			public void onProviderDisabled(String provider) {
-				Log.i(TAG, "=============> PROVIDER DISABLED: " + provider);
-			}
-		};
-
-		// Register the listener with the Location Manager to receive location
-		// updates
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10,
-				locationListener);
-	}
-
-	/**
 	 * Center the map on my last known location.
 	 */
 	private void zoomToMyLocation() {
 		Log.i(TAG, "zoomToMyLocation");
-
-		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-		if (loc == null) {
+		
+		mMyLocation = LocationService.getCurrentLocation();
+		
+		if (mMyLocation == null) {
 			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
 		} else {
-			mMapFragment.scrollToLocation(loc);			
+			mMapFragment.scrollToLocation(mMyLocation);			
 		}
-
 	}
 
 	/**
@@ -293,6 +260,23 @@ public class AddFacilityActivity extends BaseActivity {
 		Log.i(TAG, "handleFacilityPlaced");
 		mFacilityGeoPoint = event.getGeoPoint();
 		mLocationEditText.setText(mFacilityGeoPoint.getLatitude() + ", " + mFacilityGeoPoint.getLongitude());
+	}
+	
+	/**
+	 * Handle LocationChangedEvent, fired when the application detects a new user location.
+	 * 
+	 * @param event
+	 */
+	@Subscribe public void handleLocationChanged(LocationChangedEvent event) {
+		Log.i(TAG, "handleLocationChanged");
+		
+		mMyLocation = event.getLocation();
+		
+		// We only want to zoom to our location if this is the first location change
+		if (mFirstRun) {
+			mFirstRun = false;
+			this.zoomToMyLocation();			
+		}
 	}
 
 	// ============================================================================================
