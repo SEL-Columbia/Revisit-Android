@@ -10,6 +10,10 @@ import org.columbia.sel.facilitator.api.UpdateFacilityRetrofitSpiceRequest;
 import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 
+import retrofit.converter.JacksonConverter;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -119,7 +123,22 @@ public class FacilityDetailActivity extends BaseActivity {
 	@OnClick(R.id.finish_button)
 	public void submit() {
 		
+		int checkins = mFacility.getProperties().getCheckins();
+		checkins += 1;
+		mFacility.getProperties().setCheckins(checkins);
+		
 		mUpdateFacilityRequest = new UpdateFacilityRetrofitSpiceRequest(mFacility);
+		
+//		ObjectMapper mapper = new ObjectMapper();
+//		
+//		try {
+//			String json = mapper.writeValueAsString(mFacility);
+//			Log.i(TAG, json);
+//		} catch (JsonProcessingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 		getSpiceManager().execute(mUpdateFacilityRequest, "updatefacility", DurationInMillis.ONE_SECOND, new UpdateFacilityRequestListener());
 		
 //		Intent i = new Intent();

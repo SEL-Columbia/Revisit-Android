@@ -70,6 +70,10 @@ public class FacilityMapListActivity extends BaseActivity {
 	private ProgressDialog progressDialog;
 	private Toast noFacilitiesToast;
 	
+	// The provider that's being used
+	// TODO: This should be part of an application-wide location service
+	private String mProvider = LocationManager.NETWORK_PROVIDER;
+	
 	// Filter by sector
 	String sectorFilter = null;
 	
@@ -130,6 +134,9 @@ public class FacilityMapListActivity extends BaseActivity {
 		progressDialog.show();
 		
 		// TODO: Do we need to perform an initial call to fetch facilities or will the MapChangedEvent always fire?
+		// ANSWER: As long as we can establish our current location, when we call zoomToMyLocation, the MapChangedEvent will always fire.
+		// However, if the last known location isn't available, the map will not change and facilities won't be fetched.
+		// TODO: Move location management into its own service
 		
 //		facilitiesNearRequest = new FacilitiesNearRetrofitSpiceRequest(String.valueOf(loc.getLatitude()), String.valueOf(loc.getLongitude()), "10");
 //		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w), String.valueOf(n), String.valueOf(e));
@@ -194,7 +201,8 @@ public class FacilityMapListActivity extends BaseActivity {
 		  };
 
 		// Register the listener with the Location Manager to receive location updates
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+//		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+		lm.requestLocationUpdates(mProvider, 0, 10, locationListener);
 	}
 	
 	/**
@@ -202,8 +210,15 @@ public class FacilityMapListActivity extends BaseActivity {
 	 */
 	private void zoomToMyLocation() {
 		Log.i(TAG, "zoomToMyLocation");
+		Location loc;
 		
-		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		// TODO: this logic could be simplified.
+		
+		if (mMyLocation == null) {
+			loc = lm.getLastKnownLocation(mProvider);
+		} else {
+			loc = mMyLocation;
+		}
 		
 		if (loc == null) {
 			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();

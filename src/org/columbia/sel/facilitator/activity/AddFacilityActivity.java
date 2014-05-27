@@ -181,7 +181,6 @@ public class AddFacilityActivity extends BaseActivity {
 		
 		// TESTING Jackson2 conversion... works.
 //		ObjectMapper mapper = new ObjectMapper();
-//		JacksonConverter converter = new JacksonConverter(new ObjectMapper());
 //		
 //		try {
 //			String json = mapper.writeValueAsString(newFacility);
@@ -192,6 +191,7 @@ public class AddFacilityActivity extends BaseActivity {
 //		}
 
 		// TESTING Retrofit using JacksonConverter... works!
+//		JacksonConverter converter = new JacksonConverter(new ObjectMapper());
 //		RestAdapter restAdapter = new RestAdapter.Builder()
 //				.setConverter(converter)
 //				.setEndpoint("http://23.21.86.131:3000/api/v1")
