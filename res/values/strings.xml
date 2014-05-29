@@ -28,6 +28,13 @@
         <item>health</item>
         <item>education</item>
         <item>water and sanitation</item>
+        <item>energy</item>
+        <item>shelter</item>
+        <item>agriculture</item>
+        <item>finance</item>
+        <item>human rights</item>
+        <item>transportation</item>
+        <item>communications</item>
     </string-array>
     
 
