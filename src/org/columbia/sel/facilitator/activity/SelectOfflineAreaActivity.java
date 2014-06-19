@@ -1,34 +1,31 @@
 package org.columbia.sel.facilitator.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
-import org.columbia.sel.facilitator.R.id;
-import org.columbia.sel.facilitator.R.layout;
-import org.columbia.sel.facilitator.R.menu;
-import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
-import org.columbia.sel.facilitator.model.Facility;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
+import org.columbia.sel.facilitator.osm.OSMMapTilePackager;
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
-import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
-
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
 
 /**
  * TODO: THIS ACTIVITY WAS AN INITIAL TEST, NOT CURRENTLY USED
@@ -36,7 +33,7 @@ import android.widget.Toast;
  * @author Jonathan Wohl
  *
  */
-public class MapActivity extends BaseActivity {
+public class SelectOfflineAreaActivity extends BaseActivity {
 	
 	@Inject FacilityRepository fr;
 	
@@ -56,16 +53,18 @@ public class MapActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_map);
+		setContentView(R.layout.activity_select_offline);
 		
-		Log.i(APP_TAG, "_+_+_+_+_+_+_+_+_+_+_ THE TAG");
+		Log.i("SelectOfflineAreaActivity", "_+_+_+_+_+_+_+_+_+_+_ THE TAG");
 		
+		// Injection for views and onclick handlers
+		ButterKnife.inject(this);
 		
 		mMapView = (MapView) this.findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.setMultiTouchControls(true);
 
-		mMapView.getController().setZoom(15);
+		mMapView.getController().setZoom(12);
 		mMapCon = (MapController) mMapView.getController();
 		
 		mResourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
@@ -73,9 +72,24 @@ public class MapActivity extends BaseActivity {
 		this.setupLocationListener();
 		
 		this.zoomToMyLocation();
-		
-//		fr.loadFacilities();
 	}
+	
+	@OnClick(R.id.download_button)
+	public void download(View view) {
+		Log.i("SelectOfflineAreaActivity", "++++++++++++ clicked");
+		BoundingBoxE6 bb = mMapView.getBoundingBox();
+		String n = (bb.getLatNorthE6() / 1E6)+"";
+		String s = (bb.getLatSouthE6() / 1E6)+"";
+		String e = (bb.getLonEastE6() / 1E6)+"";
+		String w = (bb.getLonWestE6() / 1E6)+"";
+		
+		OSMMapTilePackager tp = new OSMMapTilePackager();
+		String fileDest = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles/Mapnik";
+		String[] args = {"-u", "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png", "-t", fileDest, "-zmin", "4", "-zmax", "12", "-n", n, "-s", s, "-e", e, "-w", w, "-fa", ".tile"};
+		tp.start(args);
+	}
+	
+	
 	
 	private void setupLocationListener() {
 		Log.i(TAG, "setupLocationListener");
@@ -127,52 +141,5 @@ public class MapActivity extends BaseActivity {
 
 		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
 		mMapCon.animateTo(point);
-	}
-	
-	private void addFacilitiesToMap(FacilityList facilities) {
-		Log.i(TAG, "addFacilitiesToMap");
-		
-		// List of markers
-		ArrayList<OverlayItem> markers = new ArrayList<OverlayItem>();
-		
-		// Create a marker for each facilitiy
-		for (Facility facility: facilities) {
-			Log.i(TAG, facility.getCoordinates().get(0) + ", " + facility.getCoordinates().get(1));
-			GeoPoint point = new GeoPoint(facility.getCoordinates().get(0), facility.getCoordinates().get(1));
-			markers.add(new OverlayItem(facility.getName(), "SampleDescription", point));
-		}
-		
-		/* OnTapListener for the Markers, shows a simple Toast. */
-        this.mMyLocationOverlay = new ItemizedIconOverlay<OverlayItem>(markers,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                    
-        			@Override
-                    public boolean onItemSingleTapUp(final int index,
-                            final OverlayItem item) {
-                        Toast.makeText(
-                                MapActivity.this,
-                                item.getTitle(), Toast.LENGTH_SHORT).show();
-                        return true; // We 'handled' this event.
-                    }
-                    
-                    @Override
-                    public boolean onItemLongPress(final int index,
-                            final OverlayItem item) {
-                        Toast.makeText(
-                        		MapActivity.this, 
-                                item.getSnippet() ,Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                    
-                }, mResourceProxy);
-        
-        // Add the overlays to the map
-        this.mMapView.getOverlays().add(this.mMyLocationOverlay);
-        mMapView.invalidate();
-	}
-	
-	@Subscribe public void handleFacilitiesLoaded(FacilitiesLoadedEvent event) {
-		Log.i(TAG, "handleFacilitiesLoaded");
-		addFacilitiesToMap(event.getFacilities());
 	}
 }

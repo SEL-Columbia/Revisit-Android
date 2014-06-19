@@ -14,7 +14,7 @@ import org.columbia.sel.facilitator.activity.FacilityDetailActivity;
 import org.columbia.sel.facilitator.activity.FacilityListActivity;
 import org.columbia.sel.facilitator.activity.FacilityMapListActivity;
 import org.columbia.sel.facilitator.activity.MainActivity;
-import org.columbia.sel.facilitator.activity.MapActivity;
+import org.columbia.sel.facilitator.activity.SelectOfflineAreaActivity;
 import org.columbia.sel.facilitator.annotation.ForApplication;
 import org.columbia.sel.facilitator.annotation.ForLogging;
 import org.columbia.sel.facilitator.fragment.AddFacilityMapFragment;
@@ -44,7 +44,7 @@ import static android.content.Context.LOCATION_SERVICE;
 		BaseActivity.class,
 		MainActivity.class,
 		FacilityListActivity.class,
-		MapActivity.class,
+		SelectOfflineAreaActivity.class,
 		FacilityDetailActivity.class,
 		FacilityMapListActivity.class,
 		AddFacilityActivity.class,

@@ -47,7 +47,7 @@ public class BaseMapFragment extends BaseFragment {
 		mMapCon = (MapController) mMapView.getController();
 		
 		// Turn off data connection, forces use of local map tiles
-//		mMapView.setUseDataConnection(false);
+		mMapView.setUseDataConnection(false);
 		
 		mMapCon.setZoom(14);
 		

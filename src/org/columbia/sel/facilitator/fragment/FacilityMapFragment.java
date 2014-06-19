@@ -3,7 +3,7 @@ package org.columbia.sel.facilitator.fragment;
 import java.util.ArrayList;
 
 import org.columbia.sel.facilitator.R;
-import org.columbia.sel.facilitator.activity.MapActivity;
+import org.columbia.sel.facilitator.activity.SelectOfflineAreaActivity;
 import org.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import org.columbia.sel.facilitator.event.FacilitySelectedEvent;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
