@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
+import org.columbia.sel.facilitator.grout.OSMMapTilePackager;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
-import org.columbia.sel.facilitator.osm.OSMMapTilePackager;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
@@ -78,15 +78,16 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	public void download(View view) {
 		Log.i("SelectOfflineAreaActivity", "++++++++++++ clicked");
 		BoundingBoxE6 bb = mMapView.getBoundingBox();
-		String n = (bb.getLatNorthE6() / 1E6)+"";
-		String s = (bb.getLatSouthE6() / 1E6)+"";
-		String e = (bb.getLonEastE6() / 1E6)+"";
-		String w = (bb.getLonWestE6() / 1E6)+"";
+		Double n = (bb.getLatNorthE6() / 1E6);
+		Double s = (bb.getLatSouthE6() / 1E6);
+		Double e = (bb.getLonEastE6() / 1E6);
+		Double w = (bb.getLonWestE6() / 1E6);
 		
-		OSMMapTilePackager tp = new OSMMapTilePackager();
-		String fileDest = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles/Mapnik";
-		String[] args = {"-u", "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png", "-t", fileDest, "-zmin", "4", "-zmax", "12", "-n", n, "-s", s, "-e", e, "-w", w, "-fa", ".tile"};
-		tp.start(args);
+		OSMMapTilePackager osmTP = new OSMMapTilePackager(n, s, e, w);
+		osmTP.run();
+//		String tempDir = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles/Mapnik";
+//		String[] args = {"-u", "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png", "-t", tempDir, "-zmin", "4", "-zmax", "12", "-n", n, "-s", s, "-e", e, "-w", w, "-fa", ".tile"};
+//		tp.start(args);
 	}
 	
 	

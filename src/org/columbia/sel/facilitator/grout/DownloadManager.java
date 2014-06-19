@@ -1,5 +1,5 @@
 // Created by plusminus on 9:34:16 PM - Mar 5, 2009
-package org.columbia.sel.facilitator.osm;
+package org.columbia.sel.facilitator.grout;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -54,7 +54,7 @@ public class DownloadManager {
 	// ===========================================================
 
 	public synchronized void add(final OSMTileInfo pTileInfo){
-		Log.i(TAG, "+++++++ Adding Tiles");
+//		Log.i(TAG, "+++++++ Adding Tiles");
 		this.mQueue.add(pTileInfo);
 		spawnNewThread();
 	}

@@ -7,6 +7,7 @@ import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -47,6 +48,7 @@ public class BaseMapFragment extends BaseFragment {
 		mMapCon = (MapController) mMapView.getController();
 		
 		// Turn off data connection, forces use of local map tiles
+//		mMapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mMapView.setUseDataConnection(false);
 		
 		mMapCon.setZoom(14);

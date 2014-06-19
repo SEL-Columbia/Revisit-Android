@@ -1,13 +1,15 @@
 // Created by plusminus on 9:22:20 PM - Mar 5, 2009
-package org.columbia.sel.facilitator.osm;
+package org.columbia.sel.facilitator.grout;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GEMFFile;
 
+import android.os.Environment;
 import android.util.Log;
 
 public class OSMMapTilePackager {
@@ -15,13 +17,35 @@ public class OSMMapTilePackager {
 	// Constants
 	// ===========================================================
 
-	private static final int THREADCOUNT_DEFAULT = 2;
+	private static final int DEFAULT_THREADCOUNT = 2;
+	private static final String DEFAULT_SERVER_URL = "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png";
+	private static final String DEFAULT_ROOT_DIR = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles";
+	private static final int DEFAULT_MAX_TILES = 10000;
 	private static boolean FORCE = false;
-	private String TAG = this.getClass().getCanonicalName();
+	private final String TAG = this.getClass().getCanonicalName();
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
+
+	// String[] args = {"-u",
+	// "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png", "-t", fileDest,
+	// "-zmin", "4", "-zmax", "12", "-n", n, "-s", s, "-e", e, "-w", w, "-fa",
+	// ".tile"};
+
+	private String mServerURL = DEFAULT_SERVER_URL;
+	private String mRootDownloadDir = DEFAULT_ROOT_DIR;
+	private String mDestinationFile = null;
+	private String mTempFolder = "Mapnik";
+	private String mFileAppendix = ".tile";
+	private Double mNorth = null;
+	private Double mSouth = null;
+	private Double mEast = null;
+	private Double mWest = null;
+	private Integer mMaxZoom = 16;
+	private int mMinZoom = 8;
+	private int mThreadCount = DEFAULT_THREADCOUNT;
+	private int mMaxTiles = DEFAULT_MAX_TILES;
 
 	// ===========================================================
 	// Constructors
@@ -29,6 +53,138 @@ public class OSMMapTilePackager {
 
 	public OSMMapTilePackager() {
 		Log.i(TAG, "++++++++++++ Creating Tile Packager");
+	}
+
+	public OSMMapTilePackager(Double north, Double south, Double east, Double west) {
+		this.mNorth = north;
+		this.mSouth = south;
+		this.mEast = east;
+		this.mWest = west;
+	}
+
+	public OSMMapTilePackager(BoundingBoxE6 bb) {
+		this.mNorth = (bb.getLatNorthE6() / 1E6);
+		this.mSouth = (bb.getLatSouthE6() / 1E6);
+		this.mEast = (bb.getLonEastE6() / 1E6);
+		this.mWest = (bb.getLonWestE6() / 1E6);
+	}
+
+	/**
+	 * Check if the specified area is suitable for download. TODO: determine
+	 * some maximum values for number of tiles.
+	 * 
+	 * @return
+	 */
+	public Boolean isValidRegionForDownload() {
+
+		// check bounds
+		if (mNorth == null || mSouth == null || mEast == null || mWest == null) {
+			return false;
+		}
+
+		// check that expected num tiles < max
+		int maxExpected = this.getExpectedFileCount(mMinZoom, mMaxZoom, mNorth, mSouth, mEast, mWest);
+		if (maxExpected > mMaxTiles) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public String getServerURL() {
+		return mServerURL;
+	}
+
+	public void setServerURL(String serverURL) {
+		this.mServerURL = serverURL;
+	}
+
+	public String getDestinationFile() {
+		return mDestinationFile;
+	}
+
+	public void setDestinationFile(String destinationFile) {
+		this.mDestinationFile = destinationFile;
+	}
+
+	public String getTempFolder() {
+		return mTempFolder;
+	}
+
+	public void setTempFolder(String tempFolder) {
+		this.mTempFolder = tempFolder;
+	}
+
+	public String getmRootDownloadDir() {
+		return mRootDownloadDir;
+	}
+
+	public void setmRootDownloadDir(String mRootDownloadDir) {
+		this.mRootDownloadDir = mRootDownloadDir;
+	}
+
+	public String getFileAppendix() {
+		return mFileAppendix;
+	}
+
+	public void setFileAppendix(String fileAppendix) {
+		this.mFileAppendix = fileAppendix;
+	}
+
+	public Double getNorth() {
+		return mNorth;
+	}
+
+	public void setNorth(Double north) {
+		this.mNorth = north;
+	}
+
+	public Double getSouth() {
+		return mSouth;
+	}
+
+	public void setSouth(Double south) {
+		this.mSouth = south;
+	}
+
+	public Double getEast() {
+		return mEast;
+	}
+
+	public void setEast(Double east) {
+		this.mEast = east;
+	}
+
+	public Double getWest() {
+		return mWest;
+	}
+
+	public void setWest(Double west) {
+		this.mWest = west;
+	}
+
+	public Integer getMaxzoom() {
+		return mMaxZoom;
+	}
+
+	public void setMaxzoom(Integer maxzoom) {
+		this.mMaxZoom = maxzoom;
+	}
+
+	public int getMinzoom() {
+		return mMinZoom;
+	}
+
+	public void setMinzoom(int minzoom) {
+		this.mMinZoom = minzoom;
+	}
+
+	public int getThreadCount() {
+		return mThreadCount;
+	}
+
+	public void setThreadCount(int threadCount) {
+		this.mThreadCount = threadCount;
 	}
 
 	public void start(final String[] args) {
@@ -48,7 +204,7 @@ public class OSMMapTilePackager {
 		Double west = null;
 		Integer maxzoom = null;
 		int minzoom = 0;
-		int threadCount = THREADCOUNT_DEFAULT;
+		int threadCount = DEFAULT_THREADCOUNT;
 
 		try {
 			for (int i = 0; i < args.length; i += 2) {
@@ -147,19 +303,53 @@ public class OSMMapTilePackager {
 				west);
 	}
 
+	public void run() {
+		// remove previously cached files
+		String fullTempPath = this.mRootDownloadDir + "/" + this.mTempFolder;
+		String fullDestinationFilePath = this.mRootDownloadDir + "/" + this.mDestinationFile;
+
+		Log.i(TAG, "----------------------- DELETING TILES in " + fullTempPath);
+		Util.deleteDirectory(new File(fullTempPath));
+
+		// If region is valid for download, do it.
+		if (isValidRegionForDownload()) {
+			Log.i(TAG, "----------------------- DOWNLOADING TILES in " + this.mTempFolder);
+			downloadTiles(mServerURL, fullTempPath, mThreadCount, mFileAppendix, mMinZoom, mMaxZoom, mNorth, mSouth,
+					mEast, mWest);
+		}
+
+		if (mDestinationFile != null) {
+			if (mDestinationFile.endsWith(".zip")) {
+				Log.i(TAG, "----------------------- ZIPPING TILES in " + this.mTempFolder);
+				runZipToFile(fullTempPath, fullDestinationFilePath);
+			} else if (mDestinationFile.endsWith(".gemf")) {
+				runCreateGEMFFile(fullTempPath, fullDestinationFilePath);
+			} else {
+				runCreateDb(fullTempPath, fullDestinationFilePath);
+			}
+
+			Log.i(TAG, "---------------------------");
+
+			if (mServerURL != null) {
+				runCleanup(fullTempPath);
+			}
+		}
+
+	}
+
 	private void run(final String pServerURL, final String pDestinationFile, final String pTempFolder,
 			final int pThreadCount, final String pFileAppendix, final int pMinZoom, final int pMaxZoom,
 			final double pNorth, final double pSouth, final double pEast, final double pWest) {
 
 		if (pServerURL != null) {
-			Log.i(TAG, "--------------------------- DELETING TILES");
+			Log.i(TAG, "--------------------------- DELETING TILES in " + pTempFolder);
 			Util.deleteDirectory(new File(pTempFolder));
 
 			Log.i(TAG, "---------------------------");
-			final int expectedFileCount = runFileExpecter(pMinZoom, pMaxZoom, pNorth, pSouth, pEast, pWest);
+			final int expectedFileCount = getExpectedFileCount(pMinZoom, pMaxZoom, pNorth, pSouth, pEast, pWest);
 
 			Log.i(TAG, "---------------------------");
-			runDownloading(pServerURL, pTempFolder, pThreadCount, pFileAppendix, pMinZoom, pMaxZoom, pNorth, pSouth,
+			downloadTiles(pServerURL, pTempFolder, pThreadCount, pFileAppendix, pMinZoom, pMaxZoom, pNorth, pSouth,
 					pEast, pWest);
 
 			Log.i(TAG, "---------------------------");
@@ -268,7 +458,7 @@ public class OSMMapTilePackager {
 		Log.i(TAG, " done.");
 	}
 
-	private void runDownloading(final String pBaseURL, final String pTempFolder, final int pThreadCount,
+	private void downloadTiles(final String pBaseURL, final String pTempFolder, final int pThreadCount,
 			final String pFileAppendix, final int pMinZoom, final int pMaxZoom, final double pNorth,
 			final double pSouth, final double pEast, final double pWest) {
 		final String pTempBaseURL = pTempFolder + File.separator + "%d" + File.separator + "%d" + File.separator + "%d"
@@ -304,7 +494,19 @@ public class OSMMapTilePackager {
 		}
 	}
 
-	private int runFileExpecter(final int pMinZoom, final int pMaxZoom, final double pNorth, final double pSouth,
+	/**
+	 * Given a min/max zoom and a bounding box, how many tiles will we be
+	 * downloading?
+	 * 
+	 * @param pMinZoom
+	 * @param pMaxZoom
+	 * @param pNorth
+	 * @param pSouth
+	 * @param pEast
+	 * @param pWest
+	 * @return int Expected number of images.
+	 */
+	private int getExpectedFileCount(final int pMinZoom, final int pMaxZoom, final double pNorth, final double pSouth,
 			final double pEast, final double pWest) {
 		/* Calculate file-count. */
 		int fileCnt = 0;
@@ -317,30 +519,7 @@ public class OSMMapTilePackager {
 			fileCnt += dx * dy;
 		}
 
-		// abortIfUserIsNotSure("This will download: " + fileCnt +
-		// " Maptiles!");
-
 		return fileCnt;
-	}
-
-	private void abortIfUserIsNotSure(final String message) {
-		if (FORCE) {
-			return;
-		}
-
-		Log.i(TAG, message);
-		Log.i(TAG, "Are you sure? [Y/N] ?: ");
-		try {
-			// java.awt.Toolkit.getDefaultToolkit().beep();
-		} catch (final Throwable t) { /* Ignore */
-		}
-
-		final String line = new Scanner(System.in).nextLine().toUpperCase().trim();
-
-		if (!line.equals("Y") && !line.equals("YES")) {
-			System.err.println("User aborted.");
-			System.exit(0);
-		}
 	}
 
 	// ===========================================================

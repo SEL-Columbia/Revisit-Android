@@ -1,5 +1,5 @@
 // Created by plusminus on 00:37:01 - 19.12.2008
-package org.columbia.sel.facilitator.osm;
+package org.columbia.sel.facilitator.grout;
 
 public class OSMTileInfo {
 	// ===========================================================
