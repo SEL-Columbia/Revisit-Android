@@ -7,6 +7,8 @@ import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.grout.OSMMapTilePackager;
+import org.columbia.sel.facilitator.grout.TileFetchingService;
+import org.columbia.sel.facilitator.grout.TileFetchingService.TileFetchingBinder;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -19,11 +21,16 @@ import org.osmdroid.views.overlay.OverlayItem;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 
@@ -45,6 +52,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	private MapController mMapCon;
 	private ItemizedOverlay<OverlayItem> mMyLocationOverlay;
 	private DefaultResourceProxyImpl mResourceProxy;
+	
+	TileFetchingService mService;
+    boolean mBound = false;
 	
 	// TODO each activity probably doesn't need a reference to the facilities?
 	// Centralize in FacilityRepository or the like?
@@ -74,17 +84,40 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		this.zoomToMyLocation();
 	}
 	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		// Bind to TileFetchingService
+        Intent intent = new Intent(this, TileFetchingService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+	}
+	
+	@Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+	
 	@OnClick(R.id.download_button)
 	public void download(View view) {
 		Log.i("SelectOfflineAreaActivity", "++++++++++++ clicked");
-		BoundingBoxE6 bb = mMapView.getBoundingBox();
-		Double n = (bb.getLatNorthE6() / 1E6);
-		Double s = (bb.getLatSouthE6() / 1E6);
-		Double e = (bb.getLonEastE6() / 1E6);
-		Double w = (bb.getLonWestE6() / 1E6);
+		if (mBound) {
+			
+			BoundingBoxE6 bb = mMapView.getBoundingBox();
+			Double n = (bb.getLatNorthE6() / 1E6);
+			Double s = (bb.getLatSouthE6() / 1E6);
+			Double e = (bb.getLonEastE6() / 1E6);
+			Double w = (bb.getLonWestE6() / 1E6);
+			
+			mService.fetchTiles(n,s,e,w);
+		}
 		
-		OSMMapTilePackager osmTP = new OSMMapTilePackager(n, s, e, w);
-		osmTP.run();
+//		OSMMapTilePackager osmTP = new OSMMapTilePackager(n, s, e, w);
+//		osmTP.run();
 //		String tempDir = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles/Mapnik";
 //		String[] args = {"-u", "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png", "-t", tempDir, "-zmin", "4", "-zmax", "12", "-n", n, "-s", s, "-e", e, "-w", w, "-fa", ".tile"};
 //		tp.start(args);
@@ -143,4 +176,23 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
 		mMapCon.animateTo(point);
 	}
+	
+	
+	/** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+        	TileFetchingBinder binder = (TileFetchingBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 }

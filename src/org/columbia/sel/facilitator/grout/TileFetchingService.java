@@ -12,7 +12,7 @@ public class TileFetchingService extends Service {
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
-		return null;
+		return mBinder;
 	}
 	
 	/**
@@ -20,10 +20,16 @@ public class TileFetchingService extends Service {
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class TileFetchingBinder extends Binder {
-    	TileFetchingService getService() {
+    	public TileFetchingService getService() {
             // Return this instance of TileFetchingService so clients can call public methods
             return TileFetchingService.this;
         }
+    	
+    }
+
+    public void fetchTiles(Double north, Double south, Double east, Double west) {
+    	OSMMapTilePackager osmTP = new OSMMapTilePackager(north, south, east, west);
+    	osmTP.run();
     }
 
 }
