@@ -4,7 +4,6 @@ package org.columbia.sel.facilitator.grout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GEMFFile;
@@ -12,11 +11,10 @@ import org.osmdroid.util.GEMFFile;
 import android.os.Environment;
 import android.util.Log;
 
-public class OSMMapTilePackager {
+public class OSMMapTilePackager implements TileFetchingListener {
 	// ===========================================================
 	// Constants
 	// ===========================================================
-
 	private static final int DEFAULT_THREADCOUNT = 2;
 	private static final String DEFAULT_SERVER_URL = "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png";
 	private static final String DEFAULT_ROOT_DIR = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles";
@@ -46,6 +44,12 @@ public class OSMMapTilePackager {
 	private int mMinZoom = 8;
 	private int mThreadCount = DEFAULT_THREADCOUNT;
 	private int mMaxTiles = DEFAULT_MAX_TILES;
+	private int mTotalExpected;
+	private int mRemaining;
+	
+	private boolean mIsRunning = false;
+	
+	private TileFetchingListener mListener;
 
 	// ===========================================================
 	// Constructors
@@ -83,70 +87,18 @@ public class OSMMapTilePackager {
 		}
 
 		// check that expected num tiles < max
-		int maxExpected = this.getExpectedFileCount(mMinZoom, mMaxZoom, mNorth, mSouth, mEast, mWest);
-		if (maxExpected > mMaxTiles) {
+		mTotalExpected = this.getExpectedFileCount(mMinZoom, mMaxZoom, mNorth, mSouth, mEast, mWest);
+		if (mTotalExpected > mMaxTiles) {
 			return false;
 		}
 
 		return true;
 	}
 
-	/**
-	 * Kick off the process of downloading tiles.
-	 */
-	public void run() {
-		// remove previously cached files
-		String fullTempPath = this.mRootDownloadDir + "/" + this.mTempFolder;
-		String fullDestinationFilePath = this.mRootDownloadDir + "/" + this.mDestinationFile;
-
-		Log.i(TAG, "----------------------- DELETING TILES in " + fullTempPath);
-		Util.deleteDirectory(new File(fullTempPath));
-
-		// If region is valid for download, do it.
-		if (isValidRegionForDownload()) {
-			Log.i(TAG, "----------------------- DOWNLOADING TILES in " + this.mTempFolder);
-			downloadTiles(mServerURL, fullTempPath, mThreadCount, mFileAppendix, mMinZoom, mMaxZoom, mNorth, mSouth,
-					mEast, mWest);
-		} else {
-			
-		}
-
-		if (mDestinationFile != null) {
-			if (mDestinationFile.endsWith(".zip")) {
-				Log.i(TAG, "----------------------- ZIPPING TILES in " + this.mTempFolder);
-				runZipToFile(fullTempPath, fullDestinationFilePath);
-			} else if (mDestinationFile.endsWith(".gemf")) {
-				runCreateGEMFFile(fullTempPath, fullDestinationFilePath);
-			} else {
-				runCreateDb(fullTempPath, fullDestinationFilePath);
-			}
-
-			Log.i(TAG, "---------------------------");
-
-			if (mServerURL != null) {
-				runCleanup(fullTempPath);
-			}
-		}
-	}
+	
 
 
-	private void runFileExistenceChecker(final int pExpectedFileCount, final String pTempFolder, final int pMinZoom,
-			final int pMaxZoom, final double pNorth, final double pSouth, final double pEast, final double pWest) {
-
-		// abortIfUserIsNotSure("This will check if the actual filecount is the same as the expected ("
-		// + pExpectedFileCount + ").");
-
-		/* Quickly count files in the tempFolder. */
-		Log.i(TAG, "Counting existing files ...");
-		final int actualFileCount = FolderFileCounter.getTotalRecursiveFileCount(new File(pTempFolder));
-		if (pExpectedFileCount == actualFileCount) {
-			Log.i(TAG, " done.");
-		} else {
-			Log.i(TAG, " FAIL!");
-			// abortIfUserIsNotSure("Reason: Actual files:" + actualFileCount +
-			// "    Expected: " + pExpectedFileCount + ". Proceed?");
-		}
-	}
+	
 
 	
 	
@@ -154,6 +106,21 @@ public class OSMMapTilePackager {
 	// Getter & Setter
 	// ===========================================================
 	
+	public TileFetchingListener getTileFetchingListener() {
+		return mListener;
+	}
+
+	public void setTileFetchingListener(TileFetchingListener mListener) {
+		this.mListener = mListener;
+	}
+	
+	public void setBoundingBox(BoundingBoxE6 bb) {
+		mNorth = (bb.getLatNorthE6() / 1E6);
+		mSouth = (bb.getLatSouthE6() / 1E6);
+		mEast = (bb.getLonEastE6() / 1E6);
+		mWest = (bb.getLonWestE6() / 1E6);
+	}
+
 	public String getServerURL() {
 		return mServerURL;
 	}
@@ -259,6 +226,66 @@ public class OSMMapTilePackager {
 	// Methods
 	// ===========================================================
 
+	/**
+	 * Kick off the process of downloading tiles.
+	 */
+	public void run() {
+		if (mIsRunning) {
+			Log.e(TAG, "Tile Packager is already running.");
+			return;
+		}
+		// remove previously cached files
+		String fullTempPath = this.mRootDownloadDir + "/" + this.mTempFolder;
+		String fullDestinationFilePath = this.mRootDownloadDir + "/" + this.mDestinationFile;
+	
+		Log.i(TAG, "----------------------- DELETING TILES in " + fullTempPath);
+		Util.deleteDirectory(new File(fullTempPath));
+	
+		// If region is valid for download, do it.
+		if (isValidRegionForDownload()) {
+			Log.i(TAG, "----------------------- DOWNLOADING TILES in " + this.mTempFolder);
+			downloadTiles(mServerURL, fullTempPath, mThreadCount, mFileAppendix, mMinZoom, mMaxZoom, mNorth, mSouth,
+					mEast, mWest);
+		} else {
+			
+		}
+	
+		if (mDestinationFile != null) {
+			if (mDestinationFile.endsWith(".zip")) {
+				Log.i(TAG, "----------------------- ZIPPING TILES in " + this.mTempFolder);
+				runZipToFile(fullTempPath, fullDestinationFilePath);
+			} else if (mDestinationFile.endsWith(".gemf")) {
+				runCreateGEMFFile(fullTempPath, fullDestinationFilePath);
+			} else {
+				runCreateDb(fullTempPath, fullDestinationFilePath);
+			}
+	
+			Log.i(TAG, "---------------------------");
+	
+			if (mServerURL != null) {
+				runCleanup(fullTempPath);
+			}
+		}
+	}
+
+	private void runFileExistenceChecker(final int pExpectedFileCount, final String pTempFolder, final int pMinZoom,
+			final int pMaxZoom, final double pNorth, final double pSouth, final double pEast, final double pWest) {
+	
+		// abortIfUserIsNotSure("This will check if the actual filecount is the same as the expected ("
+		// + pExpectedFileCount + ").");
+	
+		/* Quickly count files in the tempFolder. */
+		Log.i(TAG, "Counting existing files ...");
+		final int actualFileCount = FolderFileCounter.getTotalRecursiveFileCount(new File(pTempFolder));
+		if (pExpectedFileCount == actualFileCount) {
+			Log.i(TAG, " done.");
+		} else {
+			Log.i(TAG, " FAIL!");
+			// abortIfUserIsNotSure("Reason: Actual files:" + actualFileCount +
+			// "    Expected: " + pExpectedFileCount + ". Proceed?");
+		}
+	}
+
 	private void runCreateGEMFFile(final String pTempFolder, final String pDestinationFile) {
 		try {
 			Log.i(TAG, "Creating GEMF archive from " + pTempFolder + " to " + pDestinationFile + " ...");
@@ -304,11 +331,15 @@ public class OSMMapTilePackager {
 	private void downloadTiles(final String pBaseURL, final String pTempFolder, final int pThreadCount,
 			final String pFileAppendix, final int pMinZoom, final int pMaxZoom, final double pNorth,
 			final double pSouth, final double pEast, final double pWest) {
+		
+		// Trigger start event
+		this.onFetchingStart(new FetchingStartEvent(this.mTotalExpected));
+		
 		final String pTempBaseURL = pTempFolder + File.separator + "%d" + File.separator + "%d" + File.separator + "%d"
 				+ pBaseURL.substring(pBaseURL.lastIndexOf('.'))
 				+ pFileAppendix.replace(File.separator + File.separator, File.separator);
 
-		final DownloadManager dm = new DownloadManager(pBaseURL, pTempBaseURL, pThreadCount);
+		final DownloadManager dm = new DownloadManager(this, pBaseURL, pTempBaseURL, pThreadCount);
 
 		/* For each zoomLevel. */
 		for (int z = pMinZoom; z <= pMaxZoom; z++) {
@@ -321,20 +352,20 @@ public class OSMMapTilePackager {
 					dm.add(new OSMTileInfo(x, y, z));
 				}
 			}
-			try {
-				dm.waitEmpty();
-				Log.i(TAG, " done.");
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				dm.waitEmpty();
+//				Log.i(TAG, " done.");
+//			} catch (final InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
-		try {
-			Log.i(TAG, "Awaiting termination of all threads ...");
-			dm.waitFinished();
-			Log.i(TAG, " done.");
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Log.i(TAG, "Awaiting termination of all threads ...");
+//			dm.waitFinished();
+//			Log.i(TAG, " done.");
+//		} catch (final InterruptedException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
@@ -363,6 +394,49 @@ public class OSMMapTilePackager {
 		}
 
 		return fileCnt;
+	}
+
+	@Override
+	public void onTileDownloaded() {
+		Log.i(TAG, "------------> onTileDownloaded - remaining: " + this.mRemaining);
+		if (this.mRemaining > 0) {
+			this.mRemaining -= 1;
+		}
+		if (this.mRemaining == 0) {
+			this.onFetchingComplete();
+		}
+		FetchingProgressEvent fpe = new FetchingProgressEvent();
+		this.onFetchingProgress(fpe);
+		mListener.onTileDownloaded();
+	}
+
+	@Override
+	public void onFetchingStart(FetchingStartEvent fse) {
+		mIsRunning = true;
+		this.mRemaining = this.mTotalExpected;
+		Log.i(TAG, "-----------> onFetchingStart: total: " + this.mTotalExpected + ", remaining: " + this.mRemaining);
+		fse.total = this.mTotalExpected;
+		mListener.onFetchingStart(fse);
+	}
+
+	@Override
+	public void onFetchingStop() {
+		mIsRunning = false;
+		mListener.onFetchingStop();
+	}
+
+	@Override
+	public void onFetchingComplete() {
+		mListener.onFetchingComplete();
+		this.onFetchingStop();
+	}
+
+	@Override
+	public void onFetchingProgress(FetchingProgressEvent fpe) {
+		fpe.completed = this.mTotalExpected - this.mRemaining;
+		fpe.total = this.mTotalExpected;
+		fpe.percent = (float)fpe.completed / (float)fpe.total;
+		mListener.onFetchingProgress(fpe);
 	}
 
 	// ===========================================================

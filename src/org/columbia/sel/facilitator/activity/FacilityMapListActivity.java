@@ -50,12 +50,6 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 public class FacilityMapListActivity extends BaseActivity {
 	
-	@Inject FacilityRepository fr;
-	
-	@Inject LocationManager lm;
-	
-	private LocationService mLocationService;
-	
 	private Location mMyLocation;
 	
 	// Provides the map view and associated functionality
@@ -74,10 +68,6 @@ public class FacilityMapListActivity extends BaseActivity {
 	// These two both provide user feedback
 	private ProgressDialog progressDialog;
 	private Toast noFacilitiesToast;
-	
-	// The provider that's being used
-	// TODO: This should be part of an application-wide location service
-	private String mProvider = LocationManager.NETWORK_PROVIDER;
 	
 	// Filter by sector
 	String sectorFilter = null;

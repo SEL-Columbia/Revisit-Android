@@ -22,6 +22,7 @@ public class OSMTileInfo {
 	// ===========================================================
 
 	public final int x,y,zoom;
+	public boolean isDownloaded = false;
 
 	// ===========================================================
 	// Constructors

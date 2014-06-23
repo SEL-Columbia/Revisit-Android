@@ -6,11 +6,16 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
+import org.columbia.sel.facilitator.event.LocationChangedEvent;
+import org.columbia.sel.facilitator.grout.FetchingProgressEvent;
+import org.columbia.sel.facilitator.grout.FetchingStartEvent;
 import org.columbia.sel.facilitator.grout.OSMMapTilePackager;
+import org.columbia.sel.facilitator.grout.TileFetchingListener;
 import org.columbia.sel.facilitator.grout.TileFetchingService;
 import org.columbia.sel.facilitator.grout.TileFetchingService.TileFetchingBinder;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.model.FacilityRepository;
+import org.columbia.sel.facilitator.service.LocationService;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
@@ -19,8 +24,11 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import com.squareup.otto.Subscribe;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +41,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * TODO: THIS ACTIVITY WAS AN INITIAL TEST, NOT CURRENTLY USED
@@ -41,20 +50,19 @@ import android.view.View;
  *
  */
 public class SelectOfflineAreaActivity extends BaseActivity {
-	
-	@Inject FacilityRepository fr;
-	
-	@Inject LocationManager lm;
+
+	private LocationService mLocationService;
 	
 	private Location mMyLocation;
 	
 	private MapView mMapView;
 	private MapController mMapCon;
-	private ItemizedOverlay<OverlayItem> mMyLocationOverlay;
-	private DefaultResourceProxyImpl mResourceProxy;
+	private OSMMapTilePackager mOsmTP;
 	
 	TileFetchingService mService;
     boolean mBound = false;
+
+    ProgressDialog mProgressBar;
 	
 	// TODO each activity probably doesn't need a reference to the facilities?
 	// Centralize in FacilityRepository or the like?
@@ -77,9 +85,46 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mMapView.getController().setZoom(12);
 		mMapCon = (MapController) mMapView.getController();
 		
-		mResourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
 		
-		this.setupLocationListener();
+		mOsmTP = new OSMMapTilePackager();
+		mOsmTP.setTileFetchingListener(new TileFetchingListener() {
+
+			@Override
+			public void onTileDownloaded() {
+				// TODO Auto-generated method stub
+//				Log.i(TAG, "------------> onTileDownloaded");
+			}
+
+			@Override
+			public void onFetchingStart(FetchingStartEvent fse) {
+				// TODO Auto-generated method stub
+//				Log.i(TAG, "-----------> onFetchingStart: total: " + fse.total );
+				mProgressBar.setMax(fse.total);
+				mProgressBar.show();
+			}
+
+			@Override
+			public void onFetchingStop() {
+				// TODO Auto-generated method stub
+//				Log.i(TAG, "-----------> onFetchingStop");				
+			}
+
+			@Override
+			public void onFetchingComplete() {
+				// TODO Auto-generated method stub
+//				Log.i(TAG, "-----------> onFetchingComplete");
+				mProgressBar.dismiss();
+			}
+
+			@Override
+			public void onFetchingProgress(FetchingProgressEvent fpe) {
+				// TODO Auto-generated method stub
+				Log.i(TAG, "FetchingProgressEvent ---- complete: " + fpe.completed + ", total: " + fpe.total +
+						", percent: " + fpe.percent);
+//				int percent = Math.round(100*fpe.percent);
+				mProgressBar.setProgress(fpe.completed);
+			}
+		});
 		
 		this.zoomToMyLocation();
 	}
@@ -87,6 +132,11 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		Log.i(TAG, "------------> onStart()");
+		
+		// start location service
+		startService(new Intent(this, LocationService.class));
+		
 		// Bind to TileFetchingService
         Intent intent = new Intent(this, TileFetchingService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -95,6 +145,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	@Override
     protected void onStop() {
         super.onStop();
+        Log.i(TAG, "------------> onStop()");
         // Unbind from the service
         if (mBound) {
             unbindService(mConnection);
@@ -104,68 +155,38 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	
 	@OnClick(R.id.download_button)
 	public void download(View view) {
-		Log.i("SelectOfflineAreaActivity", "++++++++++++ clicked");
-		if (mBound) {
-			
-			BoundingBoxE6 bb = mMapView.getBoundingBox();
-			Double n = (bb.getLatNorthE6() / 1E6);
-			Double s = (bb.getLatSouthE6() / 1E6);
-			Double e = (bb.getLonEastE6() / 1E6);
-			Double w = (bb.getLonWestE6() / 1E6);
-			
-			mService.fetchTiles(n,s,e,w);
+		Log.i(TAG, "------------> download initiated");
+		BoundingBoxE6 bb = mMapView.getBoundingBox();
+		Double n = (bb.getLatNorthE6() / 1E6);
+		Double s = (bb.getLatSouthE6() / 1E6);
+		Double e = (bb.getLonEastE6() / 1E6);
+		Double w = (bb.getLonWestE6() / 1E6);
+		
+		if (mBound) {			
+//			mService.fetchTiles(n,s,e,w);
 		}
 		
-//		OSMMapTilePackager osmTP = new OSMMapTilePackager(n, s, e, w);
-//		osmTP.run();
-//		String tempDir = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles/Mapnik";
-//		String[] args = {"-u", "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png", "-t", tempDir, "-zmin", "4", "-zmax", "12", "-n", n, "-s", s, "-e", e, "-w", w, "-fa", ".tile"};
-//		tp.start(args);
+		// prepare for a progress bar dialog
+		mProgressBar = new ProgressDialog(this);
+		mProgressBar.setCancelable(true);
+		mProgressBar.setMessage("Downloading Map Tiles...");
+		mProgressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		mProgressBar.setProgress(0);
+		
+		mOsmTP.setBoundingBox(bb);
+		mOsmTP.run();
 	}
 	
 	
-	
-	private void setupLocationListener() {
-		Log.i(TAG, "setupLocationListener");
-		// Define a listener that responds to location updates
-		LocationListener locationListener = new LocationListener() {
-		    public void onLocationChanged(Location location) {
-		    	Log.i(TAG, "=============> LOCATION UPDATED: " + location.toString());
-		    	mMyLocation = location;
-		    	zoomToLocation(location);
-		    }
-
-		    public void onStatusChanged(String provider, int status, Bundle extras) {
-		    	Log.i(TAG, "=============> STATUS CHANGES: " + provider);
-		    }
-
-		    public void onProviderEnabled(String provider) {
-		    	Log.i(TAG, "=============> PROVIDER ENABLED: " + provider);
-		    }
-
-		    public void onProviderDisabled(String provider) {
-		    	Log.i(TAG, "=============> PROVIDER DISABLED: " + provider);
-		    }
-		  };
-
-		// Register the listener with the Location Manager to receive location updates
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-	}
-	
-	private void zoomToMyLocation() {
-		Log.i(TAG, "zoomToMyLocation");
-		
-		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		
-		if (loc == null) {
-			loc = new Location(LocationManager.GPS_PROVIDER);
-			loc.setLatitude(41.0);
-			loc.setLongitude(-79.0);
+	private void zoomToMyLocation() {		
+		if (mMyLocation == null) {
+			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
+		} else {
+			this.zoomToLocation(mMyLocation);			
 		}
-
-		this.zoomToLocation(loc);
+		
 	}
-	
+		
 	private void zoomToLocation(Location loc) {
 		Log.i(TAG, "zoomToLocation");
 		
@@ -184,6 +205,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
         @Override
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
+        	Log.i(TAG, "------------> SERVICE CONNECTED");
             // We've bound to LocalService, cast the IBinder and get LocalService instance
         	TileFetchingBinder binder = (TileFetchingBinder) service;
             mService = binder.getService();
@@ -192,7 +214,20 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
+        	Log.i(TAG, "------------> SERVICE DISCONNECTED");
             mBound = false;
         }
     };
+    
+    /**
+	 * Handle LocationChangedEvent, fired when the application detects a new user location.
+	 * 
+	 * @param event
+	 */
+	@Subscribe public void handleLocationChanged(LocationChangedEvent event) {
+		Log.i(TAG, "handleLocationChanged");
+		mMyLocation = event.getLocation();
+		this.zoomToMyLocation();			
+		
+	}
 }

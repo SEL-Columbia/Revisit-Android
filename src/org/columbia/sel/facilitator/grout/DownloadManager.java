@@ -16,18 +16,24 @@ import java.util.concurrent.TimeUnit;
 
 import org.osmdroid.tileprovider.util.StreamUtils;
 
-import android.os.Environment;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 public class DownloadManager {
 	// ===========================================================
 	// Constants
 	// ===========================================================
+	private final String TAG = this.getClass().getCanonicalName();
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
 
+	private OSMMapTilePackager mTilePackager;
+	
 	private final ExecutorService mThreadPool;
 
 	private final Queue<OSMTileInfo> mQueue = new LinkedBlockingQueue<OSMTileInfo>();
@@ -35,18 +41,29 @@ public class DownloadManager {
 	private final String mBaseURL;
 	private final String mDestinationURL;
 	
-	private String TAG = this.getClass().getCanonicalName();
+	private Handler mHandler;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	public DownloadManager(final String pBaseURL, final String pDestinationURL, final int mThreads) {
+	public DownloadManager(OSMMapTilePackager tp, final String pBaseURL, final String pDestinationURL, final int mThreads) {
+		this.mTilePackager = tp;
 		this.mBaseURL = pBaseURL;
 //		String root = Environment.getExternalStorageDirectory().toString();
 //		this.mDestinationURL = root + "/" + pDestinationURL;
 		this.mDestinationURL = pDestinationURL;
 		this.mThreadPool = Executors.newFixedThreadPool(mThreads);
+		
+		mHandler = new Handler(Looper.getMainLooper()) {
+			@Override
+			public void handleMessage(Message msg) {
+				Bundle bundle = msg.getData();
+				int count = bundle.getInt("count");
+//				Log.i(TAG, "------------> COUNT: " + count);
+				mTilePackager.onTileDownloaded();
+			}
+		};
 	}
 
 	// ===========================================================
@@ -100,6 +117,7 @@ public class DownloadManager {
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
+	
 
 
 	private class DownloadRunner implements Runnable {
@@ -120,6 +138,9 @@ public class DownloadManager {
 			parent.mkdirs();
 		}
 
+		/**
+		 * TODO: Maybe clean the actual downloading up?
+		 */
 		@Override
 		public void run() {
 			InputStream in = null;
@@ -142,6 +163,11 @@ public class DownloadManager {
 				StreamUtils.copy(in, out);
 
 				out.flush();
+				Message msg = new Message();
+				Bundle bundle = new Bundle();
+    			bundle.putInt("count", mQueue.size());
+                msg.setData(bundle);
+				mHandler.sendMessage(msg);
 			} catch (final Exception e) {
 				System.err.println("Error downloading: '" + this.mTileInfo + "' from URL: " + finalURL + " : " + e);
 				DownloadManager.this.add(this.mTileInfo); // try again later
