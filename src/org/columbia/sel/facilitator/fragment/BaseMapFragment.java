@@ -3,11 +3,14 @@ package org.columbia.sel.facilitator.fragment;
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.ResourceProxy;
 import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -49,6 +52,14 @@ public class BaseMapFragment extends BaseFragment {
 		
 		// Turn off data connection, forces use of local map tiles
 //		mMapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
+		OnlineTileSourceBase MAPQUESTOSM = new XYTileSource("OfflineTiles",
+                ResourceProxy.string.unknown, 0, 18, 256, ".png", new String[] {
+                                "http://otile1.mqcdn.com/tiles/1.0.0/map/",
+                                "http://otile2.mqcdn.com/tiles/1.0.0/map/",
+                                "http://otile3.mqcdn.com/tiles/1.0.0/map/",
+                                "http://otile4.mqcdn.com/tiles/1.0.0/map/" });
+		mMapView.setTileSource(MAPQUESTOSM);
+		
 		mMapView.setUseDataConnection(false);
 		
 		mMapCon.setZoom(14);

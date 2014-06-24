@@ -72,7 +72,7 @@ public class FacilityMapListActivity extends BaseActivity {
 	// Filter by sector
 	String sectorFilter = null;
 	
-	// Stores the currently loaded list of facilitites
+	// Stores the currently loaded list of facilities
 	FacilityList mFacilities;
 	
 	// Not currently used

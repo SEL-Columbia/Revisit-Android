@@ -5,7 +5,7 @@ import java.io.File;
 
 import android.util.Log;
 
-public class Util {
+public class TileUtils {
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -55,13 +55,13 @@ public class Util {
 	}
 	
 	/**
-	 * Recursively delete a directory and its contents
-	 * @param path
-	 * @return
+	 * Recursively delete a directory and its contents. Returns true on succes, false otherwise.
+	 * @param dir
+	 * @return boolean
 	 */
-	public static boolean deleteDirectory(File path) {
-		if (path.exists()) {
-			File[] files = path.listFiles();
+	public static boolean deleteDirectory(File dir) {
+		if (dir.exists()) {
+			File[] files = dir.listFiles();
 			if (files == null) {
 				return true;
 			}
@@ -73,7 +73,27 @@ public class Util {
 				}
 			}
 		}
-		return (path.delete());
+		return (dir.delete());
+	}
+	
+	/**
+	 * Returns the recursive total number of files in the specified directory.
+	 * @return int
+	 */
+	public static int getTotalRecursiveFileCount(final File dir){
+		int tmpCnt = 0;
+		if (!dir.exists()) {
+			return tmpCnt;
+		}
+		final File[] children = dir.listFiles();
+		for(final File c : children){
+			if(c.isDirectory()){
+				tmpCnt += getTotalRecursiveFileCount(c);
+			}else{
+				tmpCnt++;
+			}
+		}
+		return tmpCnt;
 	}
 
 	// ===========================================================

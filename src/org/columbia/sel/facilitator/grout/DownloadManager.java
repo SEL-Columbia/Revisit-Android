@@ -33,65 +33,74 @@ public class DownloadManager {
 	// ===========================================================
 
 	private OSMMapTilePackager mTilePackager;
-	
+
 	private final ExecutorService mThreadPool;
 
 	private final Queue<OSMTileInfo> mQueue = new LinkedBlockingQueue<OSMTileInfo>();
 
 	private final String mBaseURL;
 	private final String mDestinationURL;
-	
+
 	private Handler mHandler;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	public DownloadManager(OSMMapTilePackager tp, final String pBaseURL, final String pDestinationURL, final int mThreads) {
+	public DownloadManager(OSMMapTilePackager tp, final String pBaseURL, final String pDestinationURL,
+			final int mThreads) {
+		
 		this.mTilePackager = tp;
 		this.mBaseURL = pBaseURL;
-//		String root = Environment.getExternalStorageDirectory().toString();
-//		this.mDestinationURL = root + "/" + pDestinationURL;
 		this.mDestinationURL = pDestinationURL;
 		this.mThreadPool = Executors.newFixedThreadPool(mThreads);
-		
+//		this.mThreadPool.
+
 		mHandler = new Handler(Looper.getMainLooper()) {
 			@Override
 			public void handleMessage(Message msg) {
+				mTilePackager.onTileDownloaded();
 				Bundle bundle = msg.getData();
 				int count = bundle.getInt("count");
-//				Log.i(TAG, "------------> COUNT: " + count);
-				mTilePackager.onTileDownloaded();
+				String ti = bundle.getString("tileInfo");
+				Log.i(TAG, "-------------> " + ti);
+//				if (count == 0) {
+//					mTilePackager.onFetchingComplete();
+//				}
 			}
 		};
 	}
-
+	
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================
 
-	public synchronized void add(final OSMTileInfo pTileInfo){
-//		Log.i(TAG, "+++++++ Adding Tiles");
+	public synchronized void add(final OSMTileInfo pTileInfo) {
+		// Log.i(TAG, "+++++++ Adding Tiles");
 		this.mQueue.add(pTileInfo);
 		spawnNewThread();
 	}
 
-	private synchronized OSMTileInfo getNext(){
+	private synchronized OSMTileInfo getNext() {
 		final OSMTileInfo tile = this.mQueue.poll();
 
 		final int remaining = this.mQueue.size();
-		if(remaining % 10 == 0 && remaining > 0) {
-			Log.i(TAG, "(" + remaining +")");
+		if (remaining % 10 == 0 && remaining > 0) {
+//			Log.i(TAG, "(" + remaining + ")");
 		} else {
-			Log.i(TAG, ".");
+//			Log.i(TAG, ".");
 		}
 
 		this.notify();
 		return tile;
 	}
+	
+	public void cancel() {
+		this.mThreadPool.shutdownNow();
+	}
 
 	public synchronized void waitEmpty() throws InterruptedException {
-		while(this.mQueue.size() > 0){
+		while (this.mQueue.size() > 0) {
 			this.wait();
 		}
 	}
@@ -117,8 +126,6 @@ public class DownloadManager {
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
-	
-
 
 	private class DownloadRunner implements Runnable {
 
@@ -131,7 +138,8 @@ public class DownloadManager {
 		private void init(final OSMTileInfo pTileInfo) {
 			this.mTileInfo = pTileInfo;
 			/* Create destination file. */
-			final String filename = String.format(DownloadManager.this.mDestinationURL, this.mTileInfo.zoom, this.mTileInfo.x, this.mTileInfo.y);
+			final String filename = String.format(DownloadManager.this.mDestinationURL, this.mTileInfo.zoom,
+					this.mTileInfo.x, this.mTileInfo.y);
 			this.mDestinationFile = new File(filename);
 
 			final File parent = this.mDestinationFile.getParentFile();
@@ -152,7 +160,8 @@ public class DownloadManager {
 				return; // TODO issue 70 - make this an option
 			}
 
-			final String finalURL = String.format(DownloadManager.this.mBaseURL, this.mTileInfo.zoom, this.mTileInfo.x, this.mTileInfo.y);
+			final String finalURL = String.format(DownloadManager.this.mBaseURL, this.mTileInfo.zoom, this.mTileInfo.x,
+					this.mTileInfo.y);
 
 			try {
 				in = new BufferedInputStream(new URL(finalURL).openStream(), StreamUtils.IO_BUFFER_SIZE);
@@ -163,13 +172,17 @@ public class DownloadManager {
 				StreamUtils.copy(in, out);
 
 				out.flush();
+
 				Message msg = new Message();
 				Bundle bundle = new Bundle();
-    			bundle.putInt("count", mQueue.size());
-                msg.setData(bundle);
+				bundle.putInt("count", mQueue.size());
+				bundle.putString("tileInfo", mTileInfo.toString());
+				msg.setData(bundle);
 				mHandler.sendMessage(msg);
 			} catch (final Exception e) {
-				System.err.println("Error downloading: '" + this.mTileInfo + "' from URL: " + finalURL + " : " + e);
+				// System.err.println("Error downloading: '" + this.mTileInfo +
+				// "' from URL: " + finalURL + " : " + e);
+				Log.e(TAG, "Error downloading: '" + this.mTileInfo + "' from URL: " + finalURL + " : " + e);
 				DownloadManager.this.add(this.mTileInfo); // try again later
 			} finally {
 				StreamUtils.closeStream(in);

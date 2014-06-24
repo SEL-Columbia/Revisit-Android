@@ -10,4 +10,6 @@ public interface TileFetchingListener {
 	public void onFetchingComplete();
 	
 	public void onFetchingProgress(FetchingProgressEvent fpe);
+	
+	public void onFetchingError(FetchingErrorEvent fee);
 }
