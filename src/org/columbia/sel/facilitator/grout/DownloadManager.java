@@ -32,7 +32,7 @@ public class DownloadManager {
 	// Fields
 	// ===========================================================
 
-	private OSMMapTilePackager mTilePackager;
+	private OSMTileFetcher mTilePackager;
 
 	private final ExecutorService mThreadPool;
 
@@ -47,7 +47,7 @@ public class DownloadManager {
 	// Constructors
 	// ===========================================================
 
-	public DownloadManager(OSMMapTilePackager tp, final String pBaseURL, final String pDestinationURL,
+	public DownloadManager(OSMTileFetcher tp, final String pBaseURL, final String pDestinationURL,
 			final int mThreads) {
 		
 		this.mTilePackager = tp;
@@ -64,9 +64,6 @@ public class DownloadManager {
 				int count = bundle.getInt("count");
 				String ti = bundle.getString("tileInfo");
 				Log.i(TAG, "-------------> " + ti);
-//				if (count == 0) {
-//					mTilePackager.onFetchingComplete();
-//				}
 			}
 		};
 	}

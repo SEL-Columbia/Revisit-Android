@@ -38,7 +38,7 @@ public class TileFetchingService extends Service {
 	public void fetchTiles(Double north, Double south, Double east, Double west) {
 		Log.i(TAG, "-----------------> fetchTiles");
 		if (!mIsRunning) {
-			OSMMapTilePackager osmTP = new OSMMapTilePackager(north, south, east, west);
+			OSMTileFetcher osmTP = new OSMTileFetcher(north, south, east, west);
 			osmTP.run();
 			mIsRunning = true;
 		}

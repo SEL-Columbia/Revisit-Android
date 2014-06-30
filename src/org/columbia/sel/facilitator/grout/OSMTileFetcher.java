@@ -12,26 +12,30 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-public class OSMMapTilePackager implements TileFetchingListener {
+public class OSMTileFetcher implements TileFetchingListener {
 	// ===========================================================
 	// Constants
 	// ===========================================================
-	private static final int DEFAULT_THREADCOUNT = 100;
-	private static final String DEFAULT_SERVER_URL = "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png";
-	private static final String DEFAULT_ROOT_DIR = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles";
-	private static final int DEFAULT_MAX_TILES = 10000;
-	private static boolean FORCE = false;
 	private final String TAG = this.getClass().getCanonicalName();
+	
+	// TODO: what is the proper way to select the default number of threads?
+	private static final int DEFAULT_THREADCOUNT = 100;
+	
+	// By default we use the mapquest tile server (http://developer.mapquest.com/web/products/open/map)
+	// TODO: this tile server serves JPGs regardless of the .png extension... it works fine unless we try
+	// to archive the resulting files (known bug in osmdroid: https://github.com/osmdroid/osmdroid/issues/18)
+	private static final String DEFAULT_SERVER_URL = "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png";
+	
+	// Root directory to save files
+	private static final String DEFAULT_ROOT_DIR = Environment.getExternalStorageDirectory().toString() + "/osmdroid/tiles";
+	
+	// Default maximum tiles
+	private static final int DEFAULT_MAX_TILES = 50000;
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
-
-	// String[] args = {"-u",
-	// "http://otile1.mqcdn.com/tiles/1.0.0/map/%d/%d/%d.png", "-t", fileDest,
-	// "-zmin", "4", "-zmax", "12", "-n", n, "-s", s, "-e", e, "-w", w, "-fa",
-	// ".tile"};
-
+	
 	private String mServerURL = DEFAULT_SERVER_URL;
 	private String mRootDownloadDir = DEFAULT_ROOT_DIR;
 	private String mDestinationFile = null;
@@ -59,19 +63,19 @@ public class OSMMapTilePackager implements TileFetchingListener {
 	// Constructors
 	// ===========================================================
 
-	public OSMMapTilePackager() {
+	public OSMTileFetcher() {
 		Log.i(TAG, "++++++++++++ Creating Tile Packager");
 //		dm = new DownloadManager(this, pBaseURL, pTempBaseURL, pThreadCount);
 	}
 
-	public OSMMapTilePackager(Double north, Double south, Double east, Double west) {
+	public OSMTileFetcher(Double north, Double south, Double east, Double west) {
 		this.mNorth = north;
 		this.mSouth = south;
 		this.mEast = east;
 		this.mWest = west;
 	}
 
-	public OSMMapTilePackager(BoundingBoxE6 bb) {
+	public OSMTileFetcher(BoundingBoxE6 bb) {
 		this.mBoundingBox = bb;
 		this.mNorth = (bb.getLatNorthE6() / 1E6);
 		this.mSouth = (bb.getLatSouthE6() / 1E6);
@@ -96,14 +100,15 @@ public class OSMMapTilePackager implements TileFetchingListener {
 	}
 	
 	public void setBoundingBox(BoundingBoxE6 bb) {
-		mNorth = (bb.getLatNorthE6() / 1E6);
-		mSouth = (bb.getLatSouthE6() / 1E6);
-		mEast = (bb.getLonEastE6() / 1E6);
-		mWest = (bb.getLonWestE6() / 1E6);
+		this.mBoundingBox = bb;
+		this.mNorth = (bb.getLatNorthE6() / 1E6);
+		this.mSouth = (bb.getLatSouthE6() / 1E6);
+		this.mEast = (bb.getLonEastE6() / 1E6);
+		this.mWest = (bb.getLonWestE6() / 1E6);
 	}
 
 	public String getServerURL() {
-		return mServerURL;
+		return this.mServerURL;
 	}
 
 	public void setServerURL(String serverURL) {
@@ -221,22 +226,24 @@ public class OSMMapTilePackager implements TileFetchingListener {
 	public void run() {
 		// perform validity checks before attempting to download tiles
 		if (!isValidForDownload()) {
+			Log.e(TAG, "Select is invalid for download.");
 			return;
 		}
 
-		// remove previously cached files
+		// build full paths using the specified root
 		String fullTempPath = getFullTempPath();
 		String fullDestinationFilePath = getFullDestinationFilePath();
-		
-		
 
+		// remove previously cached files
 		Log.i(TAG, "----------------------- DELETING TILES in " + fullTempPath);
-		runCleanup(fullTempPath);
+		deleteOfflineTiles(fullTempPath);
 
+		// download tiles for selected region
 		Log.i(TAG, "----------------------- DOWNLOADING TILES in " + this.mTempFolder);
 		downloadTiles(mServerURL, fullTempPath, mThreadCount, mFileAppendix, mMinZoom, mMaxZoom, mNorth, mSouth,
 				mEast, mWest);
-	
+		
+		// if a destination file is specified, create it from the downloaded tiles
 		if (mDestinationFile != null) {
 			if (mDestinationFile.endsWith(".zip")) {
 				Log.i(TAG, "----------------------- ZIPPING TILES in " + this.mTempFolder);
@@ -247,10 +254,8 @@ public class OSMMapTilePackager implements TileFetchingListener {
 				createDb(fullTempPath, fullDestinationFilePath);
 			}
 	
-			Log.i(TAG, "---------------------------");
-	
 			if (mServerURL != null) {
-				runCleanup(fullTempPath);
+				deleteOfflineTiles(fullTempPath);
 			}
 		}
 	}
@@ -266,7 +271,7 @@ public class OSMMapTilePackager implements TileFetchingListener {
 	}
 
 	/**
-	 * Check if the specified area is suitable for download, emitting errors. 
+	 * Check if the specified area is suitable for download, emitting error events. 
 	 * TODO: determine some maximum values for number of tiles.
 	 * 
 	 * @return
@@ -314,7 +319,7 @@ public class OSMMapTilePackager implements TileFetchingListener {
 	private void checkFileExistence() {
 		String fullTempPath = getFullTempPath();
 	
-		/* Quickly count files in the tempFolder. */
+		// count files in the temp folder
 		Log.i(TAG, "-------------> Counting existing files ...");
 		int actualFileCount = TileUtils.getTotalRecursiveFileCount(new File(fullTempPath));
 		if (mTotalExpected == actualFileCount) {
@@ -356,7 +361,7 @@ public class OSMMapTilePackager implements TileFetchingListener {
 		}
 	}
 
-	private void runCleanup(final String pTempFolder) {
+	private void deleteOfflineTiles(final String pTempFolder) {
 		// abortIfUserIsNotSure("This will delete the temp folder: " +
 		// pTempFolder + " !");
 
@@ -366,28 +371,55 @@ public class OSMMapTilePackager implements TileFetchingListener {
 		Log.i(TAG, " done.");
 	}
 	
+	/**
+	 * Deletes all cached tiles.
+	 */
 	public void clearOfflineTiles() {
 		String fullTempPath = getFullTempPath();
 		Log.i(TAG, "-------------> CLEARING OFFLINE TILES in " + fullTempPath);
 		TileUtils.deleteDirectory(new File(fullTempPath));
 	}
 	
+	/**
+	 * Returns the number of cached tiles currently downloaded.
+	 * @return int
+	 */
 	public int countCachedTiles() {
 		String fullTempPath = getFullTempPath();
 		Log.i(TAG, "-------------> Counting tiles in " + fullTempPath);
 		return TileUtils.getTotalRecursiveFileCount(new File(fullTempPath));
 	}
 	
+	/**
+	 * Public method for creating a Zip file from the cached tiles.
+	 */
 	public void createZipFile() {
 		Log.i(TAG, "-------------> Creating Zip");
 		this.createZipFile(getFullTempPath(), getFullDestinationFilePath());
 	}
 	
+	/**
+	 * Public method for creating a GEMF file from the cached tiles.
+	 */
 	public void createGemfFile() {
 		Log.i(TAG, "-------------> Creating GEMF");
 		this.createGemfFile(getFullTempPath(), getFullDestinationFilePath());
 	}
 
+	/**
+	 * Kicks off the actual download of the tiles for the selected region.
+	 * 
+	 * @param pBaseURL
+	 * @param pTempFolder
+	 * @param pThreadCount
+	 * @param pFileAppendix
+	 * @param pMinZoom
+	 * @param pMaxZoom
+	 * @param pNorth
+	 * @param pSouth
+	 * @param pEast
+	 * @param pWest
+	 */
 	private void downloadTiles(final String pBaseURL, final String pTempFolder, final int pThreadCount,
 			final String pFileAppendix, final int pMinZoom, final int pMaxZoom, final double pNorth,
 			final double pSouth, final double pEast, final double pWest) {
@@ -402,36 +434,22 @@ public class OSMMapTilePackager implements TileFetchingListener {
 		// TODO: Possible memory leak. The download manager probably shouldn't get reinstantiated each time. 
 		dm = new DownloadManager(this, pBaseURL, pTempBaseURL, pThreadCount);
 
-		/* For each zoomLevel. */
+		// Add all of the tiles to the queue for download
 		for (int z = pMinZoom; z <= pMaxZoom; z++) {
 			final OSMTileInfo upperLeft = TileUtils.getMapTileFromCoordinates(pNorth, pWest, z);
 			final OSMTileInfo lowerRight = TileUtils.getMapTileFromCoordinates(pSouth, pEast, z);
 
-			Log.i(TAG, "ZoomLevel: " + z + " ");
+			Log.i(TAG, "Adding ZoomLevel: " + z + " ");
 			for (int x = upperLeft.x; x <= lowerRight.x; x++) {
 				for (int y = upperLeft.y; y <= lowerRight.y; y++) {
 					dm.add(new OSMTileInfo(x, y, z));
 				}
 			}
-//			try {
-//				dm.waitEmpty();
-//				Log.i(TAG, " done.");
-//			} catch (final InterruptedException e) {
-//				e.printStackTrace();
-//			}
 		}
-//		try {
-//			Log.i(TAG, "Awaiting termination of all threads ...");
-//			dm.waitFinished();
-//			Log.i(TAG, " done.");
-//		} catch (final InterruptedException e) {
-//			e.printStackTrace();
-//		}
 	}
 
 	/**
-	 * Given a min/max zoom and a bounding box, how many tiles will we be
-	 * downloading?
+	 * Given a min/max zoom and a bounding box, how many tiles will we be downloading?
 	 * 
 	 * @param pMinZoom
 	 * @param pMaxZoom
@@ -457,6 +475,10 @@ public class OSMMapTilePackager implements TileFetchingListener {
 		return fileCnt;
 	}
 
+	// ===========================================================
+	// Listener Implementations
+	// ===========================================================
+	
 	@Override
 	public void onTileDownloaded() {
 //		Log.i(TAG, "------------> onTileDownloaded - remaining: " + this.mRemaining);

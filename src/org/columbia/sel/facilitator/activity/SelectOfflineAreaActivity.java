@@ -10,7 +10,7 @@ import org.columbia.sel.facilitator.event.LocationChangedEvent;
 import org.columbia.sel.facilitator.grout.FetchingErrorEvent;
 import org.columbia.sel.facilitator.grout.FetchingProgressEvent;
 import org.columbia.sel.facilitator.grout.FetchingStartEvent;
-import org.columbia.sel.facilitator.grout.OSMMapTilePackager;
+import org.columbia.sel.facilitator.grout.OSMTileFetcher;
 import org.columbia.sel.facilitator.grout.TileFetchingListener;
 import org.columbia.sel.facilitator.grout.TileFetchingService;
 import org.columbia.sel.facilitator.grout.TileFetchingService.TileFetchingBinder;
@@ -57,7 +57,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 	private MapView mMapView;
 	private MapController mMapCon;
-	private OSMMapTilePackager mOsmTP;
+	private OSMTileFetcher mOsmTP;
 
 	TileFetchingService mService;
 	boolean mBound = false;
@@ -95,7 +95,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		// TODO: remove this.
 		mMyLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-		mOsmTP = new OSMMapTilePackager();
+		mOsmTP = new OSMTileFetcher();
 		mOsmTP.setTileFetchingListener(new TileFetchingListener() {
 
 			@Override
