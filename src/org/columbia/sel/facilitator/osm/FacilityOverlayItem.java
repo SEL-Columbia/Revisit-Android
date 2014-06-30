@@ -3,7 +3,6 @@ package org.columbia.sel.facilitator.osm;
 import org.columbia.sel.facilitator.model.Facility;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.MapView.Projection;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import android.graphics.Canvas;

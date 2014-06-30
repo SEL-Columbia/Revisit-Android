@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.MapView.Projection;
+import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
@@ -49,8 +49,8 @@ public class AddFacilityItemizedIconOverlay extends ItemizedIconOverlay<OverlayI
 	
 	@Override
 	public boolean onSingleTapConfirmed(MotionEvent event, MapView mapView) {
-		float x = event.getX();
-		float y = event.getY();
+		int x = (int) event.getX();
+		int y = (int) event.getY();
 		Projection projection = mapView.getProjection();
 		GeoPoint tappedGeoPoint = (GeoPoint) projection.fromPixels(x, y);
 		double lat = tappedGeoPoint.getLatitude();

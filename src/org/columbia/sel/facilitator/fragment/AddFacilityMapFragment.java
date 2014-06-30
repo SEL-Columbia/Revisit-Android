@@ -10,7 +10,7 @@ import org.columbia.sel.facilitator.osm.FacilityOverlayItem;
 import org.columbia.sel.facilitator.resource.FacilityMarker;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.MapView.Projection;
+import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -70,8 +70,8 @@ public class AddFacilityMapFragment extends BaseMapFragment {
 			
 			@Override
 			public boolean onSingleTapConfirmed(MotionEvent event, MapView mapView) {
-				float x = event.getX();
-				float y = event.getY();
+				int x = (int) event.getX();
+				int y = (int) event.getY();
 				Projection projection = mapView.getProjection();
 				GeoPoint tappedGeoPoint = (GeoPoint) projection.fromPixels(x, y);
 				bus.post(new FacilityPlacedEvent(tappedGeoPoint));

@@ -71,7 +71,7 @@ dependencies {
     compile 'com.octo.android.robospice:robospice-retrofit:1.4.12'
     
 	// osmdroid
-	compile "org.osmdroid:osmdroid-android:4.1"
+	compile 'org.osmdroid:osmdroid-android:4.2'
 	compile "org.slf4j:slf4j-android:1.6.1-RC1"
 	compile 'org.osmdroid:osmdroid-packager:4.1'
 	

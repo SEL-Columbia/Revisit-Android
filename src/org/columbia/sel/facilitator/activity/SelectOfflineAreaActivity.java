@@ -84,7 +84,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		mMapView.getController().setZoom(12);
 		OnlineTileSourceBase MAPQUESTOSM = new XYTileSource("MapquestOSM",
-                ResourceProxy.string.mapquest_osm, 0, 18, 256, ".png", new String[] {
+                ResourceProxy.string.mapquest_osm, 0, 18, 256, ".jpg", new String[] {
                                 "http://otile1.mqcdn.com/tiles/1.0.0/map/",
                                 "http://otile2.mqcdn.com/tiles/1.0.0/map/",
                                 "http://otile3.mqcdn.com/tiles/1.0.0/map/",
@@ -239,6 +239,12 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mOsmTP.setDestinationFile("OfflineTiles.gemf");
 		mOsmTP.createGemfFile();
 //		Toast.makeText(this, "Total Tiles Cached: " + numTiles, Toast.LENGTH_SHORT).show();
+	}
+	
+	@OnClick(R.id.map_button)
+	public void gotoOfflineMap(View view) {
+		Intent i = new Intent(this, FacilityMapListActivity.class);
+		startActivity(i);
 	}
 
 	private void zoomToMyLocation() {

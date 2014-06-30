@@ -2,6 +2,7 @@ package org.columbia.sel.facilitator.fragment;
 
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.event.MapChangedEvent;
+import org.columbia.sel.facilitator.grout.OfflineTileSource;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.events.DelayedMapListener;
@@ -45,21 +46,27 @@ public class BaseMapFragment extends BaseFragment {
 		
 		View view = inflater.inflate(R.layout.fragment_map, container, false); 
 		
+		Log.i(TAG, ">>>>>>>>>>> onCreateView: BaseMapFragment");
+		
 		// Inflate the layout for this fragment
 		ButterKnife.inject(this, view);
 
 		mMapCon = (MapController) mMapView.getController();
 		
 		// Turn off data connection, forces use of local map tiles
-//		mMapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
-		OnlineTileSourceBase MAPQUESTOSM = new XYTileSource("OfflineTiles",
-                ResourceProxy.string.unknown, 0, 18, 256, ".png", new String[] {
-                                "http://otile1.mqcdn.com/tiles/1.0.0/map/",
-                                "http://otile2.mqcdn.com/tiles/1.0.0/map/",
-                                "http://otile3.mqcdn.com/tiles/1.0.0/map/",
-                                "http://otile4.mqcdn.com/tiles/1.0.0/map/" });
-		mMapView.setTileSource(MAPQUESTOSM);
+
+		OfflineTileSource OFFLINETILES = new OfflineTileSource ("OfflineTiles",
+				ResourceProxy.string.unknown, 0, 18, 256, ".png", new String[] {
+				"http://otile1.mqcdn.com/tiles/1.0.0/sat/",
+				"http://otile2.mqcdn.com/tiles/1.0.0/sat/",
+				"http://otile3.mqcdn.com/tiles/1.0.0/sat/",
+				"http://otile4.mqcdn.com/tiles/1.0.0/sat/" });
+
+//		OfflineTileSource OFFLINETILES = new OfflineTileSource("OfflineTiles",
+//                ResourceProxy.string.unknown, 0, 18, 256, ".jpg");
 		
+		mMapView.setTileSource(OFFLINETILES);
+//		mMapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mMapView.setUseDataConnection(false);
 		
 		mMapCon.setZoom(14);
@@ -77,6 +84,10 @@ public class BaseMapFragment extends BaseFragment {
 		ButterKnife.reset(this);
 	}
 	
+	/**
+	 * Get this fragment's MapView
+	 * @return MapView
+	 */
 	public MapView getMapView() {
 		return mMapView;
 	}
