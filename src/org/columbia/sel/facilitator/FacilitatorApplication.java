@@ -16,6 +16,11 @@ import android.app.Application;
 import android.content.Intent;
 import dagger.ObjectGraph;
 
+/**
+ * Main Application class.
+ * @author Jonathan Wohl
+ *
+ */
 public class FacilitatorApplication extends Application {
 	// TAG for logging
 	private final String TAG = this.getClass().getCanonicalName();
