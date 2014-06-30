@@ -1,4 +1,4 @@
-package org.columbia.sel.facilitator.grout;
+package org.columbia.sel.facilitator.grout.event;
 
 public class FetchingErrorEvent {
 	public static final int INVALID_REGION = 1;

@@ -7,13 +7,13 @@ import javax.inject.Inject;
 
 import org.columbia.sel.facilitator.R;
 import org.columbia.sel.facilitator.event.LocationChangedEvent;
-import org.columbia.sel.facilitator.grout.FetchingErrorEvent;
-import org.columbia.sel.facilitator.grout.FetchingProgressEvent;
-import org.columbia.sel.facilitator.grout.FetchingStartEvent;
 import org.columbia.sel.facilitator.grout.OSMTileFetcher;
 import org.columbia.sel.facilitator.grout.TileFetchingListener;
 import org.columbia.sel.facilitator.grout.TileFetchingService;
 import org.columbia.sel.facilitator.grout.TileFetchingService.TileFetchingBinder;
+import org.columbia.sel.facilitator.grout.event.FetchingErrorEvent;
+import org.columbia.sel.facilitator.grout.event.FetchingProgressEvent;
+import org.columbia.sel.facilitator.grout.event.FetchingStartEvent;
 import org.columbia.sel.facilitator.model.FacilityList;
 import org.columbia.sel.facilitator.service.LocationService;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;

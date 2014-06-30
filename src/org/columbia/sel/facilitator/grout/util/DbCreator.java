@@ -1,4 +1,4 @@
-package org.columbia.sel.facilitator.grout;
+package org.columbia.sel.facilitator.grout.util;
 
 import java.io.File;
 import java.io.FileInputStream;

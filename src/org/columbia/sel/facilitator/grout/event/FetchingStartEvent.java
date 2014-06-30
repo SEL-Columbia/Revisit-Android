@@ -1,4 +1,4 @@
-package org.columbia.sel.facilitator.grout;
+package org.columbia.sel.facilitator.grout.event;
 
 public class FetchingStartEvent {
 	public int total;

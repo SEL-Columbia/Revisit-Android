@@ -1,7 +1,9 @@
 // Created by plusminus on 10:15:51 PM - Mar 5, 2009
-package org.columbia.sel.facilitator.grout;
+package org.columbia.sel.facilitator.grout.util;
 
 import java.io.File;
+
+import org.columbia.sel.facilitator.grout.OSMTileInfo;
 
 import android.util.Log;
 

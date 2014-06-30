@@ -1,5 +1,9 @@
 package org.columbia.sel.facilitator.grout;
 
+import org.columbia.sel.facilitator.grout.event.FetchingErrorEvent;
+import org.columbia.sel.facilitator.grout.event.FetchingProgressEvent;
+import org.columbia.sel.facilitator.grout.event.FetchingStartEvent;
+
 public interface TileFetchingListener {
 	public void onTileDownloaded();
 	
