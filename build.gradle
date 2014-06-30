@@ -87,6 +87,8 @@ dependencies {
 	// compile 'com.android.support:support-v4:18.0.+'
     compile 'com.android.support:appcompat-v7:+'
     
+    // SEL projects
+    // compile 'edu.columbia.sel:grout:0.1-SNAPSHOT'
 	
     // compile fileTree(dir: 'libs', include: ['*.jar'])
 }

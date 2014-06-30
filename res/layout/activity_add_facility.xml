@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_map"
-        android:name="org.columbia.sel.facilitator.fragment.AddFacilityMapFragment"
+        android:name="edu.columbia.sel.facilitator.fragment.AddFacilityMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />

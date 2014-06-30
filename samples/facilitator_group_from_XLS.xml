@@ -24,7 +24,7 @@
     </model>
   </h:head>
   <h:body>
-    <group appearance="field-list" intent="org.columbia.sel.facilitator.COLLECT(sector='education')" ref="/facility_group_field_type/facility">
+    <group appearance="field-list" intent="edu.columbia.sel.facilitator.COLLECT(sector='education')" ref="/facility_group_field_type/facility">
       <label>Facility</label>
       <input ref="/facility_group_field_type/facility/facility_name">
         <label>Name</label>

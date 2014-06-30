@@ -67,16 +67,16 @@ The Facilitator application depends on several open source libraries, outlined h
 *NOTE: At this time, facility coordinates are in the form `coordinates: [longitude, latitude]`.* This is because the data is being served from a simple node/mongo server, and geospatial indices in mongo expect coordinates in the order (longitude, latitude). In order not to confuse future developers, this sillyness will likely be abstracted out on the server.
 
 ### Debugging / Logging
-Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. org.columbia.sel.facilitators.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
+Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. edu.columbia.sel.facilitators.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
 
 ```
-$ adb logcat | grep --line-buffered ".*org.columbia.sel.facilitator.*"
+$ adb logcat | grep --line-buffered ".*edu.columbia.sel.facilitator.*"
 ```
 
 I'd recommend using [pidcat](https://github.com/JakeWharton/pidcat) or [coloredlogcat](http://jsharkey.org/blog/2009/04/22/modifying-the-android-logcat-stream-for-full-color-debugging/) for a much nicer log viewing experience. For me, pidcat wasn't working consistently, so I used coloredlogcat (renamed logcatc) and added an alias in my .bash_profile for convenience:
 
 ```
-alias logfac='adb logcat | grep --line-buffered ".*org.columbia.sel.facilitator*" | logcatc'
+alias logfac='adb logcat | grep --line-buffered ".*edu.columbia.sel.facilitator*" | logcatc'
 ```
 Additionally, an `APP_TAG` member is injected in all activities and the application itself with a value of FacilitatorApplication. You can log to this tag, and filter on it to view only these log entries.
 
