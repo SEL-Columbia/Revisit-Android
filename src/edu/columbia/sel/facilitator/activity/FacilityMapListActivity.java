@@ -228,11 +228,8 @@ public class FacilityMapListActivity extends BaseActivity {
 	public void onAddNewFacility(View view) {
 		Log.i(TAG, "Begin add new Facility...");
 		Intent i = new Intent(FacilityMapListActivity.this, AddFacilityActivity.class);
-		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+//		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 		startActivityForResult(i, 1);
-		if (isLaunchedFromOdk) {
-			this.finish();
-		}
 	}
 
 	/**
@@ -282,9 +279,6 @@ public class FacilityMapListActivity extends BaseActivity {
 		i.putExtra("facility", f);
 //		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 		startActivityForResult(i, 1);
-		if (isLaunchedFromOdk) {
-			// this.finish();
-		}
 	}
 
 	/**

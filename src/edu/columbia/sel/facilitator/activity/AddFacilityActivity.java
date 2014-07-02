@@ -3,6 +3,7 @@ package edu.columbia.sel.facilitator.activity;
 import javax.inject.Inject;
 
 import edu.columbia.sel.facilitator.R;
+
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 
@@ -30,6 +31,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,6 +83,9 @@ public class AddFacilityActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_facility);
 
+		// add 'back' button to go to parent (FacilityMapListActivity)
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
 		// Inject view member variables
 		ButterKnife.inject(this);
 
@@ -116,6 +121,9 @@ public class AddFacilityActivity extends BaseActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
+		case android.R.id.home:
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
 		case R.id.action_mylocation:
 			zoomToMyLocation();
 			return true;
@@ -227,7 +235,7 @@ public class AddFacilityActivity extends BaseActivity {
 	 * @param view
 	 */
 	public void onPopulateLocationClick(View view) {
-//		Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		// Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		Location loc = LocationService.getCurrentLocation();
 		String locationValue;
 
@@ -258,7 +266,7 @@ public class AddFacilityActivity extends BaseActivity {
 		double e = (bb.getLonEastE6() / 1E6);
 		double w = (bb.getLonWestE6() / 1E6);
 		Log.i(TAG, n + ", " + w + ", " + s + ", " + e);
-		
+
 		// cacheKey uses lat/lng so as to be unique
 		String cacheKey = "facs" + n + "," + w + "," + s + "," + e;
 		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),

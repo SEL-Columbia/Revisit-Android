@@ -61,6 +61,9 @@
             android:name="edu.columbia.sel.facilitator.activity.AddFacilityActivity"
             android:label="@string/title_add_facility"
             android:windowSoftInputMode="stateHidden|adjustPan" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.columbia.sel.facilitator.activity.FacilityMapListActivity" />
         </activity>
 
         <service
