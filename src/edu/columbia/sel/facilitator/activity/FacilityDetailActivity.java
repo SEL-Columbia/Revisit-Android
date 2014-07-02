@@ -3,7 +3,6 @@ package edu.columbia.sel.facilitator.activity;
 import javax.inject.Inject;
 
 import edu.columbia.sel.facilitator.R;
-
 import retrofit.converter.JacksonConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,7 +24,11 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -64,6 +67,9 @@ public class FacilityDetailActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_facility_detail);
+		
+		// add 'back' button to go to parent (FacilityMapListActivity)
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Injection for views and onclick handlers
 		ButterKnife.inject(this);
@@ -72,6 +78,26 @@ public class FacilityDetailActivity extends BaseActivity {
 		Intent i = this.getIntent();
 		mFacility = i.getParcelableExtra("facility");
 		this.displayFacility(mFacility);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    // Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.maplist_menu, menu);
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle presses on the action bar items
+	    switch (item.getItemId()) {
+	        case android.R.id.home:
+	            NavUtils.navigateUpFromSameTask(this);
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 
 	/**

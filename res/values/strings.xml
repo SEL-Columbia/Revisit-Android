@@ -24,6 +24,9 @@
     <string name="add_facility_sector">Sector</string>
     <string name="add_facility_location">Location</string>
     
+    <string name="download_button">Download Region</string>
+    <string name="view_offline_button">View Offline Map</string>
+    
     <string-array name="sectors_array">
         <item>health</item>
         <item>education</item>
