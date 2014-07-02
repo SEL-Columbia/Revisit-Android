@@ -1,11 +1,9 @@
 package edu.columbia.sel.facilitator.activity;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import javax.inject.Inject;
 
 import edu.columbia.sel.facilitator.R;
+
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
@@ -28,6 +26,7 @@ import edu.columbia.sel.facilitator.osm.TileFetchingService.TileFetchingBinder;
 import edu.columbia.sel.facilitator.service.LocationService;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -83,18 +82,16 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mMapView.setMultiTouchControls(true);
 
 		mMapView.getController().setZoom(12);
-		OnlineTileSourceBase MAPQUESTOSM = new XYTileSource("MapquestOSM",
-                ResourceProxy.string.mapquest_osm, 0, 18, 256, ".jpg", new String[] {
-                                "http://otile1.mqcdn.com/tiles/1.0.0/map/",
-                                "http://otile2.mqcdn.com/tiles/1.0.0/map/",
-                                "http://otile3.mqcdn.com/tiles/1.0.0/map/",
-                                "http://otile4.mqcdn.com/tiles/1.0.0/map/" });
+		OnlineTileSourceBase MAPQUESTOSM = new XYTileSource("MapquestOSM", ResourceProxy.string.mapquest_osm, 0, 18,
+				256, ".jpg", new String[] { "http://otile1.mqcdn.com/tiles/1.0.0/map/",
+						"http://otile2.mqcdn.com/tiles/1.0.0/map/", "http://otile3.mqcdn.com/tiles/1.0.0/map/",
+						"http://otile4.mqcdn.com/tiles/1.0.0/map/" });
 		mMapView.setTileSource(MAPQUESTOSM);
 		mMapCon = (MapController) mMapView.getController();
 
 		// TODO: remove this.
 		mMyLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		
+
 		if (mMyLocation != null) {
 			this.zoomToMyLocation();
 		}
@@ -122,6 +119,22 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			@Override
 			public void onFetchingComplete() {
 				mProgressBar.dismiss();
+				// 1. Instantiate an AlertDialog.Builder with its constructor
+				AlertDialog.Builder builder = new AlertDialog.Builder(SelectOfflineAreaActivity.this);
+
+				// 2. Chain together various setter methods to set the dialog characteristics
+				builder.setMessage("Success!")
+				       .setTitle("The region you selected has been downloaded. You can now use this application offline.");
+				
+				builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			               // User clicked OK button
+			           }
+			       });
+
+				// 3. Get the AlertDialog from create()
+				AlertDialog dialog = builder.create();
+				dialog.show();
 			}
 
 			@Override
@@ -174,20 +187,11 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			mBound = false;
 		}
 	}
-	
+
 	@OnClick(R.id.download_button)
 	public void download(View view) {
 		Log.i(TAG, "------------> download initiated");
 		BoundingBoxE6 bb = mMapView.getBoundingBox();
-		Double n = (bb.getLatNorthE6() / 1E6);
-		Double s = (bb.getLatSouthE6() / 1E6);
-		Double e = (bb.getLonEastE6() / 1E6);
-		Double w = (bb.getLonWestE6() / 1E6);
-
-		if (mBound) {
-			// mService.fetchTiles(n,s,e,w);
-		}
-
 		// prepare a progress bar dialog
 		mProgressBar = new ProgressDialog(this);
 		mProgressBar.setCancelable(true);
@@ -197,7 +201,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						// TODO: Stop download.
 						mOsmTP.cancel();
 					}
 
@@ -219,32 +222,34 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mOsmTP.setBoundingBox(bb);
 		mOsmTP.run();
 	}
-	
-	@OnClick(R.id.clear_button)
-	public void clearOfflineTiles(View view) {
-		mOsmTP.clearOfflineTiles();
-	}
-	
-	@OnClick(R.id.count_button)
-	public void countOfflineTiles(View view) {
-		int numTiles = mOsmTP.countCachedTiles();
-		Toast.makeText(this, "Total Tiles Cached: " + numTiles, Toast.LENGTH_SHORT).show();
-	}
-	
-	@OnClick(R.id.zip_button)
-	public void createZip(View view) {
-		mOsmTP.setDestinationFile("OfflineTiles.zip");
-		mOsmTP.createZipFile();
+
+//	@OnClick(R.id.clear_button)
+//	public void clearOfflineTiles(View view) {
+//		mOsmTP.clearOfflineTiles();
+//	}
+//
+//	@OnClick(R.id.count_button)
+//	public void countOfflineTiles(View view) {
+//		int numTiles = mOsmTP.countCachedTiles();
 //		Toast.makeText(this, "Total Tiles Cached: " + numTiles, Toast.LENGTH_SHORT).show();
-	}
-	
-	@OnClick(R.id.gemf_button)
-	public void createGemf(View view) {
-		mOsmTP.setDestinationFile("OfflineTiles.gemf");
-		mOsmTP.createGemfFile();
-//		Toast.makeText(this, "Total Tiles Cached: " + numTiles, Toast.LENGTH_SHORT).show();
-	}
-	
+//	}
+//
+//	@OnClick(R.id.zip_button)
+//	public void createZip(View view) {
+//		mOsmTP.setDestinationFile("OfflineTiles.zip");
+//		mOsmTP.createZipFile();
+//		// Toast.makeText(this, "Total Tiles Cached: " + numTiles,
+//		// Toast.LENGTH_SHORT).show();
+//	}
+//
+//	@OnClick(R.id.gemf_button)
+//	public void createGemf(View view) {
+//		mOsmTP.setDestinationFile("OfflineTiles.gemf");
+//		mOsmTP.createGemfFile();
+//		// Toast.makeText(this, "Total Tiles Cached: " + numTiles,
+//		// Toast.LENGTH_SHORT).show();
+//	}
+
 	@OnClick(R.id.map_button)
 	public void gotoOfflineMap(View view) {
 		Intent i = new Intent(this, FacilityMapListActivity.class);

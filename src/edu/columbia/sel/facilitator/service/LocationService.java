@@ -112,7 +112,6 @@ public class LocationService extends Service implements LocationListener {
 								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 						Log.d(TAG, "Network Provider Enabled");
 						tempLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-						Log.i(TAG, "-------> WHAT IS MY TEMP NETWORK LOCATION? " + tempLocation.toString());
 						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation))
 							Log.i(TAG, "-------> NETWORK: " + tempLocation.toString());
 							mCurrentLocation = tempLocation;
@@ -126,7 +125,6 @@ public class LocationService extends Service implements LocationListener {
 								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 						Log.d(TAG, "GPS Provider Enabled");
 						tempLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-						Log.i(TAG, "-------> WHAT IS MY TEMP GPS LOCATION? " + tempLocation.toString());
 						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation))
 							Log.i(TAG, "-------> GPS: " + tempLocation.toString());
 							mCurrentLocation = tempLocation;

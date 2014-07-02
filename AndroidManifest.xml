@@ -13,10 +13,10 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> -->
-	<uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
-	<!-- <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" /> -->
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <!-- <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" /> -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -36,7 +36,7 @@
         <activity
             android:name="edu.columbia.sel.facilitator.activity.SelectOfflineAreaActivity"
             android:label="@string/title_activity_map" >
-           	<intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -44,10 +44,14 @@
         <activity
             android:name="edu.columbia.sel.facilitator.activity.FacilityDetailActivity"
             android:label="@string/title_facility_detail" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.columbia.sel.facilitator.activity.FacilityMapListActivity" />
         </activity>
         <activity
             android:name="edu.columbia.sel.facilitator.activity.FacilityMapListActivity"
-            android:label="@string/title_facility_map_list" >
+            android:label="@string/title_facility_map_list"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="edu.columbia.sel.facilitator.COLLECT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -58,13 +62,14 @@
             android:label="@string/title_add_facility"
             android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
-        
-        
+
         <service
             android:name="edu.columbia.sel.facilitator.api.FacilityRetrofitSpiceService"
             android:exported="false" />
-        <service android:name="edu.columbia.sel.facilitator.service.LocationService"></service>
-        <service android:name="edu.columbia.sel.facilitator.osm.TileFetchingService"></service>
+        <service android:name="edu.columbia.sel.facilitator.service.LocationService" >
+        </service>
+        <service android:name="edu.columbia.sel.facilitator.osm.TileFetchingService" >
+        </service>
     </application>
 
 </manifest>
