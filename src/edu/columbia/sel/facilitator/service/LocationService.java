@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import com.squareup.otto.Bus;
 
 import edu.columbia.sel.facilitator.FacilitatorApplication;
+import edu.columbia.sel.facilitator.event.DeviceOfflineEvent;
 import edu.columbia.sel.facilitator.event.LocationChangedEvent;
 import android.app.Service;
 import android.content.Context;
@@ -41,7 +42,7 @@ public class LocationService extends Service implements LocationListener {
 
 	@Inject
 	Bus bus;
-	
+
 	@Inject
 	LocationManager mLocationManager;
 
@@ -50,8 +51,6 @@ public class LocationService extends Service implements LocationListener {
 
 	// The minimum time between updates in milliseconds
 	private static final long MIN_TIME_BW_UPDATES = 0;
-
-	
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -100,8 +99,9 @@ public class LocationService extends Service implements LocationListener {
 
 	public void start() {
 		if (isOnline()) {
-
 			try {
+				Location tempLocation;
+				
 				isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
 				isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -111,8 +111,10 @@ public class LocationService extends Service implements LocationListener {
 						mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
 								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 						Log.d(TAG, "Network Provider Enabled");
-						Location tempLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+						tempLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+						Log.i(TAG, "-------> WHAT IS MY TEMP NETWORK LOCATION? " + tempLocation.toString());
 						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation))
+							Log.i(TAG, "-------> NETWORK: " + tempLocation.toString());
 							mCurrentLocation = tempLocation;
 					}
 				}
@@ -123,20 +125,51 @@ public class LocationService extends Service implements LocationListener {
 						mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
 								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 						Log.d(TAG, "GPS Provider Enabled");
-						Location tempLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+						tempLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+						Log.i(TAG, "-------> WHAT IS MY TEMP GPS LOCATION? " + tempLocation.toString());
 						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation))
+							Log.i(TAG, "-------> GPS: " + tempLocation.toString());
 							mCurrentLocation = tempLocation;
 					}
 				}
-
+//				bus.post(new LocationChangedEvent(mCurrentLocation));
 			} catch (Exception e) {
-				Log.e(TAG, e.getMessage());
+				Log.e(TAG, e.toString());
 				e.printStackTrace();
 			}
 		} else {
-			// onOfflineResponse(requestData);
+			// The device is offline. Let's see if we have a last known location, and post it along with the 
+			// DeviceOfflineEvent.
 			Log.e(TAG, "ERROR: Device not online.");
+			mCurrentLocation = getLastKnownLocation();
+			if (mCurrentLocation != null) {
+				bus.post(new LocationChangedEvent(mCurrentLocation));
+			}
+			bus.post(new DeviceOfflineEvent());
 		}
+	}
+	
+	private Location getLastKnownLocation() {
+		Location tempNetworkLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		Location tempGpsLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		// if we have last known locs from both providers, see which is better and return it
+		if (tempNetworkLocation != null && tempGpsLocation != null) {
+			if (isBetterLocation(tempNetworkLocation, tempGpsLocation)) {
+				return tempNetworkLocation;
+			} else {
+				return tempGpsLocation;
+			}
+		}
+		
+		// if we only have one of the two, return the one we have
+		if (tempNetworkLocation != null) {
+			return tempNetworkLocation;
+		} else if (tempGpsLocation != null) {
+			return tempGpsLocation;
+		}
+		
+		return null;
 	}
 
 	/**
@@ -167,7 +200,9 @@ public class LocationService extends Service implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		Log.i(TAG, "New Location from " + location.getProvider() + ": " + location.getLatitude() + ", " + location.getLongitude());
+		Log.i(TAG,
+				"----------> New Location from " + location.getProvider() + ": " + location.getLatitude() + ", "
+						+ location.getLongitude());
 		if (location != null && isBetterLocation(location, this.mCurrentLocation)) {
 			this.mCurrentLocation = location;
 			bus.post(new LocationChangedEvent(location));

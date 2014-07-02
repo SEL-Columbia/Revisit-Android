@@ -62,13 +62,16 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     protected void onStop() {
         spiceManager.shouldStop();
-        stopService(new Intent(this, LocationService.class));
         super.onStop();
     }
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		// onPause is called before the following activity's onStart, so we stop the Service here
+		// in case the next activity want's to start it again (calling stopService in onStop is a problem
+		// because onStop gets called AFTER the next activity has started).
+		stopService(new Intent(this, LocationService.class));
 		bus.unregister(this);
 	}
 

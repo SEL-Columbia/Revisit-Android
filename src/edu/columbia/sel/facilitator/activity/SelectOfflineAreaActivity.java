@@ -94,6 +94,10 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		// TODO: remove this.
 		mMyLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		
+		if (mMyLocation != null) {
+			this.zoomToMyLocation();
+		}
 
 		mOsmTP = new OSMTileFetcher();
 		mOsmTP.setTileFetchingListener(new TileFetchingListener() {
@@ -170,7 +174,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			mBound = false;
 		}
 	}
-
+	
 	@OnClick(R.id.download_button)
 	public void download(View view) {
 		Log.i(TAG, "------------> download initiated");
@@ -244,6 +248,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	@OnClick(R.id.map_button)
 	public void gotoOfflineMap(View view) {
 		Intent i = new Intent(this, FacilityMapListActivity.class);
+		finish();
 		startActivity(i);
 	}
 

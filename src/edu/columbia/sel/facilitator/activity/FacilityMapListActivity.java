@@ -3,6 +3,7 @@ package edu.columbia.sel.facilitator.activity;
 import javax.inject.Inject;
 
 import edu.columbia.sel.facilitator.R;
+
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.views.MapView;
 
@@ -13,6 +14,7 @@ import com.squareup.otto.Subscribe;
 
 import edu.columbia.sel.facilitator.adapter.FacilityArrayAdapter;
 import edu.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
+import edu.columbia.sel.facilitator.event.DeviceOfflineEvent;
 import edu.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import edu.columbia.sel.facilitator.event.FacilitySelectedEvent;
 import edu.columbia.sel.facilitator.event.LocationChangedEvent;
@@ -131,6 +133,8 @@ public class FacilityMapListActivity extends BaseActivity {
 		// As long as we can establish our current location, when we call zoomToMyLocation, the MapChangedEvent 
 		// will always fire, triggering the reloading of facilities. However, if the last known location isn't 
 		// available, the map will not change and facilities won't be fetched.
+		// TODO: figure out how to handle this in a more centralized/uniform way
+//		this.zoomToMyLocation();
 	}
 	
 	@Override
@@ -286,6 +290,17 @@ public class FacilityMapListActivity extends BaseActivity {
 		}
 	}
 	
+	/**
+	 * Handle LocationChangedEvent, fired when the application detects a new user location.
+	 * 
+	 * @param event
+	 */
+	@Subscribe public void handleDeviceOfflineEvent(DeviceOfflineEvent event) {
+		Log.i(TAG, "handleDeviceOfflineEvent");
+		Toast.makeText(this, "The device is not currently online.", Toast.LENGTH_SHORT).show();
+		progressDialog.dismiss();
+	}
+	
 	
 	// ============================================================================================
     // INNER CLASSES
@@ -293,7 +308,7 @@ public class FacilityMapListActivity extends BaseActivity {
 
 
 	/**
-	 * Used by RoboSpice as to handle the response from the facilities "within" request.
+	 * Used by RoboSpice to handle the response from the facilities "within" request.
 	 * @author Jonathan Wohl
 	 *
 	 */
