@@ -1,7 +1,10 @@
 apply plugin: 'android'
 
+def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+
 repositories {
     mavenCentral()
+    mavenRepo urls: localMavenRepo
 }
 
 buildscript {
@@ -88,7 +91,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:+'
     
     // SEL projects
-    // compile 'edu.columbia.sel:grout:0.1-SNAPSHOT'
+    compile 'edu.columbia.sel:grout:0.1-SNAPSHOT'
 	
     // compile fileTree(dir: 'libs', include: ['*.jar'])
 }
