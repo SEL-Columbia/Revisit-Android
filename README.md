@@ -61,10 +61,13 @@ The Facilitator application depends on several open source libraries, outlined h
 ### ButterKnife
 [ButterKnife](http://jakewharton.github.io/butterknife/) simplifies injecting views and click handlers into Activities and Fragments.
 
+### grout
+[grout](https://github.com/SEL-Columbia/grout) is a small library used for downloading, packaging, and managing offline map tiles. **NOTE: this dependency is not yet in Maven Central, and must be built and installed to your local Maven repo. Alternatively, you can build the project locally and copy the compiled .jar file to the libs directory.** 
+
 ## Application Notes
 
 ### Coordinates
-*NOTE: At this time, facility coordinates are in the form `coordinates: [longitude, latitude]`.* This is because the data is being served from a simple node/mongo server, and geospatial indices in mongo expect coordinates in the order (longitude, latitude). In order not to confuse future developers, this sillyness will likely be abstracted out on the server.
+**NOTE: At this time, facility coordinates are in the form `coordinates: [longitude, latitude]`.** This is because the data is being served from a simple node/mongo server, and geospatial indices in mongo expect coordinates in the order (longitude, latitude). In order not to confuse future developers, this sillyness will likely be abstracted out on the server.
 
 ### Debugging / Logging
 Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. edu.columbia.sel.facilitators.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
