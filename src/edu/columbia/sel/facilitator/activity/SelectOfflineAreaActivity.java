@@ -15,11 +15,12 @@ import org.osmdroid.ResourceProxy;
 import com.squareup.otto.Subscribe;
 
 import edu.columbia.sel.facilitator.event.LocationChangedEvent;
-import edu.columbia.sel.facilitator.grout.OSMTileFetcher;
+import edu.columbia.sel.facilitator.grout.Grout;
 import edu.columbia.sel.facilitator.grout.TileFetchingListener;
 import edu.columbia.sel.facilitator.grout.event.FetchingErrorEvent;
 import edu.columbia.sel.facilitator.grout.event.FetchingProgressEvent;
 import edu.columbia.sel.facilitator.grout.event.FetchingStartEvent;
+import edu.columbia.sel.facilitator.grout.util.DeleterListener;
 import edu.columbia.sel.facilitator.model.FacilityList;
 import edu.columbia.sel.facilitator.osm.TileFetchingService;
 import edu.columbia.sel.facilitator.osm.TileFetchingService.TileFetchingBinder;
@@ -31,6 +32,7 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Location;
@@ -56,12 +58,15 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 	private MapView mMapView;
 	private MapController mMapCon;
-	private OSMTileFetcher mOsmTP;
+	private Grout mGrout;
 
 	TileFetchingService mService;
 	boolean mBound = false;
+	
+	boolean mDoDownload = false;
 
 	ProgressDialog mProgressBar;
+	ProgressDialog mDeleteProgressBar;
 
 	// TODO each activity probably doesn't need a reference to the facilities?
 	// Centralize in FacilityRepository or the like?
@@ -76,7 +81,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		// Injection for views and onclick handlers
 		ButterKnife.inject(this);
-
+		
 		mMapView = (MapView) this.findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.setMultiTouchControls(true);
@@ -96,8 +101,25 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			this.zoomToMyLocation();
 		}
 
-		mOsmTP = new OSMTileFetcher();
-		mOsmTP.setTileFetchingListener(new TileFetchingListener() {
+		mGrout = new Grout();
+		mGrout.setMaxzoom(17);
+		mGrout.setDeleterListener(new DeleterListener() {
+
+			@Override
+			public void onDeleteComplete() {
+				mDeleteProgressBar.dismiss();
+				if (mDoDownload) {
+					mGrout.run();
+					mDoDownload = false;
+				}
+			}
+
+			@Override
+			public void onDeleteStart() {
+			}
+			
+		});
+		mGrout.setTileFetchingListener(new TileFetchingListener() {
 
 			@Override
 			public void onTileDownloaded() {
@@ -119,20 +141,16 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			@Override
 			public void onFetchingComplete() {
 				mProgressBar.dismiss();
-				// 1. Instantiate an AlertDialog.Builder with its constructor
+				
+				// Alert the user that the download has completed successfully.
 				AlertDialog.Builder builder = new AlertDialog.Builder(SelectOfflineAreaActivity.this);
-
-				// 2. Chain together various setter methods to set the dialog characteristics
 				builder.setMessage("Success!")
 				       .setTitle("The region you selected has been downloaded. You can now use this application offline.");
-				
 				builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			           public void onClick(DialogInterface dialog, int id) {
 			               // User clicked OK button
 			           }
 			       });
-
-				// 3. Get the AlertDialog from create()
 				AlertDialog dialog = builder.create();
 				dialog.show();
 			}
@@ -201,7 +219,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						mOsmTP.cancel();
+						mGrout.cancel();
 					}
 
 				});
@@ -219,14 +237,31 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mProgressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		mProgressBar.setProgress(0);
 
-		mOsmTP.setBoundingBox(bb);
-		mOsmTP.run();
+		mGrout.setBoundingBox(bb);
+		mDoDownload = true;
+		clearOfflineTiles();
+//		mGrout.run();
 	}
 
-//	@OnClick(R.id.clear_button)
-//	public void clearOfflineTiles(View view) {
-//		mOsmTP.clearOfflineTiles();
-//	}
+	@OnClick(R.id.clear_button)
+	public void clearOfflineTiles(View view) {
+		clearOfflineTiles();
+	}
+	
+	private void clearOfflineTiles() {
+		mDeleteProgressBar = new ProgressDialog(this);
+		mDeleteProgressBar.setCancelable(true);
+		mDeleteProgressBar.setCanceledOnTouchOutside(false);
+		mDeleteProgressBar.setTitle("Deleting Tiles...");
+		mDeleteProgressBar.setOnShowListener(new OnShowListener() {
+			@Override
+			public void onShow(DialogInterface arg0) {
+				mGrout.clearOfflineTiles();						
+			}
+		});
+		mDeleteProgressBar.show();
+	}
+	
 //
 //	@OnClick(R.id.count_button)
 //	public void countOfflineTiles(View view) {

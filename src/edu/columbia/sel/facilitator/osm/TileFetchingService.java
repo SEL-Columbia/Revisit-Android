@@ -1,6 +1,6 @@
 package edu.columbia.sel.facilitator.osm;
 
-import edu.columbia.sel.facilitator.grout.OSMTileFetcher;
+import edu.columbia.sel.facilitator.grout.Grout;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -39,7 +39,7 @@ public class TileFetchingService extends Service {
 	public void fetchTiles(Double north, Double south, Double east, Double west) {
 		Log.i(TAG, "-----------------> fetchTiles");
 		if (!mIsRunning) {
-			OSMTileFetcher osmTP = new OSMTileFetcher(north, south, east, west);
+			Grout osmTP = new Grout(north, south, east, west);
 			osmTP.run();
 			mIsRunning = true;
 		}
