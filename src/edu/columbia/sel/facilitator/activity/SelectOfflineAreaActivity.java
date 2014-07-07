@@ -103,6 +103,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		mGrout = new Grout();
 		mGrout.setMaxzoom(17);
+		mGrout.setDestinationFile("OfflineTiles.gemf");
 		mGrout.setDeleterListener(new DeleterListener() {
 
 			@Override
@@ -116,6 +117,10 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 			@Override
 			public void onDeleteStart() {
+			}
+			
+			@Override
+			public void onDeleteError() {
 			}
 			
 		});
