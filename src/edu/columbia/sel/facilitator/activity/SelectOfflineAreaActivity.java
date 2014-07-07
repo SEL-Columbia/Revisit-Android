@@ -12,8 +12,14 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.ResourceProxy;
 
+import com.octo.android.robospice.persistence.DurationInMillis;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.otto.Subscribe;
 
+import edu.columbia.sel.facilitator.activity.FacilityMapListActivity.FacilitiesRequestListener;
+import edu.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
+import edu.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
 import edu.columbia.sel.facilitator.event.LocationChangedEvent;
 import edu.columbia.sel.facilitator.grout.Grout;
 import edu.columbia.sel.facilitator.grout.TileFetchingListener;
@@ -65,10 +71,12 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	private MapController mMapCon;
 	private Grout mGrout;
 
-	TileFetchingService mService;
-	boolean mBound = false;
-	
+	BoundingBoxE6 mBoundingBox;
 	boolean mDoDownload = false;
+
+	// RoboSpice request object to handle fetching of facilities within the
+	// bounds of the map view
+	private FacilitiesWithinRetrofitSpiceRequest mFacilitiesWithinRequest;
 
 	ProgressDialog mProgressBar;
 	ProgressDialog mDeleteProgressBar;
@@ -86,7 +94,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		// Injection for views and onclick handlers
 		ButterKnife.inject(this);
-		
+
 		mMapView = (MapView) this.findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.setMultiTouchControls(true);
@@ -108,9 +116,11 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		mGrout = new Grout();
 		mGrout.setMaxzoom(17);
-		// For now we're just using raw tiles on the file system... seems fastest, and the archives
-		// aren't working with the jpgs fetched (as .png files) from the tile servers.
-//		mGrout.setDestinationFile("OfflineTiles.gemf");
+		// For now we're just using raw tiles on the file system... seems
+		// fastest, and the archives
+		// aren't working with the jpgs fetched (as .png files) from the tile
+		// servers.
+		// mGrout.setDestinationFile("OfflineTiles.gemf");
 		mGrout.setDeleterListener(new DeleterListener() {
 
 			@Override
@@ -125,11 +135,11 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			@Override
 			public void onDeleteStart() {
 			}
-			
+
 			@Override
 			public void onDeleteError() {
 			}
-			
+
 		});
 		mGrout.setTileFetchingListener(new TileFetchingListener() {
 
@@ -153,16 +163,20 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			@Override
 			public void onFetchingComplete() {
 				mProgressBar.dismiss();
+
+				// go get the facilities
+				fetchFacilities();
 				
 				// Alert the user that the download has completed successfully.
 				AlertDialog.Builder builder = new AlertDialog.Builder(SelectOfflineAreaActivity.this);
-				builder.setMessage("Success!")
-				       .setTitle("The region you selected has been downloaded. You can now use this application offline.");
+				builder.setMessage(
+						"The region you selected has been downloaded. You can now use this application offline.")
+						.setTitle("Success!");
 				builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			               // User clicked OK button
-			           }
-			       });
+					public void onClick(DialogInterface dialog, int id) {
+						// User clicked OK button
+					}
+				});
 				AlertDialog dialog = builder.create();
 				dialog.show();
 			}
@@ -208,7 +222,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		super.onStop();
 		Log.i(TAG, "------------> onStop()");
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
@@ -222,20 +236,32 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
 		case R.id.action_settings:
-			 openSettings();
+			openSettings();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	/**
-	 * Open the SettingsActivity 
+	 * Open the SettingsActivity
 	 */
 	private void openSettings() {
 		Log.i(TAG, "openSettings()");
 		Intent i = new Intent(this, SettingsActivity.class);
 		startActivity(i);
+	}
+
+	private void fetchFacilities() {
+		Log.i(TAG, "00000000000000--     Fetch those Facs.");
+		Double n = (mBoundingBox.getLatNorthE6() / 1E6);
+		Double s = (mBoundingBox.getLatSouthE6() / 1E6);
+		Double e = (mBoundingBox.getLonEastE6() / 1E6);
+		Double w = (mBoundingBox.getLonWestE6() / 1E6);
+		mFacilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),
+				String.valueOf(n), String.valueOf(e));
+		getSpiceManager().execute(mFacilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND,
+				new FacilitiesRequestListener());
 	}
 
 	@OnClick(R.id.download_button)
@@ -269,27 +295,31 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mProgressBar.setProgress(0);
 
 		// Set additional params for Grout
-		BoundingBoxE6 bb = mMapView.getBoundingBox();
-		mGrout.setBoundingBox(bb);
+		mBoundingBox = mMapView.getBoundingBox();
+		mGrout.setBoundingBox(mBoundingBox);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		mGrout.setServerURL(sharedPref.getString("tile_server_url", "http://otile1.mqcdn.com/tiles/1.0.0/map/"));
 		mDoDownload = true;
-		
-		// For our purpose, we want to clear offline tiles first, then start the new download, so we use the
-		// onDeleteComplete listener to start the new download rather than kicking of the download here.
-//		mGrout.run();
+
+		// For our purpose, we want to clear offline tiles first, then start the
+		// new download, so we use the
+		// onDeleteComplete listener to start the new download rather than
+		// kicking of the download here.
+		// mGrout.run();
 		clearOfflineTiles();
 	}
 
 	/**
-	 * Public click handler for clearing offline tiles, not to be confused with the private method called therein.
+	 * Public click handler for clearing offline tiles, not to be confused with
+	 * the private method called therein.
+	 * 
 	 * @param view
 	 */
 	@OnClick(R.id.clear_button)
 	public void clearOfflineTiles(View view) {
 		clearOfflineTiles();
 	}
-	
+
 	/**
 	 * Show the Delete progress dialog, then begin clearing the tiles.
 	 */
@@ -301,39 +331,40 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mDeleteProgressBar.setOnShowListener(new OnShowListener() {
 			@Override
 			public void onShow(DialogInterface arg0) {
-				mGrout.clearOfflineTiles();						
+				mGrout.clearOfflineTiles();
 			}
 		});
 		mDeleteProgressBar.show();
 	}
-	
-//
-//	@OnClick(R.id.count_button)
-//	public void countOfflineTiles(View view) {
-//		int numTiles = mOsmTP.countCachedTiles();
-//		Toast.makeText(this, "Total Tiles Cached: " + numTiles, Toast.LENGTH_SHORT).show();
-//	}
-//
-//	@OnClick(R.id.zip_button)
-//	public void createZip(View view) {
-//		mOsmTP.setDestinationFile("OfflineTiles.zip");
-//		mOsmTP.createZipFile();
-//		// Toast.makeText(this, "Total Tiles Cached: " + numTiles,
-//		// Toast.LENGTH_SHORT).show();
-//	}
-//
-//	@OnClick(R.id.gemf_button)
-//	public void createGemf(View view) {
-//		mOsmTP.setDestinationFile("OfflineTiles.gemf");
-//		mOsmTP.createGemfFile();
-//		// Toast.makeText(this, "Total Tiles Cached: " + numTiles,
-//		// Toast.LENGTH_SHORT).show();
-//	}
+
+	//
+	// @OnClick(R.id.count_button)
+	// public void countOfflineTiles(View view) {
+	// int numTiles = mOsmTP.countCachedTiles();
+	// Toast.makeText(this, "Total Tiles Cached: " + numTiles,
+	// Toast.LENGTH_SHORT).show();
+	// }
+	//
+	// @OnClick(R.id.zip_button)
+	// public void createZip(View view) {
+	// mOsmTP.setDestinationFile("OfflineTiles.zip");
+	// mOsmTP.createZipFile();
+	// // Toast.makeText(this, "Total Tiles Cached: " + numTiles,
+	// // Toast.LENGTH_SHORT).show();
+	// }
+	//
+	// @OnClick(R.id.gemf_button)
+	// public void createGemf(View view) {
+	// mOsmTP.setDestinationFile("OfflineTiles.gemf");
+	// mOsmTP.createGemfFile();
+	// // Toast.makeText(this, "Total Tiles Cached: " + numTiles,
+	// // Toast.LENGTH_SHORT).show();
+	// }
 
 	@OnClick(R.id.map_button)
 	public void gotoOfflineMap(View view) {
 		Intent i = new Intent(this, FacilityMapListActivity.class);
-		finish();
+		// finish();
 		startActivity(i);
 	}
 
@@ -369,5 +400,31 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mMyLocation = event.getLocation();
 		this.zoomToMyLocation();
 
+	}
+
+	// ============================================================================================
+	// INNER CLASSES
+	// ============================================================================================
+
+	/**
+	 * Used by RoboSpice to handle the response from the facilities "within"
+	 * request.
+	 * 
+	 * @author Jonathan Wohl
+	 * 
+	 */
+	public final class FacilitiesRequestListener implements RequestListener<FacilityList> {
+
+		@Override
+		public void onRequestFailure(SpiceException spiceException) {
+			Log.e(TAG, spiceException.toString());
+			Toast.makeText(SelectOfflineAreaActivity.this, "Failed to load facilities.", Toast.LENGTH_SHORT).show();
+		}
+
+		@Override
+		public void onRequestSuccess(final FacilityList result) {
+			Log.i(TAG, "00000000000 Facilities Loaded: " + result.size());
+//			bus.post(new FacilitiesLoadedEvent(result));
+		}
 	}
 }
