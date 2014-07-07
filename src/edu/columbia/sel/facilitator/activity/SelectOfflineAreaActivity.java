@@ -229,6 +229,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		}
 	}
 	
+	/**
+	 * Open the SettingsActivity 
+	 */
 	private void openSettings() {
 		Log.i(TAG, "openSettings()");
 		Intent i = new Intent(this, SettingsActivity.class);

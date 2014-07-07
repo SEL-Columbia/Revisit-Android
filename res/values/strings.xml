@@ -42,8 +42,9 @@
     
 	<!-- PREFERENCES -->
 	<string name="tile_server_url_title">Tile Server URL</string>
-	<string name="tile_server_url_summary">The base URL from which the tiles should be fetched. For instance, if a 
-	    specific tile comes from http://otile1.mqcdn.com/tiles/1.0.0/sat/15/5240/12661.jpg, the base URL would be: http://otile1.mqcdn.com/tiles/1.0.0/sat/</string>
+	<string name="tile_server_url_summary">The base URL from which the tiles should be fetched.</string>
+	<string name="facility_server_url_title">Facility Registry Server URL</string>
+	<string name="facility_server_url_summary">The base URL for the Facility Registry API to be used.</string>
     
     
 </resources>

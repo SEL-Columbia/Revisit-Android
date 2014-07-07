@@ -172,11 +172,20 @@ public class FacilityMapListActivity extends BaseActivity {
 			zoomToMyLocation();
 			return true;
 		case R.id.action_settings:
-			// openSettings();
+			 openSettings();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	/**
+	 * Open the SettingsActivity 
+	 */
+	private void openSettings() {
+		Log.i(TAG, "openSettings()");
+		Intent i = new Intent(this, SettingsActivity.class);
+		startActivity(i);
 	}
 
 	@Override

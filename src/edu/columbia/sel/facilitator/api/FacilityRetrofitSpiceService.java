@@ -1,5 +1,8 @@
 package edu.columbia.sel.facilitator.api;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import com.octo.android.robospice.retrofit.RetrofitJackson2SpiceService;
 
 /**
@@ -10,7 +13,7 @@ import com.octo.android.robospice.retrofit.RetrofitJackson2SpiceService;
  */
 public class FacilityRetrofitSpiceService extends RetrofitJackson2SpiceService {
 
-	private final static String BASE_URL = "http://23.21.86.131:3000/api/v1";
+	private static String BASE_URL = "http://23.21.86.131:3000/api/v1";
 
     @Override
     public void onCreate() {
@@ -20,6 +23,7 @@ public class FacilityRetrofitSpiceService extends RetrofitJackson2SpiceService {
 
     @Override
     protected String getServerUrl() {
-        return BASE_URL;
+    	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		return sharedPref.getString("facility_server_url", BASE_URL);
     }
 }
