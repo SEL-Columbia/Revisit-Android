@@ -65,7 +65,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.columbia.sel.facilitator.activity.FacilityMapListActivity" />
         </activity>
+        
+        
+        <activity
+            android:name="edu.columbia.sel.facilitator.activity.SettingsActivity"
+            android:label="@string/action_settings" >
+        </activity>
 
+        
+        
         <service
             android:name="edu.columbia.sel.facilitator.api.FacilityRetrofitSpiceService"
             android:exported="false" />

@@ -35,11 +35,16 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -103,7 +108,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		mGrout = new Grout();
 		mGrout.setMaxzoom(17);
-		mGrout.setDestinationFile("OfflineTiles.gemf");
+		// For now we're just using raw tiles on the file system... seems fastest, and the archives
+		// aren't working with the jpgs fetched (as .png files) from the tile servers.
+//		mGrout.setDestinationFile("OfflineTiles.gemf");
 		mGrout.setDeleterListener(new DeleterListener() {
 
 			@Override
@@ -194,27 +201,43 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		// start location service
 		startService(new Intent(this, LocationService.class));
-
-		// Bind to TileFetchingService
-		Intent intent = new Intent(this, TileFetchingService.class);
-		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
 		Log.i(TAG, "------------> onStop()");
-		// Unbind from the service
-		if (mBound) {
-			unbindService(mConnection);
-			mBound = false;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.offline_select_menu, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle presses on the action bar items
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			 openSettings();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	private void openSettings() {
+		Log.i(TAG, "openSettings()");
+		Intent i = new Intent(this, SettingsActivity.class);
+		startActivity(i);
 	}
 
 	@OnClick(R.id.download_button)
 	public void download(View view) {
 		Log.i(TAG, "------------> download initiated");
-		BoundingBoxE6 bb = mMapView.getBoundingBox();
 		// prepare a progress bar dialog
 		mProgressBar = new ProgressDialog(this);
 		mProgressBar.setCancelable(true);
@@ -242,17 +265,31 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mProgressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		mProgressBar.setProgress(0);
 
+		// Set additional params for Grout
+		BoundingBoxE6 bb = mMapView.getBoundingBox();
 		mGrout.setBoundingBox(bb);
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		mGrout.setServerURL(sharedPref.getString("tile_server_url", "http://otile1.mqcdn.com/tiles/1.0.0/map/"));
 		mDoDownload = true;
-		clearOfflineTiles();
+		
+		// For our purpose, we want to clear offline tiles first, then start the new download, so we use the
+		// onDeleteComplete listener to start the new download rather than kicking of the download here.
 //		mGrout.run();
+		clearOfflineTiles();
 	}
 
+	/**
+	 * Public click handler for clearing offline tiles, not to be confused with the private method called therein.
+	 * @param view
+	 */
 	@OnClick(R.id.clear_button)
 	public void clearOfflineTiles(View view) {
 		clearOfflineTiles();
 	}
 	
+	/**
+	 * Show the Delete progress dialog, then begin clearing the tiles.
+	 */
 	private void clearOfflineTiles() {
 		mDeleteProgressBar = new ProgressDialog(this);
 		mDeleteProgressBar.setCancelable(true);
@@ -316,26 +353,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
 		mMapCon.animateTo(point);
 	}
-
-	/** Defines callbacks for service binding, passed to bindService() */
-	private ServiceConnection mConnection = new ServiceConnection() {
-
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			Log.i(TAG, "------------> SERVICE CONNECTED");
-			// We've bound to LocalService, cast the IBinder and get
-			// LocalService instance
-			TileFetchingBinder binder = (TileFetchingBinder) service;
-			mService = binder.getService();
-			mBound = true;
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			Log.i(TAG, "------------> SERVICE DISCONNECTED");
-			mBound = false;
-		}
-	};
 
 	/**
 	 * Handle LocationChangedEvent, fired when the application detects a new

@@ -88,11 +88,6 @@ public class FacilityMapListActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map_list);
 
-		if (savedInstanceState != null) {
-			Log.i(TAG, ">>>>>>>>>>> Saved Instance State not Null");
-			mSectorFilter = savedInstanceState.getString("sectorFilter");
-		}
-
 		Intent i = getIntent();
 		String action = i.getAction();
 		if (action == Intent.ACTION_MAIN) {
