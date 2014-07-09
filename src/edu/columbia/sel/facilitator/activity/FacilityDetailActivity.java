@@ -19,6 +19,7 @@ import edu.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
 import edu.columbia.sel.facilitator.api.UpdateFacilityRetrofitSpiceRequest;
 import edu.columbia.sel.facilitator.model.Facility;
 import edu.columbia.sel.facilitator.model.FacilityRepository;
+import edu.columbia.sel.facilitator.model.FileSystemSiteRepository;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -153,61 +154,50 @@ public class FacilityDetailActivity extends BaseActivity {
 		checkins += 1;
 		mFacility.getProperties().setCheckins(checkins);
 		
-		mUpdateFacilityRequest = new UpdateFacilityRetrofitSpiceRequest(mFacility);
+		FileSystemSiteRepository sr = new FileSystemSiteRepository(this);
+		sr.saveSite(mFacility);
 		
-//		ObjectMapper mapper = new ObjectMapper();
-//		
-//		try {
-//			String json = mapper.writeValueAsString(mFacility);
-//			Log.i(TAG, json);
-//		} catch (JsonProcessingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
+		Intent i = new Intent();
+		i.putExtra("facility_name", mFacility.getName());
+		i.putExtra("facility_sector", mFacility.getProperties().getSector());
+		i.putExtra("facility_type", mFacility.getProperties().getType());
+		i.putExtra("facility_latitude", mFacility.getCoordinates().get(1));
+		i.putExtra("facility_longitude", mFacility.getCoordinates().get(0));
+		i.putExtra("facility_location", mFacility.getCoordinates().get(1) + ", " + mFacility.getCoordinates().get(0));
+		setResult(RESULT_OK, i);
+		finish();
+	}
+	
+//	
+//	/**
+//	 * Used by RoboSpice to handle the response for adding a Facility.
+//	 * @author Jonathan Wohl
+//	 *
+//	 */
+//	public final class UpdateFacilityRequestListener implements
+//			RequestListener<Facility> {
+//
+//		@Override
+//		public void onRequestFailure(SpiceException spiceException) {
+//			Log.e(TAG, spiceException.toString());
+//			Toast.makeText(FacilityDetailActivity.this, "Failed to add new facility.",
+//					Toast.LENGTH_SHORT).show();
 //		}
-		
-		getSpiceManager().execute(mUpdateFacilityRequest, "updatefacility", DurationInMillis.ONE_SECOND, new UpdateFacilityRequestListener());
-		
-//		Intent i = new Intent();
-//		i.putExtra("facility_name", facility.getName());
-//		i.putExtra("facility_sector", facility.getProperties().getSector());
-//		i.putExtra("facility_type", facility.getProperties().getType());
-//		i.putExtra("facility_latitude", facility.getCoordinates().get(1));
-//		i.putExtra("facility_longitude", facility.getCoordinates().get(0));
-//		i.putExtra("facility_location", facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
-//		this.setResult(RESULT_OK, i);
-//		this.finish();
-	}
-	
-	
-	/**
-	 * Used by RoboSpice to handle the response for adding a Facility.
-	 * @author Jonathan Wohl
-	 *
-	 */
-	public final class UpdateFacilityRequestListener implements
-			RequestListener<Facility> {
-
-		@Override
-		public void onRequestFailure(SpiceException spiceException) {
-			Log.e(TAG, spiceException.toString());
-			Toast.makeText(FacilityDetailActivity.this, "Failed to add new facility.",
-					Toast.LENGTH_SHORT).show();
-		}
-
-		/**
-		 * On Success, we finish the activity and start the Detail activity.
-		 */
-		@Override
-		public void onRequestSuccess(final Facility facility) {
-			Intent i = new Intent();
-			i.putExtra("facility_name", facility.getName());
-			i.putExtra("facility_sector", facility.getProperties().getSector());
-			i.putExtra("facility_type", facility.getProperties().getType());
-			i.putExtra("facility_latitude", facility.getCoordinates().get(1));
-			i.putExtra("facility_longitude", facility.getCoordinates().get(0));
-			i.putExtra("facility_location", facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
-			setResult(RESULT_OK, i);
-			finish();
-		}
-	}
+//
+//		/**
+//		 * On Success, we finish the activity and start the Detail activity.
+//		 */
+//		@Override
+//		public void onRequestSuccess(final Facility facility) {
+//			Intent i = new Intent();
+//			i.putExtra("facility_name", facility.getName());
+//			i.putExtra("facility_sector", facility.getProperties().getSector());
+//			i.putExtra("facility_type", facility.getProperties().getType());
+//			i.putExtra("facility_latitude", facility.getCoordinates().get(1));
+//			i.putExtra("facility_longitude", facility.getCoordinates().get(0));
+//			i.putExtra("facility_location", facility.getCoordinates().get(1) + ", " + facility.getCoordinates().get(0));
+//			setResult(RESULT_OK, i);
+//			finish();
+//		}
+//	}
 }

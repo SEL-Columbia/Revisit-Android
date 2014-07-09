@@ -17,9 +17,9 @@ import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.otto.Subscribe;
 
-import edu.columbia.sel.facilitator.activity.FacilityMapListActivity.FacilitiesRequestListener;
+import edu.columbia.sel.facilitator.api.AddFacilityRetrofitSpiceRequest;
 import edu.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
-import edu.columbia.sel.facilitator.event.FacilitiesLoadedEvent;
+import edu.columbia.sel.facilitator.api.UpdateFacilityRetrofitSpiceRequest;
 import edu.columbia.sel.facilitator.event.LocationChangedEvent;
 import edu.columbia.sel.facilitator.grout.Grout;
 import edu.columbia.sel.facilitator.grout.TileFetchingListener;
@@ -27,25 +27,21 @@ import edu.columbia.sel.facilitator.grout.event.FetchingErrorEvent;
 import edu.columbia.sel.facilitator.grout.event.FetchingProgressEvent;
 import edu.columbia.sel.facilitator.grout.event.FetchingStartEvent;
 import edu.columbia.sel.facilitator.grout.util.DeleterListener;
+import edu.columbia.sel.facilitator.model.Facility;
 import edu.columbia.sel.facilitator.model.FacilityList;
-import edu.columbia.sel.facilitator.osm.TileFetchingService;
-import edu.columbia.sel.facilitator.osm.TileFetchingService.TileFetchingBinder;
+import edu.columbia.sel.facilitator.model.FileSystemSiteRepository;
 import edu.columbia.sel.facilitator.service.LocationService;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -166,7 +162,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 				// go get the facilities
 				fetchFacilities();
-				
+
 				// Alert the user that the download has completed successfully.
 				AlertDialog.Builder builder = new AlertDialog.Builder(SelectOfflineAreaActivity.this);
 				builder.setMessage(
@@ -337,13 +333,25 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mDeleteProgressBar.show();
 	}
 
-	//
-	// @OnClick(R.id.count_button)
-	// public void countOfflineTiles(View view) {
-	// int numTiles = mOsmTP.countCachedTiles();
-	// Toast.makeText(this, "Total Tiles Cached: " + numTiles,
-	// Toast.LENGTH_SHORT).show();
-	// }
+	@OnClick(R.id.sync_button)
+	public void syncFacilities(View view) {
+		FileSystemSiteRepository sr = new FileSystemSiteRepository(this);
+		FacilityList facs = sr.getSitesForSync();
+		for (Facility f : facs) {
+			if (f.get_id() == null) {
+				Log.i(TAG, "                 ---> ADDING FACILITY.");
+				AddFacilityRetrofitSpiceRequest addFacilityRequest = new AddFacilityRetrofitSpiceRequest(f);
+				getSpiceManager().execute(addFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND,
+						new AddFacilityRequestListener());
+			} else {
+				UpdateFacilityRetrofitSpiceRequest updateFacilityRequest = new UpdateFacilityRetrofitSpiceRequest(f);
+				getSpiceManager().execute(updateFacilityRequest, "updatefacility", DurationInMillis.ONE_SECOND,
+						new UpdateFacilityRequestListener());
+			}
+		}
+		Toast.makeText(this, "Total Facilities Within Bounds: " + facs.size(), Toast.LENGTH_SHORT).show();
+	}
+
 	//
 	// @OnClick(R.id.zip_button)
 	// public void createZip(View view) {
@@ -424,7 +432,60 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		@Override
 		public void onRequestSuccess(final FacilityList result) {
 			Log.i(TAG, "00000000000 Facilities Loaded: " + result.size());
-//			bus.post(new FacilitiesLoadedEvent(result));
+			FileSystemSiteRepository sr = new FileSystemSiteRepository(SelectOfflineAreaActivity.this);
+			sr.saveSites(result);
+		}
+		// bus.post(new FacilitiesLoadedEvent(result));
+	}
+
+	/**
+	 * Used by RoboSpice to handle the response for adding a Facility.
+	 * 
+	 * @author Jonathan Wohl
+	 * 
+	 */
+	public final class AddFacilityRequestListener implements RequestListener<Facility> {
+
+		@Override
+		public void onRequestFailure(SpiceException spiceException) {
+			Log.e(TAG, spiceException.toString());
+			Toast.makeText(SelectOfflineAreaActivity.this, "Failed to add new facility.", Toast.LENGTH_SHORT).show();
+		}
+
+		/**
+		 * On Success, we finish the activity and start the Detail activity.
+		 */
+		@Override
+		public void onRequestSuccess(final Facility result) {
+			Log.i(TAG, "Facility Added!");
+			result.setRequestSync(false);
+			Toast.makeText(SelectOfflineAreaActivity.this, result.getName() + " saved to server.", Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
+
+	/**
+	 * Used by RoboSpice to handle the response for adding a Facility.
+	 * 
+	 * @author Jonathan Wohl
+	 * 
+	 */
+	public final class UpdateFacilityRequestListener implements RequestListener<Facility> {
+
+		@Override
+		public void onRequestFailure(SpiceException spiceException) {
+			Log.e(TAG, spiceException.toString());
+			Toast.makeText(SelectOfflineAreaActivity.this, "Failed to add new facility.", Toast.LENGTH_SHORT).show();
+		}
+
+		/**
+		 * On Success, we finish the activity and start the Detail activity.
+		 */
+		@Override
+		public void onRequestSuccess(final Facility facility) {
+			facility.setRequestSync(false);
+			Toast.makeText(SelectOfflineAreaActivity.this, facility.getName() + " saved to server.", Toast.LENGTH_SHORT)
+					.show();
 		}
 	}
 }

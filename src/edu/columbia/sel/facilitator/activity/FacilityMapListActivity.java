@@ -22,6 +22,7 @@ import edu.columbia.sel.facilitator.event.MapChangedEvent;
 import edu.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import edu.columbia.sel.facilitator.model.Facility;
 import edu.columbia.sel.facilitator.model.FacilityList;
+import edu.columbia.sel.facilitator.model.FileSystemSiteRepository;
 import edu.columbia.sel.facilitator.service.LocationService;
 import android.app.FragmentManager;
 import android.app.ListFragment;
@@ -138,17 +139,17 @@ public class FacilityMapListActivity extends BaseActivity {
 		// the last known location isn't
 		// available, the map will not change and facilities won't be fetched.
 		// TODO: figure out how to handle this in a more centralized/uniform way
-		// this.zoomToMyLocation();
+		 this.zoomToMyLocation();
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 		startService(new Intent(this, LocationService.class));
-		if (mFacilities != null) {
-			getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND,
-					new FacilitiesRequestListener());
-		}
+//		if (mFacilities != null) {
+//			getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND,
+//					new FacilitiesRequestListener());
+//		}
 	}
 
 	@Override
@@ -188,17 +189,6 @@ public class FacilityMapListActivity extends BaseActivity {
 		startActivity(i);
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-
-		Log.i(TAG, ">>>>>>>>>>> Saving Activity State");
-		// Save UI state changes to the savedInstanceState.
-		// This bundle will be passed to onCreate if the process is
-		// killed and restarted.
-		savedInstanceState.putString("sectorFilter", mSectorFilter);
-	}
-
 	/**
 	 * When the result is received from the FacilityDetailActivity, we simply set the result on this Activity
 	 * and finish, thus passing the selected Facility data back to ODK.
@@ -232,7 +222,6 @@ public class FacilityMapListActivity extends BaseActivity {
 	public void onAddNewFacility(View view) {
 		Log.i(TAG, "Begin add new Facility...");
 		Intent i = new Intent(FacilityMapListActivity.this, AddFacilityActivity.class);
-//		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 		startActivityForResult(i, 1);
 	}
 
@@ -281,7 +270,6 @@ public class FacilityMapListActivity extends BaseActivity {
 		Facility f = event.getFacility();
 		Intent i = new Intent(FacilityMapListActivity.this, FacilityDetailActivity.class);
 		i.putExtra("facility", f);
-//		i.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 		startActivityForResult(i, 1);
 	}
 
@@ -303,13 +291,16 @@ public class FacilityMapListActivity extends BaseActivity {
 		double s = (bb.getLatSouthE6() / 1E6);
 		double e = (bb.getLonEastE6() / 1E6);
 		double w = (bb.getLonWestE6() / 1E6);
-
 		Log.i(TAG, n + ", " + w + ", " + s + ", " + e + ": " + mSectorFilter);
 
-		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),
-				String.valueOf(n), String.valueOf(e), mSectorFilter);
-		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND,
-				new FacilitiesRequestListener());
+		FileSystemSiteRepository sr = new FileSystemSiteRepository(this);
+		FacilityList facs = sr.getSitesWithin(n, s, e, w);
+		bus.post(new FacilitiesLoadedEvent(facs));
+
+//		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),
+//				String.valueOf(n), String.valueOf(e), mSectorFilter);
+//		getSpiceManager().execute(facilitiesWithinRequest, "facilities", DurationInMillis.ONE_SECOND,
+//				new FacilitiesRequestListener());
 	}
 
 	/**

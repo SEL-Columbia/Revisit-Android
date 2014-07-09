@@ -49,6 +49,7 @@ public class Facility implements Parcelable {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "EST")
 	private Date createdAt;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private Boolean requestSync = false;
 
 	/**
 	 * Default constructor
@@ -147,19 +148,25 @@ public class Facility implements Parcelable {
 		this.additionalProperties.put(name, value);
 	}
 
+	public Boolean getRequestSync() {
+		return requestSync;
+	}
+	
+	
+	public void setRequestSync(Boolean requestSync) {
+		this.requestSync = requestSync;
+	}
 	
 	////////////////////////
 	// Parcelable Interface
 	////////////////////////
-	
-	// TODO: Implement again... or use JSON instead?
-	
+
+
 	public int describeContents() {
 		return 0;
 	}
 
 	public void writeToParcel(Parcel out, int flags) {
-		// out.writeInt();
 		Properties props = this.getProperties();
 		out.writeString(_id);
 		out.writeString(uuid);
@@ -182,8 +189,6 @@ public class Facility implements Parcelable {
 	};
 
 	private Facility(Parcel in) {
-		// Log.i(TAG, in.toString());
-		
 		_id = in.readString();
 		uuid = in.readString();
 		name = in.readString();

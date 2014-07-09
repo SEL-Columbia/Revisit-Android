@@ -38,23 +38,23 @@
             android:layout_below="@id/download_button"
             android:background="@android:drawable/btn_default"
             android:text="@string/view_offline_button" />
-        
-		    <Button
-		        android:id="@+id/clear_button"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_below="@id/map_button"
-            	android:background="@android:drawable/btn_default"
-		        android:text="Clear Offline Tiles" />
+
+        <Button
+            android:id="@+id/clear_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/map_button"
+            android:background="@android:drawable/btn_default"
+            android:text="Clear Tiles" />
+
+        <Button
+            android:id="@+id/sync_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/clear_button"
+            android:background="@android:drawable/btn_default"
+            android:text="Sync Facilities" />
         <!--
-		
-		    <Button
-		        android:id="@+id/count_button"
-		        android:layout_width="match_parent"
-		        android:layout_height="0dp"
-		        android:layout_weight="1"
-		        android:text="Count Offline Tiles" />
-		
 		    <Button
 		        android:id="@+id/zip_button"
 		        android:layout_width="match_parent"
