@@ -1,10 +1,10 @@
-Facilitator
+Revisit
 ===========
 
-An android application that facilitates facility selection.
+A helpful counterpart app to ODK Collect which facilitates the selection of survey Sites. A Site might be a health facility, an education Facility, or something more generic like a water access point.
 
 ## Usage
-The Facilitator application is designed to be used in conjunction with [ODK Collect](http://opendatakit.org/use/collect/). The goal is to streamline the collection of facility information by pulling from a central repository of facility data. Users of the app can quickly select the facility at which they are conducting a survey, reducing manual entry errors and speeding the data entry process. Additionally, users can contribute general facility information (name, sector, location, etc.) and fix incorrect information in order to grow and improve the central repository over time.
+The Revisit application is designed to be used in conjunction with [ODK Collect](http://opendatakit.org/use/collect/). The goal is to streamline the collection of site information by pulling from a central repository of site data. Users of the app can quickly select the site at which they are conducting a survey, reducing manual entry errors and speeding the data entry process. Additionally, users can contribute general site information (name, sector, location, etc.) and fix incorrect information in order to grow and improve the central repository over time.
 
 ## Setup and Build
 This project is being developed in Eclipse (ADT), but using gradle for dependency management and builds.
@@ -35,7 +35,7 @@ $ gradle installDebug
 After some chugging, it should finish with a success message. If an error occurs, fix the problem and try again.
 
 ## Included Libraries
-The Facilitator application depends on several open source libraries, outlined here. This list will be updated as these dependencies change, and more information about their implmentation may be added at a later date.
+The Revisit application depends on several open source libraries, outlined here. This list will be updated as these dependencies change, and more information about their implmentation may be added at a later date.
 
 ### osmdroid
 [osmdroid](https://github.com/osmdroid/osmdroid) is used as the map framework, providing a relatively well documented implementation of Open Street Maps.
@@ -67,7 +67,7 @@ The Facilitator application depends on several open source libraries, outlined h
 ## Application Notes
 
 ### Coordinates
-**NOTE: At this time, facility coordinates are in the form `coordinates: [longitude, latitude]`.** This is because the data is being served from a simple node/mongo server, and geospatial indices in mongo expect coordinates in the order (longitude, latitude). In order not to confuse future developers, this sillyness will likely be abstracted out on the server.
+**NOTE: At this time, site coordinates are stored in the form `coordinates: [longitude, latitude]`.** This is because we want to conform to the [FRED API](http://facilityregistry.org) standard for transfering facility data.
 
 ### Debugging / Logging
 Every activity that subclasses BaseActivity has a `TAG` member that is the class's canonical name (e.g. edu.columbia.sel.revisits.activity.MapActivity). This is useful for debugging on the command line using logcat with grep to filter.
@@ -81,11 +81,10 @@ I'd recommend using [pidcat](https://github.com/JakeWharton/pidcat) or [coloredl
 ```
 alias logfac='adb logcat | grep --line-buffered ".*edu.columbia.sel.revisit*" | logcatc'
 ```
-Additionally, an `APP_TAG` member is injected in all activities and the application itself with a value of FacilitatorApplication. You can log to this tag, and filter on it to view only these log entries.
+Additionally, an `APP_TAG` member is injected in all activities and the application itself with a value of RevisitApplication. You can log to this tag, and filter on it to view only these log entries.
 
 ## TODO
-- Better project description, purpose
-- Offline use
+- Better project description, usage overview
 - Image capture
-- Basic architecture description
 - Documentation
+- Basic architecture description
