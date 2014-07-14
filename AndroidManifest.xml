@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.columbia.sel.facilitator"
+    package="edu.columbia.sel.revisit"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -20,21 +20,21 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:name="edu.columbia.sel.facilitator.FacilitatorApplication"
+        android:name="edu.columbia.sel.revisit.RevisitApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="edu.columbia.sel.facilitator.activity.MainActivity"
+            android:name="edu.columbia.sel.revisit.activity.MainActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="edu.columbia.sel.facilitator.activity.FacilityListActivity"
-            android:label="@string/title_activity_facility_list" >
+            android:name="edu.columbia.sel.revisit.activity.SiteListActivity"
+            android:label="@string/title_activity_site_list" >
         </activity>
         <activity
-            android:name="edu.columbia.sel.facilitator.activity.SelectOfflineAreaActivity"
+            android:name="edu.columbia.sel.revisit.activity.SelectOfflineAreaActivity"
             android:label="@string/title_activity_map" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,44 +42,44 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.columbia.sel.facilitator.activity.FacilityDetailActivity"
-            android:label="@string/title_facility_detail" >
+            android:name="edu.columbia.sel.revisit.activity.SiteDetailActivity"
+            android:label="@string/title_site_detail" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.columbia.sel.facilitator.activity.FacilityMapListActivity" />
+                android:value="edu.columbia.sel.revisit.activity.SiteMapListActivity" />
         </activity>
         <activity
-            android:name="edu.columbia.sel.facilitator.activity.FacilityMapListActivity"
-            android:label="@string/title_facility_map_list"
+            android:name="edu.columbia.sel.revisit.activity.SiteMapListActivity"
+            android:label="@string/title_site_map_list"
             android:launchMode="singleTop" >
             <intent-filter>
-                <action android:name="edu.columbia.sel.facilitator.COLLECT" />
+                <action android:name="edu.columbia.sel.revisit.COLLECT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.columbia.sel.facilitator.activity.AddFacilityActivity"
-            android:label="@string/title_add_facility"
+            android:name="edu.columbia.sel.revisit.activity.AddSiteActivity"
+            android:label="@string/title_add_site"
             android:windowSoftInputMode="stateHidden|adjustPan" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.columbia.sel.facilitator.activity.FacilityMapListActivity" />
+                android:value="edu.columbia.sel.revisit.activity.SiteMapListActivity" />
         </activity>
         
         
         <activity
-            android:name="edu.columbia.sel.facilitator.activity.SettingsActivity"
+            android:name="edu.columbia.sel.revisit.activity.SettingsActivity"
             android:label="@string/action_settings" >
         </activity>
 
         
         
         <service
-            android:name="edu.columbia.sel.facilitator.api.FacilityRetrofitSpiceService"
+            android:name="edu.columbia.sel.revisit.api.SiteRetrofitSpiceService"
             android:exported="false" />
-        <service android:name="edu.columbia.sel.facilitator.service.LocationService" >
+        <service android:name="edu.columbia.sel.revisit.service.LocationService" >
         </service>
-        <service android:name="edu.columbia.sel.facilitator.osm.TileFetchingService" >
+        <service android:name="edu.columbia.sel.revisit.osm.TileFetchingService" >
         </service>
     </application>
 

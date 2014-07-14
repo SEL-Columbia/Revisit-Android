@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_map"
-        android:name="edu.columbia.sel.facilitator.fragment.FacilityMapFragment"
+        android:name="edu.columbia.sel.revisit.fragment.SiteMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
@@ -28,7 +28,7 @@
             android:id="@+id/add_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onAddNewFacility"
+            android:onClick="onAddNewSite"
             android:text="@string/add_button_text"
             android:background="@android:drawable/btn_default"
             android:layout_marginTop="1dip" />

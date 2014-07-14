@@ -6,6 +6,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="edu.columbia.sel.facilitator.MainActivity$PlaceholderFragment" >
+    tools:context="edu.columbia.sel.revisit.MainActivity$PlaceholderFragment" >
 
 </RelativeLayout>

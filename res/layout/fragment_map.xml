@@ -6,7 +6,7 @@
     android:background="@color/black" >
 
     <org.osmdroid.views.MapView
-        android:id="@+id/facilities_map"
+        android:id="@+id/sites_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

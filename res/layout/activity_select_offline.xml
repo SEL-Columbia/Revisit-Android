@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/clear_button"
             android:background="@android:drawable/btn_default"
-            android:text="Sync Facilities" />
+            android:text="Sync Sites" />
         <!--
 		    <Button
 		        android:id="@+id/zip_button"

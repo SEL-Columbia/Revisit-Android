@@ -3,26 +3,26 @@
 
     <string name="app_name">Facilitator</string>
 
-    <string name="title_activity_facility_list">Facilities</string>
-    <string name="title_activity_map">Facility Map</string>
-    <string name="title_facility_detail">Facility Detail</string>
-    <string name="title_facility_map_list">Select a Facility</string>
-    <string name="title_add_facility">Add a Facility</string>
+    <string name="title_activity_site_list">Sites</string>
+    <string name="title_activity_map">Site Map</string>
+    <string name="title_site_detail">Site Detail</string>
+    <string name="title_site_map_list">Select a Site</string>
+    <string name="title_add_site">Add a Site</string>
     
     <string name="action_search">Search</string>
     <string name="action_mylocation">My Location</string>
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
-    <string name="add_button_text">Add a New Facility</string>
-    <string name="submit_add_button_text">Submit New Facility</string>
+    <string name="add_button_text">Add a New Site</string>
+    <string name="submit_add_button_text">Submit New Site</string>
     <string name="checkin_button">Finish and Check In</string>
     
-    <string name="facility_icon_desc">Facility Type</string>
-    <string name="add_facility_title">Add New Facility</string>
-    <string name="add_facility_name">Name</string>
-    <string name="add_facility_type">Type</string>
-    <string name="add_facility_sector">Sector</string>
-    <string name="add_facility_location">Location</string>
+    <string name="site_icon_desc">Site Type</string>
+    <string name="add_site_title">Add New Site</string>
+    <string name="add_site_name">Name</string>
+    <string name="add_site_type">Type</string>
+    <string name="add_site_sector">Sector</string>
+    <string name="add_site_location">Location</string>
     
     <string name="download_button">Download Region</string>
     <string name="view_offline_button">View Offline Map</string>
@@ -43,8 +43,8 @@
 	<!-- PREFERENCES -->
 	<string name="tile_server_url_title">Tile Server URL</string>
 	<string name="tile_server_url_summary">The base URL from which the tiles should be fetched.</string>
-	<string name="facility_server_url_title">Facility Registry Server URL</string>
-	<string name="facility_server_url_summary">The base URL for the Facility Registry API to be used.</string>
+	<string name="site_server_url_title">Site Registry Server URL</string>
+	<string name="site_server_url_summary">The base URL for the Site Registry API to be used.</string>
     
     
 </resources>

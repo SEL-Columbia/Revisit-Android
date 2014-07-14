@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:id="@+id/detail_image_frame"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@color/black"
+        >
+
+        <ProgressBar
+            android:id="@+id/detail_image_progress"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/detail_image"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible" />
+        
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/detail_site_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detail_image_frame"
+        android:background="@color/white"
+        android:padding="10dp"
+        android:text="Site Name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/detail_site_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detail_site_name"
+        android:padding="10dp"
+        android:text="Site Type"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <LinearLayout
+        android:id="@+id/detail_sector_wrap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detail_site_type"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <ImageView
+            android:id="@+id/site_sector_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_marginRight="10dip"
+            android:contentDescription="@string/site_icon_desc"
+            android:src="@drawable/ic_launcher" />
+
+        <TextView
+            android:id="@+id/detail_site_sector"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="Site Sector"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <!--
+             <TextView
+            android:id="@+id/site_list_item_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/site_type_icon"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            android:textSize="14sp" />
+        -->
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/detail_site_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detail_sector_wrap"
+        android:padding="10dp"
+        android:text="Location (lat,lng)"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/detail_site_checkins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detail_site_location"
+        android:padding="10dp"
+        android:text="Checkins"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <Button
+        android:id="@+id/finish_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/checkin_button" />
+
+</RelativeLayout>

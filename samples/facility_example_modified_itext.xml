@@ -68,7 +68,7 @@
        <label>Welcome again!</label>
     </input>
     <group ref="/facilitytest/facility" appearance="field-list" 
-            intent="edu.columbia.sel.facilitator.COLLECT(uuid=/facilitytest/meta/instanceID, 
+            intent="edu.columbia.sel.revisit.COLLECT(uuid=/facilitytest/meta/instanceID, 
                                       deviceid=/facilitytest/deviceid)" >
       
       <label ref="jr:itext('facilityText')"/>

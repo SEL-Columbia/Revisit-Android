@@ -7,9 +7,9 @@
         android:defaultValue="http://otile1.mqcdn.com/tiles/1.0.0/map" />
     
     <EditTextPreference
-        android:key="facility_server_url"
-        android:title="@string/facility_server_url_title"
-        android:summary="@string/facility_server_url_summary"
+        android:key="site_server_url"
+        android:title="@string/site_server_url_title"
+        android:summary="@string/site_server_url_summary"
         android:defaultValue="http://23.21.86.131:3000/api/v1/" />
 
 </PreferenceScreen>
