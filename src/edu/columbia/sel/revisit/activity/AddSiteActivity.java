@@ -167,7 +167,7 @@ public class AddSiteActivity extends BaseActivity {
 		// ObjectMapper mapper = new ObjectMapper();
 		//
 		// try {
-		// String json = mapper.writeValueAsString(newFacility);
+		// String json = mapper.writeValueAsString(newSite);
 		// Log.i(TAG, json);
 		// } catch (JsonProcessingException e) {
 		// // TODO Auto-generated catch block
@@ -182,12 +182,12 @@ public class AddSiteActivity extends BaseActivity {
 		// .setEndpoint("http://23.21.86.131:3000/api/v1")
 		// .build();
 		//
-		// FacilitatorApi service = restAdapter.create(FacilitatorApi.class);
+		// RevisitApi service = restAdapter.create(RevisitApi.class);
 		//
-		// Facility newFacility = new Facility();
-		// newFacility.setName("Testing");
+		// Site newSite = new Site();
+		// newSite.setName("Testing");
 		//
-		// service.addFacility(newFacility, new Callback<Facility>() {
+		// service.addSite(newSite, new Callback<Site>() {
 		//
 		// @Override
 		// public void failure(RetrofitError arg0) {
@@ -197,11 +197,11 @@ public class AddSiteActivity extends BaseActivity {
 		// }
 		//
 		// @Override
-		// public void success(Facility facility, Response arg1) {
+		// public void success(Site site, Response arg1) {
 		// // TODO Auto-generated method stub
 		// Log.i(TAG,
-		// "((((((((((((((((((( NEW FACILITY ADDED )))))))))))))))))))");
-		// Log.i(TAG, facility.getName());
+		// "((((((((((((((((((( NEW SITE ADDED )))))))))))))))))))");
+		// Log.i(TAG, site.getName());
 		// }
 		//
 		// });

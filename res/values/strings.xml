@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Facilitator</string>
+    <string name="app_name">Revisit</string>
 
     <string name="title_activity_site_list">Sites</string>
     <string name="title_activity_map">Site Map</string>
