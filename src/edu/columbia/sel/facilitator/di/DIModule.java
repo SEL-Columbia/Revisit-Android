@@ -14,17 +14,20 @@ import edu.columbia.sel.facilitator.activity.MainActivity;
 import edu.columbia.sel.facilitator.activity.SelectOfflineAreaActivity;
 import edu.columbia.sel.facilitator.annotation.ForApplication;
 import edu.columbia.sel.facilitator.annotation.ForLogging;
+import edu.columbia.sel.facilitator.api.FacilityRetrofitSpiceService;
 import edu.columbia.sel.facilitator.fragment.AddFacilityMapFragment;
 import edu.columbia.sel.facilitator.fragment.BaseFragment;
 import edu.columbia.sel.facilitator.fragment.BaseMapFragment;
 import edu.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import edu.columbia.sel.facilitator.model.FacilityRepository;
+import edu.columbia.sel.facilitator.model.JsonFileSiteRepository;
 import edu.columbia.sel.facilitator.osm.AddFacilityItemizedIconOverlay;
 import edu.columbia.sel.facilitator.service.LocationService;
 import edu.columbia.sel.facilitator.task.FacilityRequestTask;
 
 import javax.inject.Singleton;
 
+import com.octo.android.robospice.SpiceManager;
 import com.squareup.otto.Bus;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -58,7 +61,8 @@ import static android.content.Context.LOCATION_SERVICE;
 		FacilityRequestTask.class,
 		FacilityRepository.class,
 		AddFacilityItemizedIconOverlay.class,
-		LocationService.class
+		LocationService.class,
+		JsonFileSiteRepository.class
 	}
 )
 public class DIModule {
@@ -104,5 +108,11 @@ public class DIModule {
 	@Singleton
 	LocationManager provideLocationManager() {
 		return (LocationManager) application.getSystemService(LOCATION_SERVICE);
+	}
+	
+	@Provides
+	@Singleton
+	SpiceManager provideSpiceManager() {
+		return new SpiceManager(FacilityRetrofitSpiceService.class);
 	}
 }

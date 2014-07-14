@@ -24,7 +24,7 @@ import edu.columbia.sel.facilitator.event.MapChangedEvent;
 import edu.columbia.sel.facilitator.fragment.AddFacilityMapFragment;
 import edu.columbia.sel.facilitator.model.Facility;
 import edu.columbia.sel.facilitator.model.FacilityList;
-import edu.columbia.sel.facilitator.model.FileSystemSiteRepository;
+import edu.columbia.sel.facilitator.model.JsonFileSiteRepository;
 import edu.columbia.sel.facilitator.service.LocationService;
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -224,8 +224,8 @@ public class AddFacilityActivity extends BaseActivity {
 		facility.getProperties().setCheckins(0);
 		facility.getCoordinates().add(mFacilityGeoPoint.getLongitude());
 		facility.getCoordinates().add(mFacilityGeoPoint.getLatitude());
-		FileSystemSiteRepository sr = new FileSystemSiteRepository(this);
-		sr.saveSite(facility);
+//		JsonFileSiteRepository sr = new JsonFileSiteRepository(this);
+		mSiteRepository.addSite(facility);
 		
 		Intent i = new Intent(AddFacilityActivity.this, FacilityDetailActivity.class);
 		i.putExtra("facility", facility);

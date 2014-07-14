@@ -29,7 +29,7 @@ import edu.columbia.sel.facilitator.grout.event.FetchingStartEvent;
 import edu.columbia.sel.facilitator.grout.util.DeleterListener;
 import edu.columbia.sel.facilitator.model.Facility;
 import edu.columbia.sel.facilitator.model.FacilityList;
-import edu.columbia.sel.facilitator.model.FileSystemSiteRepository;
+import edu.columbia.sel.facilitator.model.JsonFileSiteRepository;
 import edu.columbia.sel.facilitator.service.LocationService;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -335,21 +335,24 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 	@OnClick(R.id.sync_button)
 	public void syncFacilities(View view) {
-		FileSystemSiteRepository sr = new FileSystemSiteRepository(this);
-		FacilityList facs = sr.getSitesForSync();
-		for (Facility f : facs) {
-			if (f.get_id() == null) {
-				Log.i(TAG, "                 ---> ADDING FACILITY.");
-				AddFacilityRetrofitSpiceRequest addFacilityRequest = new AddFacilityRetrofitSpiceRequest(f);
-				getSpiceManager().execute(addFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND,
-						new AddFacilityRequestListener());
-			} else {
-				UpdateFacilityRetrofitSpiceRequest updateFacilityRequest = new UpdateFacilityRetrofitSpiceRequest(f);
-				getSpiceManager().execute(updateFacilityRequest, "updatefacility", DurationInMillis.ONE_SECOND,
-						new UpdateFacilityRequestListener());
-			}
-		}
-		Toast.makeText(this, "Total Facilities Within Bounds: " + facs.size(), Toast.LENGTH_SHORT).show();
+//		JsonFileSiteRepository sr = new JsonFileSiteRepository(this);
+//		sr.syncSites();
+//		for (Facility f : facs) {
+//			if (f.get_id() == null) {
+//				Log.i(TAG, "                 ---> ADDING FACILITY.");
+//				AddFacilityRetrofitSpiceRequest addFacilityRequest = new AddFacilityRetrofitSpiceRequest(f);
+//				getSpiceManager().execute(addFacilityRequest, "addfacility", DurationInMillis.ONE_SECOND,
+//						new AddFacilityRequestListener());
+//			} else {
+//				Log.i(TAG, "                 ---> UPDATING FACILITY.");
+//				UpdateFacilityRetrofitSpiceRequest updateFacilityRequest = new UpdateFacilityRetrofitSpiceRequest(f);
+//				getSpiceManager().execute(updateFacilityRequest, "updatefacility", DurationInMillis.ONE_SECOND,
+//						new UpdateFacilityRequestListener());
+//			}
+//		}
+		FacilityList sitesForSync = this.mSiteRepository.getSitesForSync();
+		Toast.makeText(this, "Total Facilities Marked for Sync: " + sitesForSync.size(), Toast.LENGTH_SHORT).show();
+		this.mSiteRepository.syncSites();
 	}
 
 	//
@@ -432,8 +435,8 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		@Override
 		public void onRequestSuccess(final FacilityList result) {
 			Log.i(TAG, "00000000000 Facilities Loaded: " + result.size());
-			FileSystemSiteRepository sr = new FileSystemSiteRepository(SelectOfflineAreaActivity.this);
-			sr.saveSites(result);
+//			JsonFileSiteRepository sr = new JsonFileSiteRepository(SelectOfflineAreaActivity.this);
+			mSiteRepository.persistSites(result);
 		}
 		// bus.post(new FacilitiesLoadedEvent(result));
 	}
@@ -456,10 +459,10 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		 * On Success, we finish the activity and start the Detail activity.
 		 */
 		@Override
-		public void onRequestSuccess(final Facility result) {
+		public void onRequestSuccess(final Facility facility) {
 			Log.i(TAG, "Facility Added!");
-			result.setRequestSync(false);
-			Toast.makeText(SelectOfflineAreaActivity.this, result.getName() + " saved to server.", Toast.LENGTH_SHORT)
+			facility.setRequestSync(false);
+			Toast.makeText(SelectOfflineAreaActivity.this, facility.getName() + " saved to server.", Toast.LENGTH_SHORT)
 					.show();
 		}
 	}

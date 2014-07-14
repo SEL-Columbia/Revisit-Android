@@ -26,4 +26,9 @@ public class FacilityRetrofitSpiceService extends RetrofitJackson2SpiceService {
     	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		return sharedPref.getString("facility_server_url", BASE_URL);
     }
+    
+    @Override
+	public int getThreadCount() {
+    	return 4;
+    }
 }

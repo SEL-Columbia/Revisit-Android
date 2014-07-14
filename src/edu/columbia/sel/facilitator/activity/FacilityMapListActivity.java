@@ -22,7 +22,7 @@ import edu.columbia.sel.facilitator.event.MapChangedEvent;
 import edu.columbia.sel.facilitator.fragment.FacilityMapFragment;
 import edu.columbia.sel.facilitator.model.Facility;
 import edu.columbia.sel.facilitator.model.FacilityList;
-import edu.columbia.sel.facilitator.model.FileSystemSiteRepository;
+import edu.columbia.sel.facilitator.model.JsonFileSiteRepository;
 import edu.columbia.sel.facilitator.service.LocationService;
 import android.app.FragmentManager;
 import android.app.ListFragment;
@@ -293,8 +293,7 @@ public class FacilityMapListActivity extends BaseActivity {
 		double w = (bb.getLonWestE6() / 1E6);
 		Log.i(TAG, n + ", " + w + ", " + s + ", " + e + ": " + mSectorFilter);
 
-		FileSystemSiteRepository sr = new FileSystemSiteRepository(this);
-		FacilityList facs = sr.getSitesWithin(n, s, e, w);
+		FacilityList facs = mSiteRepository.getSitesWithin(n, s, e, w);
 		bus.post(new FacilitiesLoadedEvent(facs));
 
 //		facilitiesWithinRequest = new FacilitiesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),

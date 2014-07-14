@@ -59,7 +59,7 @@ public class FacilitatorApplication extends Application {
 	
 	/**
 	 * Cleanup. At the moment, we need to unregister the FacilityRepository here
-	 * because it has no lifecycle methods of it's own.
+	 * because it has no lifecycle methods of its own.
 	 */
 	@Override
 	public void onTerminate() {

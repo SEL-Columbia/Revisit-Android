@@ -5,9 +5,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -18,24 +20,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * A POJO representing a Facility. Implements Parcelable so that it can
- * be passed around between Activities.
+ * A POJO representing a Facility. Implements Parcelable so that it can be
+ * passed around between Activities.
  * 
  * @author jmw
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({ "_id", "name", "uuid", "active", "coordinates",
-		"properties", "updatedAt", "createdAt" })
+@JsonPropertyOrder({ "_id", "name", "uuid", "active", "coordinates", "properties", "updatedAt", "createdAt" })
 public class Facility implements Parcelable {
 
+	private final String TAG = this.getClass().getCanonicalName();
+	
 	@JsonProperty("_id")
 	private String _id;
 	@JsonProperty("name")
 	private String name;
+
+	// We generate a random UUID on the client when a new Site is created in
+	// order to manage offline use and syncing
 	@JsonProperty("uuid")
-	private String uuid = "-1";
+	private String uuid = UUID.randomUUID().toString();
 	@JsonProperty("active")
 	private Boolean active = false;
 	@JsonProperty("coordinates")
@@ -53,11 +59,13 @@ public class Facility implements Parcelable {
 
 	/**
 	 * Default constructor
+	 * 
 	 * @return
 	 */
-	public Facility() {}
-	
-	
+	public Facility() {
+//		this.uuid = UUID.randomUUID().toString();
+	}
+
 	@JsonProperty("_id")
 	public String get_id() {
 		return _id;
@@ -151,16 +159,62 @@ public class Facility implements Parcelable {
 	public Boolean getRequestSync() {
 		return requestSync;
 	}
-	
-	
+
 	public void setRequestSync(Boolean requestSync) {
 		this.requestSync = requestSync;
 	}
-	
-	////////////////////////
-	// Parcelable Interface
-	////////////////////////
 
+	@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((_id == null) ? 0 : _id.hashCode());
+        return result;
+    }
+	
+	// Use @Override to avoid accidental overloading.
+	@Override
+	public boolean equals(Object o) {
+//		Log.i(TAG, "EQUALS:");
+		// Return true if the objects are identical.
+		// (This is just an optimization, not required for correctness.)
+		if (this == o) {
+			return true;
+		}
+
+		// Return false if the other object has the wrong type.
+		// This type may be an interface depending on the interface's
+		// specification.
+		if (!(o instanceof Facility)) {
+			return false;
+		}
+
+		// Cast to the appropriate type.
+		// This will succeed because of the instanceof, and lets us access
+		// private fields.
+		Facility site = (Facility) o;
+
+		
+		// Check each field. Primitive fields, reference fields, and nullable
+		// reference
+		// fields are all treated differently.
+		if (site.get_id() != null && site.get_id().equals(this.get_id())) {
+			Log.i(TAG, "Server _id Match: " + this.get_id() + " = " + site.get_id());
+			return true;
+		}
+
+		if (site.getUuid() != null && !site.getUuid().equals("-1") && site.getUuid().equals(this.getUuid())) {
+			Log.i(TAG, "UUID Match: " + this.getUuid() + " = " + site.getUuid());
+			return true;
+		}
+
+		return false;
+	}
+
+	//
+	// Parcelable Interface
+	//
 
 	public int describeContents() {
 		return 0;

@@ -3,25 +3,48 @@ package edu.columbia.sel.facilitator.model;
 public interface ISiteRepository {
 	
 	/**
-	 * Persists a list of sites.
+	 * Persists the list of Sites currently in memory.
 	 * @param sites
 	 */
-	public void saveSites(FacilityList sites);
+	public boolean persistSites();
 	
 	/**
-	 * Persists an individual site.
+	 * Persists a list of Sites.
+	 * @param sites
+	 */
+	public boolean persistSites(FacilityList sites);
+	
+	/**
+	 * Persists an individual Site.
 	 * @param site
 	 */
-	public void saveSite(Facility site);
+	public boolean persistSite(Facility site, boolean markForSync);
 	
 	/**
-	 * Gets all of the persisted sites.
+	 * Add a new Site, marking for sync.
+	 */
+	public boolean addSite(Facility site);
+	
+	/**
+	 * Update a Site, marking for sync.
+	 */
+	public boolean updateSite(Facility site);
+	
+	/**
+	 * Save a site to memory without marking for sync.
+	 * @param site
+	 * @return
+	 */
+	public boolean saveSite(Facility site);
+	
+	/**
+	 * Gets all of the persisted Sites.
 	 * @return
 	 */
 	public FacilityList getSites();
 	
 	/**
-	 * Gets all of the persisted sites within the specific lat/lng bounds.
+	 * Gets all of the persisted Sites within the specific lat/lng bounds.
 	 * @param n
 	 * @param s
 	 * @param e
@@ -31,16 +54,27 @@ public interface ISiteRepository {
 	public FacilityList getSitesWithin(double n, double s, double e, double w);
 	
 	/**
-	 * Gets an individual site by server-assigned ID.
+	 * Gets an individual Site by server-assigned ID.
 	 * @param _id
 	 * @return
 	 */
 	public Facility getSiteById(String _id);
 	
 	/**
-	 * Gets all of the sites requesting to be synced to the server.
+	 * Gets all of the Sites requesting to be synced to the server.
 	 * @return
 	 */
 	public FacilityList getSitesForSync();
+	
+	/**
+	 * Sends local changes to Sites to the remote server.
+	 * @return
+	 */
+	public boolean syncSites();
+
+	/**
+	 * Delete a Site.
+	 */
+	public boolean deleteSite(Facility site);
 	
 }

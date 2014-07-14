@@ -19,7 +19,7 @@ import edu.columbia.sel.facilitator.api.FacilitiesWithinRetrofitSpiceRequest;
 import edu.columbia.sel.facilitator.api.UpdateFacilityRetrofitSpiceRequest;
 import edu.columbia.sel.facilitator.model.Facility;
 import edu.columbia.sel.facilitator.model.FacilityRepository;
-import edu.columbia.sel.facilitator.model.FileSystemSiteRepository;
+import edu.columbia.sel.facilitator.model.JsonFileSiteRepository;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -154,8 +154,8 @@ public class FacilityDetailActivity extends BaseActivity {
 		checkins += 1;
 		mFacility.getProperties().setCheckins(checkins);
 		
-		FileSystemSiteRepository sr = new FileSystemSiteRepository(this);
-		sr.saveSite(mFacility);
+//		JsonFileSiteRepository sr = new JsonFileSiteRepository(this);
+		mSiteRepository.updateSite(mFacility);
 		
 		Intent i = new Intent();
 		i.putExtra("facility_name", mFacility.getName());

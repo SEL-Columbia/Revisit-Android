@@ -8,6 +8,8 @@ import com.squareup.otto.Bus;
 import edu.columbia.sel.facilitator.FacilitatorApplication;
 import edu.columbia.sel.facilitator.annotation.ForLogging;
 import edu.columbia.sel.facilitator.api.FacilityRetrofitSpiceService;
+import edu.columbia.sel.facilitator.model.ISiteRepository;
+import edu.columbia.sel.facilitator.model.JsonFileSiteRepository;
 import edu.columbia.sel.facilitator.service.LocationService;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,8 +38,12 @@ public abstract class BaseActivity extends ActionBarActivity {
 	@ForLogging
 	String APP_TAG;
 	
-	// TODO - move this to DI?
-	private SpiceManager spiceManager = new SpiceManager(FacilityRetrofitSpiceService.class);
+	// All activites should have access to the SpiceManager for network requests
+	@Inject
+	SpiceManager mSpiceManager;
+	
+	@Inject
+	JsonFileSiteRepository mSiteRepository;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +61,14 @@ public abstract class BaseActivity extends ActionBarActivity {
 	
 	@Override
     protected void onStart() {
-        spiceManager.start(this);
+		if (!mSpiceManager.isStarted()) {
+			mSpiceManager.start(this);	
+		}
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        spiceManager.shouldStop();
         super.onStop();
     }
 
@@ -72,6 +79,13 @@ public abstract class BaseActivity extends ActionBarActivity {
 		// in case the next activity want's to start it again (calling stopService in onStop is a problem
 		// because onStop gets called AFTER the next activity has started).
 		stopService(new Intent(this, LocationService.class));
+		if (mSpiceManager.isStarted()) {
+			mSpiceManager.shouldStop();
+		}
+		
+		// we should persist our in-memory Site list
+		mSiteRepository.persistSites();
+		
 		bus.unregister(this);
 	}
 
@@ -82,6 +96,6 @@ public abstract class BaseActivity extends ActionBarActivity {
 	}
 	
     protected SpiceManager getSpiceManager() {
-        return spiceManager;
+        return mSpiceManager;
     }
 }
