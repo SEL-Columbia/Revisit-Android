@@ -61,8 +61,8 @@ The Revisit application depends on several open source libraries, outlined here.
 ### ButterKnife
 [ButterKnife](http://jakewharton.github.io/butterknife/) simplifies injecting views and click handlers into Activities and Fragments.
 
-### grout
-[grout](https://github.com/SEL-Columbia/grout) is a small library used for downloading, packaging, and managing offline map tiles. **NOTE: this dependency is not yet in Maven Central, and must be built and installed to your local Maven repo. Alternatively, you can build the project locally and copy the compiled .jar file to the libs directory.** 
+### Grout
+[Grout](https://github.com/SEL-Columbia/Grout) is a small library used for downloading, packaging, and managing offline map tiles. **NOTE: this dependency is not yet in Maven Central, and must be built and installed to your local Maven repo. Alternatively, you can build the project locally and copy the compiled .jar file to the libs directory.** 
 
 ## Application Notes
 
