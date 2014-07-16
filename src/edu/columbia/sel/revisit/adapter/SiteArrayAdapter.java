@@ -62,7 +62,7 @@ public class SiteArrayAdapter extends ArrayAdapter<Site> {
 		title.setText(f.getName());
 		
 		TextView desc = (TextView) itemView.findViewById(R.id.site_list_item_description);
-		desc.setText("checkins: " + f.getProperties().getCheckins());
+		desc.setText("visits: " + f.getProperties().getVisits());
 		
 		return itemView;
 		

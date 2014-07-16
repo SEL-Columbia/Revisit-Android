@@ -228,7 +228,7 @@ public class Site implements Parcelable {
 		out.writeByte((byte) (active ? 1 : 0));
 		out.writeString(props.getType());
 		out.writeString(props.getSector());
-		out.writeInt(props.getCheckins());
+		out.writeInt(props.getVisits());
 		out.writeList(coordinates);
 	}
 
@@ -249,7 +249,7 @@ public class Site implements Parcelable {
 		active = in.readByte() != 0;
 		this.properties.setType(in.readString());
 		this.properties.setSector(in.readString());
-		this.properties.setCheckins(in.readInt());
+		this.properties.setVisits(in.readInt());
 		in.readList(coordinates, null);
 	}
 

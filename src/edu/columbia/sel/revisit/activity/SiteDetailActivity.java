@@ -41,7 +41,7 @@ public class SiteDetailActivity extends BaseActivity {
 	@InjectView (R.id.site_sector_icon) ImageView mSiteSectorIconView;
 	@InjectView (R.id.detail_site_type) TextView mSiteTypeView;
 	@InjectView (R.id.detail_site_location) TextView mSiteLocationView;
-	@InjectView (R.id.detail_site_checkins) TextView mSiteCheckinsView;
+	@InjectView (R.id.detail_site_visits) TextView mSiteVisitsView;
 	
 	// The GET request that retrieves known sites within the map bounds
 //	private UpdateSiteRetrofitSpiceRequest mUpdateSiteRequest;
@@ -129,15 +129,15 @@ public class SiteDetailActivity extends BaseActivity {
 		this.mSiteTypeView.setText(site.getProperties().getType());
 		this.mSiteSectorView.setText(sector.toUpperCase());
 		this.mSiteLocationView.setText("Location: " + site.getCoordinates().get(1) + ", " + site.getCoordinates().get(0));
-		this.mSiteCheckinsView.setText("Checkins: " + site.getProperties().getCheckins());
+		this.mSiteVisitsView.setText("Visits: " + site.getProperties().getVisits());
 	}
 	
 	@OnClick(R.id.finish_button)
 	public void submit() {
 		
-		int checkins = mSite.getProperties().getCheckins();
-		checkins += 1;
-		mSite.getProperties().setCheckins(checkins);
+		int visits = mSite.getProperties().getVisits();
+		visits += 1;
+		mSite.getProperties().setVisits(visits);
 		
 //		JsonFileSiteRepository sr = new JsonFileSiteRepository(this);
 		mSiteRepository.updateSite(mSite);

@@ -15,15 +15,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "sector", "type", "checkins" })
+@JsonPropertyOrder({ "sector", "type", "visits" })
 public class Properties {
 
 	@JsonProperty("sector")
 	private String sector;
 	@JsonProperty("type")
 	private String type;
-	@JsonProperty("checkins")
-	private Integer checkins;
+	@JsonProperty("visits")
+	private Integer visits;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	@JsonProperty("sector")
@@ -46,14 +46,14 @@ public class Properties {
 		this.type = type;
 	}
 
-	@JsonProperty("checkins")
-	public Integer getCheckins() {
-		return checkins;
+	@JsonProperty("visits")
+	public Integer getVisits() {
+		return visits;
 	}
 
-	@JsonProperty("checkins")
-	public void setCheckins(Integer checkins) {
-		this.checkins = checkins;
+	@JsonProperty("visits")
+	public void setVisits(Integer visits) {
+		this.visits = visits;
 	}
 
 	@JsonAnyGetter

@@ -96,12 +96,12 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
-        android:id="@+id/detail_site_checkins"
+        android:id="@+id/detail_site_visits"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/detail_site_location"
         android:padding="10dp"
-        android:text="Checkins"
+        android:text="Visits"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Button

@@ -221,7 +221,7 @@ public class AddSiteActivity extends BaseActivity {
 		site.getProperties().setType(type);
 		site.getProperties().setSector(sector);
 
-		site.getProperties().setCheckins(0);
+		site.getProperties().setVisits(0);
 		site.getCoordinates().add(mSiteGeoPoint.getLongitude());
 		site.getCoordinates().add(mSiteGeoPoint.getLatitude());
 //		JsonFileSiteRepository sr = new JsonFileSiteRepository(this);
