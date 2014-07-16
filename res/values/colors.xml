@@ -8,4 +8,10 @@
     <color name="light_blue">#E9F2F9</color>
     <color name="rich_blue">#3A89C9</color>
     <color name="orange">#F26C4F</color>
+    
+    <color name="android_blue">#33B5E5</color>
+    <color name="android_purple">#AA66CC</color>
+    <color name="android_green">#99CC00</color>
+    <color name="android_orange">#FFBB33</color>
+    <color name="android_red">#FF4444</color>
 </resources>
