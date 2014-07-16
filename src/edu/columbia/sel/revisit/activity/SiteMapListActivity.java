@@ -139,7 +139,7 @@ public class SiteMapListActivity extends BaseActivity {
 		// the last known location isn't
 		// available, the map will not change and sites won't be fetched.
 		// TODO: figure out how to handle this in a more centralized/uniform way
-		 this.zoomToMyLocation();
+//		 this.zoomToMyLocation();
 	}
 
 	@Override
