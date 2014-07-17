@@ -70,7 +70,7 @@ public class BaseMapFragment extends BaseFragment {
 //		mMapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mMapView.setUseDataConnection(false);
 		
-		mMapCon.setZoom(14);
+		mMapCon.setZoom(17);
 		
 		mResourceProxy = new DefaultResourceProxyImpl(this.getActivity().getApplication());
 		

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#000</color>
-    <color name="white">#FFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="light_gray">#EEEEEE</color>
     
     <color name="deep_blue">#1B325F</color>
     <color name="mid_blue">#9CC4E4</color>
@@ -14,4 +15,10 @@
     <color name="android_green">#99CC00</color>
     <color name="android_orange">#FFBB33</color>
     <color name="android_red">#FF4444</color>
+    
+    <color name="android_dark_blue">#0099CC</color>
+    <color name="android_dark_purple">#9933CC</color>
+    <color name="android_dark_green">#669900</color>
+    <color name="android_dark_orange">#FF8800</color>
+    <color name="android_dark_red">#CC0000</color>
 </resources>

@@ -44,11 +44,11 @@ public class SiteMarker extends Drawable {
 	 * @return BitmapDrawable
 	 */
 	public static BitmapDrawable createSiteMarker(Resources resources, String text) {
-		SiteMarker fm = new SiteMarker(resources, text);
+		SiteMarker sm = new SiteMarker(resources, text);
 		Bitmap bmp = Bitmap.createBitmap(SiteMarker.width, SiteMarker.height, Config.ARGB_8888); 
 	    Canvas canvas = new Canvas(bmp);
-	    fm.setBounds(0, 0, SiteMarker.width, SiteMarker.height);
-	    fm.draw(canvas);
+	    sm.setBounds(0, 0, SiteMarker.width, SiteMarker.height);
+	    sm.draw(canvas);
 	    return new BitmapDrawable(resources, bmp);
 	}
 	
@@ -59,12 +59,12 @@ public class SiteMarker extends Drawable {
 	 * @return BitmapDrawable
 	 */
 	public static BitmapDrawable createSiteMarker(Resources resources, String text, int backgroundColor) {
-		SiteMarker fm = new SiteMarker(resources, text);
+		SiteMarker sm = new SiteMarker(resources, text);
 		Bitmap bmp = Bitmap.createBitmap(SiteMarker.width, SiteMarker.height, Config.ARGB_8888); 
 	    Canvas canvas = new Canvas(bmp);
-	    fm.setBounds(0, 0, SiteMarker.width, SiteMarker.height);
-	    fm.backgroundColor = backgroundColor;
-	    fm.draw(canvas);
+	    sm.setBounds(0, 0, SiteMarker.width, SiteMarker.height);
+	    sm.backgroundColor = backgroundColor;
+	    sm.draw(canvas);
 	    return new BitmapDrawable(resources, bmp);
 	}
 	

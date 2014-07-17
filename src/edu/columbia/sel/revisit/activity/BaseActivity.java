@@ -7,13 +7,12 @@ import com.squareup.otto.Bus;
 
 import edu.columbia.sel.revisit.RevisitApplication;
 import edu.columbia.sel.revisit.annotation.ForLogging;
-import edu.columbia.sel.revisit.api.SiteRetrofitSpiceService;
-import edu.columbia.sel.revisit.model.ISiteRepository;
 import edu.columbia.sel.revisit.model.JsonFileSiteRepository;
 import edu.columbia.sel.revisit.service.LocationService;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+//import android.support.v7.app.ActionBarActivity;
 
 /**
  * BaseActivity contains a few core features that should be included in all
@@ -25,7 +24,7 @@ import android.support.v7.app.ActionBarActivity;
  * @author Jonathan Wohl
  * 
  */
-public abstract class BaseActivity extends ActionBarActivity {
+public abstract class BaseActivity extends Activity {
 	// TAG for logging
 	protected String TAG;
 

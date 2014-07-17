@@ -4,8 +4,22 @@
         Base application theme for API 11+. This theme completely replaces
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
     -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar"></style>
+
+    <!-- Application theme. -->
+    <style name="RevisitAppTheme" parent="AppBaseTheme">
+
         <!-- API 11 theme customizations can go here. -->
+        <item name="android:actionBarStyle">@style/RevisitActionBar</item>
+        <item name="actionBarStyle">@style/RevisitActionBar</item>
+    </style>
+
+    <style name="RevisitActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/black</item>
+        <!-- <item name="android:textColor">@color/white</item> -->
+
+        <item name="background">@color/black</item>
+        <!-- <item name="textColor">@color/white</item> -->
     </style>
 
 </resources>

@@ -34,7 +34,7 @@ public class JsonFileSiteRepository implements ISiteRepository {
 
 	private final String TAG = this.getClass().getCanonicalName();
 
-	private final String DEFAULT_DIR = Environment.getExternalStorageDirectory().toString() + File.separator
+	private final String DEFAULT_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + File.separator
 			+ "revisit";
 
 	@Inject

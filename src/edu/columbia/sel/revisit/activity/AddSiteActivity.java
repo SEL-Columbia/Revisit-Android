@@ -1,7 +1,5 @@
 package edu.columbia.sel.revisit.activity;
 
-import javax.inject.Inject;
-
 import edu.columbia.sel.revisit.R;
 
 import org.osmdroid.util.BoundingBoxE6;
@@ -24,13 +22,10 @@ import edu.columbia.sel.revisit.event.MapChangedEvent;
 import edu.columbia.sel.revisit.fragment.AddSiteMapFragment;
 import edu.columbia.sel.revisit.model.Site;
 import edu.columbia.sel.revisit.model.SiteList;
-import edu.columbia.sel.revisit.model.JsonFileSiteRepository;
 import edu.columbia.sel.revisit.service.LocationService;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
@@ -59,8 +54,8 @@ public class AddSiteActivity extends BaseActivity {
 	@InjectView(R.id.type)
 	EditText mTypeEditText;
 
-	@InjectView(R.id.location)
-	EditText mLocationEditText;
+//	@InjectView(R.id.location)
+//	EditText mLocationEditText;
 
 	private boolean mFirstRun = true;
 
@@ -74,7 +69,7 @@ public class AddSiteActivity extends BaseActivity {
 	private AddSiteMapFragment mMapFragment;
 
 	// The POST request that submits the new Site
-	private AddSiteRetrofitSpiceRequest mAddSiteRequest;
+//	private AddSiteRetrofitSpiceRequest mAddSiteRequest;
 
 	// The GET request that retrieves known Sites within the map bounds
 	private SitesWithinRetrofitSpiceRequest mSitesWithinRequest;
@@ -208,10 +203,15 @@ public class AddSiteActivity extends BaseActivity {
 
 		String name = this.mNameEditText.getText().toString();
 		String type = this.mTypeEditText.getText().toString();
-		String sector = this.mSectorEditText.getSelectedItem().toString();
+		String sector = "";
+		
+		Object sectorItem = this.mSectorEditText.getSelectedItem();
+		if (sectorItem != null) {
+			sector = sectorItem.toString();			
+		}
 
-		if (mSiteGeoPoint == null || name.equals("") || type.equals("")) {
-			Toast.makeText(AddSiteActivity.this, "Please enter name, type, and location.", Toast.LENGTH_SHORT)
+		if (mSiteGeoPoint == null || name.equals("") || type.equals("") || sector.equals("")) {
+			Toast.makeText(AddSiteActivity.this, "Please enter name, sector, and type.", Toast.LENGTH_SHORT)
 					.show();
 			return;
 		}
@@ -247,12 +247,12 @@ public class AddSiteActivity extends BaseActivity {
 	public void onPopulateLocationClick(View view) {
 		// Location loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		Location loc = LocationService.getCurrentLocation();
-		String locationValue;
+//		String locationValue;
 
 		if (loc != null) {
 			mSiteGeoPoint = new GeoPoint(loc);
-			locationValue = loc.getLatitude() + ", " + loc.getLongitude();
-			mLocationEditText.setText(locationValue);
+//			locationValue = loc.getLatitude() + ", " + loc.getLongitude();
+//			mLocationEditText.setText(locationValue);
 		} else {
 			Toast.makeText(AddSiteActivity.this, "Current location could not be determined.", Toast.LENGTH_SHORT)
 					.show();
@@ -295,7 +295,7 @@ public class AddSiteActivity extends BaseActivity {
 	public void handleSitePlaced(SitePlacedEvent event) {
 		Log.i(TAG, "handleSitePlaced");
 		mSiteGeoPoint = event.getGeoPoint();
-		mLocationEditText.setText(mSiteGeoPoint.getLatitude() + ", " + mSiteGeoPoint.getLongitude());
+//		mLocationEditText.setText(mSiteGeoPoint.getLatitude() + ", " + mSiteGeoPoint.getLongitude());
 	}
 
 	/**

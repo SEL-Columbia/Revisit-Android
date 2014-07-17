@@ -36,11 +36,11 @@ public class SiteDetailActivity extends BaseActivity {
 	// Use ButterKnife to inject views
 	@InjectView (R.id.detail_image_progress) ProgressBar mSiteImageProgressView;
 	@InjectView (R.id.detail_image) ImageView mSiteImageView;
-	@InjectView (R.id.detail_site_name) TextView mSiteNameView;
+//	@InjectView (R.id.detail_site_name) TextView mSiteNameView;
 	@InjectView (R.id.detail_site_sector) TextView mSiteSectorView;
 	@InjectView (R.id.site_sector_icon) ImageView mSiteSectorIconView;
 	@InjectView (R.id.detail_site_type) TextView mSiteTypeView;
-	@InjectView (R.id.detail_site_location) TextView mSiteLocationView;
+//	@InjectView (R.id.detail_site_location) TextView mSiteLocationView;
 	@InjectView (R.id.detail_site_visits) TextView mSiteVisitsView;
 	
 	// The GET request that retrieves known sites within the map bounds
@@ -109,7 +109,9 @@ public class SiteDetailActivity extends BaseActivity {
 				
 			});
 		
-		this.mSiteNameView.setText(site.getName());
+		// TODO: set activity title instead;
+//		this.mSiteNameView.setText(site.getName());
+		this.setTitle(site.getName());
 		
 		String sector = site.getProperties().getSector();
 		
@@ -127,9 +129,9 @@ public class SiteDetailActivity extends BaseActivity {
 		}
 		this.mSiteImageView.invalidate();
 		this.mSiteTypeView.setText(site.getProperties().getType());
-		this.mSiteSectorView.setText(sector.toUpperCase());
-		this.mSiteLocationView.setText("Location: " + site.getCoordinates().get(1) + ", " + site.getCoordinates().get(0));
-		this.mSiteVisitsView.setText("Visits: " + site.getProperties().getVisits());
+		this.mSiteSectorView.setText(sector);
+//		this.mSiteLocationView.setText("Location: " + site.getCoordinates().get(1) + ", " + site.getCoordinates().get(0));
+		this.mSiteVisitsView.setText(site.getProperties().getVisits() + " Visits");
 	}
 	
 	@OnClick(R.id.finish_button)

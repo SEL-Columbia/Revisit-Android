@@ -6,23 +6,23 @@
     <string name="title_activity_site_list">Sites</string>
     <string name="title_activity_map">Site Map</string>
     <string name="title_site_detail">Site Detail</string>
-    <string name="title_site_map_list">Select a Site</string>
-    <string name="title_add_site">Add a Site</string>
+    <string name="title_site_map_list">Select Site</string>
+    <string name="title_add_site">Add Site</string>
     
     <string name="action_search">Search</string>
     <string name="action_mylocation">My Location</string>
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
-    <string name="add_button_text">Add a New Site</string>
-    <string name="submit_add_button_text">Submit New Site</string>
-    <string name="checkin_button">Finish and Check In</string>
+    <string name="add_button_text">Add new site</string>
+    <string name="submit_add_button_text">Submit</string>
+    <string name="checkin_button">Select site</string>
     
     <string name="site_icon_desc">Site Type</string>
     <string name="add_site_title">Add New Site</string>
     <string name="add_site_name">Name</string>
     <string name="add_site_type">Type</string>
     <string name="add_site_sector">Sector</string>
-    <string name="add_site_location">Location</string>
+    <string name="add_site_location">Location</string>    
     
     <string name="download_button">Download Region</string>
     <string name="view_offline_button">View Offline Map</string>

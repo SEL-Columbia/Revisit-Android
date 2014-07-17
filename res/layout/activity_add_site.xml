@@ -14,9 +14,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
         android:descendantFocusability="beforeDescendants"
-  		android:focusableInTouchMode="true" >
+        android:focusableInTouchMode="true"
+        android:padding="10dp" >
 
         <EditText
             android:id="@+id/name"
@@ -25,17 +25,17 @@
             android:layout_marginBottom="10dp"
             android:hint="@string/add_site_name"
             android:inputType="textCapWords"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textColorHint="@color/black"
+            android:textSize="16sp" />
 
-        <Spinner
-		    android:id="@+id/sector"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_below="@id/name"
-		    android:layout_marginBottom="10dp"
-            android:hint="@string/add_site_sector"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        
+        <edu.columbia.sel.revisit.view.NoDefaultSpinner
+            android:id="@+id/sector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/name"
+            android:layout_marginBottom="10dp"
+            android:prompt="@string/add_site_sector" />
+
         <EditText
             android:id="@+id/type"
             android:layout_width="match_parent"
@@ -44,9 +44,10 @@
             android:layout_marginBottom="10dp"
             android:hint="@string/add_site_type"
             android:inputType="text"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textColorHint="@color/black"
+            android:textSize="16sp" />
 
-        <LinearLayout 
+        <!-- <LinearLayout
             android:id="@+id/location_wrap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,30 +58,29 @@
                 android:id="@+id/location"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginBottom="10dp"
+                android:layout_weight="1"
                 android:hint="@string/add_site_location"
                 android:inputType="text"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textSize="12sp" />
 
             <ImageButton
                 android:id="@+id/get_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="Use current location"
-                android:src="@drawable/ic_action_location_found"
-                android:onClick="onPopulateLocationClick" />
-            
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/add_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/location_wrap"
-            android:background="@android:drawable/btn_default"
-            android:onClick="onAddNewSite"
-            android:text="@string/submit_add_button_text" />
+                android:onClick="onPopulateLocationClick"
+                android:src="@drawable/ic_action_location_found" />
+        </LinearLayout> -->
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/add_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:background="@drawable/button_custom"
+        android:onClick="onAddNewSite"
+        android:text="@string/submit_add_button_text" />
 
 </LinearLayout>
