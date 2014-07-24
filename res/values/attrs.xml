@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This isn't used anymore, but I'm leaving it here for future reference. -->
+<resources>
+   <declare-styleable name="IconWithTextButton">
+       <attr name="buttonIcon" format="integer" />
+       <attr name="text" format="string" />
+   </declare-styleable>
+</resources>

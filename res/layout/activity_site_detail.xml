@@ -102,13 +102,14 @@
 
     <!-- Select Button -->
 
-    <Button
+    <edu.columbia.sel.revisit.view.IconWithTextButton
         android:id="@+id/finish_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_custom"
+        android:background="@drawable/green_button"
         android:text="@string/checkin_button"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:drawableStart="@drawable/select_site_icon"
         android:textColor="@color/white" />
 
 </LinearLayout>
