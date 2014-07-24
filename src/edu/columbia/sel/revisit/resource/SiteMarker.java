@@ -6,6 +6,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
@@ -26,46 +27,54 @@ public class SiteMarker extends Drawable {
 	private Paint mTextPaint;
 	private String text;
 	private int backgroundColor = Color.argb(200, 18, 74, 255);
-	private static int width = 30;
-	private static int height = 30;
+	private int width = 30;
+	private int height = 30;
 	private static int radius = 10;
-	private static float textHeight = 12; 
+	private static float textHeight = 14; 
 	
 	public SiteMarker(Resources resources, String text) {
-		this.mBackgroundPaint = new Paint();
 		this.mTextPaint = new Paint();
 		this.text = text;
 	}
-	
-	/**
-	 * Factory method for generating new SiteMarkers.
-	 * @param resources
-	 * @param text
-	 * @return BitmapDrawable
-	 */
-	public static BitmapDrawable createSiteMarker(Resources resources, String text) {
-		SiteMarker sm = new SiteMarker(resources, text);
-		Bitmap bmp = Bitmap.createBitmap(SiteMarker.width, SiteMarker.height, Config.ARGB_8888); 
-	    Canvas canvas = new Canvas(bmp);
-	    sm.setBounds(0, 0, SiteMarker.width, SiteMarker.height);
-	    sm.draw(canvas);
-	    return new BitmapDrawable(resources, bmp);
+
+	public SiteMarker(Resources resources, String text, int w, int h) {
+		this.mTextPaint = new Paint();
+		this.text = text;
+		this.width = w;
+		this.height = h;
 	}
 	
 	/**
-	 * Factory method for generating new SiteMarkers.
+	 * Factory method for generating new SiteMarkers, using the passed in drawable as a background.
 	 * @param resources
 	 * @param text
 	 * @return BitmapDrawable
 	 */
-	public static BitmapDrawable createSiteMarker(Resources resources, String text, int backgroundColor) {
-		SiteMarker sm = new SiteMarker(resources, text);
-		Bitmap bmp = Bitmap.createBitmap(SiteMarker.width, SiteMarker.height, Config.ARGB_8888); 
-	    Canvas canvas = new Canvas(bmp);
-	    sm.setBounds(0, 0, SiteMarker.width, SiteMarker.height);
-	    sm.backgroundColor = backgroundColor;
-	    sm.draw(canvas);
-	    return new BitmapDrawable(resources, bmp);
+	public static BitmapDrawable createSiteMarker(Resources resources, String text, Drawable background) {
+		// used to draw text onto canvas
+		SiteMarker sm = new SiteMarker(resources, text, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+
+		// Output bitmap and canvas
+		Bitmap bmpOverlay = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Config.ARGB_8888);
+		Canvas canvasOverlay = new Canvas(bmpOverlay);
+		
+		// Convert background to bitmap
+		Bitmap bmpBackground = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Config.ARGB_8888); 
+	    Canvas canvas = new Canvas(bmpBackground);
+	    background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+	    background.draw(canvas);
+	    
+	    // Convert text to bitmap
+	    Bitmap bmpText = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Config.ARGB_8888); 
+	    Canvas canvasText = new Canvas(bmpText);
+	    sm.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+	    sm.draw(canvasText);
+	    
+	    // Overlay two components
+	    canvasOverlay.drawBitmap(bmpBackground, new Matrix(), null);
+	    canvasOverlay.drawBitmap(bmpText, new Matrix(), null);
+	    
+	    return new BitmapDrawable(resources, bmpOverlay);
 	}
 	
 	/**
@@ -78,24 +87,18 @@ public class SiteMarker extends Drawable {
 	@Override
 	public void draw(Canvas canvas) {
 		Log.i(TAG, "\\\\\\\\\\\\\\\\\\     DRAWING     //////////////////");
-		mBackgroundPaint.setColor(backgroundColor);
-		mBackgroundPaint.setStrokeWidth(2);
-		mBackgroundPaint.setStyle(Style.FILL);
-		mBackgroundPaint.setAntiAlias(true);
-		mBackgroundPaint.setShadowLayer(5.0f, 0.0f, 0.0f, Color.BLACK);
-		
-		mTextPaint.setARGB(255, 255, 255, 255);
+
+		mTextPaint.setARGB(255, 0, 0, 0);
 		mTextPaint.setTextAlign(Align.CENTER);
 		mTextPaint.setAntiAlias(true);
 		mTextPaint.setFakeBoldText(true);
 		
 		mTextPaint.setTextSize(textHeight);
 		
-		float markerCenterX = SiteMarker.width/2;
-		float markerCenterY = SiteMarker.height/2;
+		float markerCenterX = this.width/2;
+		float markerCenterY = this.height/2;
 		
-		canvas.drawCircle(markerCenterX, markerCenterY, SiteMarker.radius, mBackgroundPaint);
-		canvas.drawText(text, markerCenterX, markerCenterY+textHeight/2-2, mTextPaint);
+		canvas.drawText(text, markerCenterX, markerCenterY, mTextPaint);
 	}
 
 	@Override

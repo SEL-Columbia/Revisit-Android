@@ -12,6 +12,7 @@ import org.osmdroid.views.overlay.OverlayItem.HotspotPlace;
 
 import com.squareup.otto.Subscribe;
 
+import edu.columbia.sel.revisit.R;
 import edu.columbia.sel.revisit.event.SitesLoadedEvent;
 import edu.columbia.sel.revisit.event.SitePlacedEvent;
 import edu.columbia.sel.revisit.model.Site;
@@ -21,6 +22,7 @@ import edu.columbia.sel.revisit.resource.SiteMarker;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -103,8 +105,9 @@ public class AddSiteMapFragment extends BaseMapFragment {
 		
 		OverlayItem item = new OverlayItem("New Site", "Description", point);
 
+		Drawable background = this.getResources().getDrawable(R.drawable.ic_location_blue);
 		BitmapDrawable bmd = SiteMarker.createSiteMarker(
-				getResources(), "+", Color.argb(200, 18, 74, 255));
+				getResources(), "+", background);
 		item.setMarker(bmd);
 		item.setMarkerHotspot(HotspotPlace.CENTER);
 		mNewSiteMarkers.clear();
@@ -160,7 +163,8 @@ public class AddSiteMapFragment extends BaseMapFragment {
 			Log.i(TAG, site.getCoordinates().get(1) + ", " + site.getCoordinates().get(0));
 			GeoPoint point = new GeoPoint(site.getCoordinates().get(1), site.getCoordinates().get(0));
 			SiteOverlayItem item = new SiteOverlayItem(site, point, i);
-			BitmapDrawable bmd = SiteMarker.createSiteMarker(getResources(), "", Color.argb(127, 18, 255, 74));
+			Drawable background = this.getResources().getDrawable(R.drawable.ic_location_green);
+			BitmapDrawable bmd = SiteMarker.createSiteMarker(getResources(), "", background);
 			item.setMarker(bmd);
 			item.setMarkerHotspot(HotspotPlace.CENTER);
 			markers.add(item);

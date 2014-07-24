@@ -87,8 +87,8 @@ public class SiteMapFragment extends BaseMapFragment {
 			Log.i(TAG, site.getCoordinates().get(1) + ", " + site.getCoordinates().get(0));
 			GeoPoint point = new GeoPoint(site.getCoordinates().get(1), site.getCoordinates().get(0));
 			SiteOverlayItem item = new SiteOverlayItem(site, point, i);
-			
-			BitmapDrawable bmd = SiteMarker.createSiteMarker(getResources(), String.valueOf(i+1));
+			Drawable background = this.getResources().getDrawable(R.drawable.ic_location_green); 
+			BitmapDrawable bmd = SiteMarker.createSiteMarker(getResources(), String.valueOf(i+1), background);
 			item.setMarker(bmd);
 			item.setMarkerHotspot(HotspotPlace.CENTER);
 			markers.add(item);
