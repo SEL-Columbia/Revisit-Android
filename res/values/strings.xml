@@ -29,10 +29,10 @@
     
     <!-- Splash -->
     <string name="splash_welcome">Thanks for visiting</string>
-    <string name="select_offline_button">Download map\nfor offline use</string>
-    <string name="view_offline_button">View offline map\n</string>
-    <string name="settings_button">Settings\n</string>
-    <string name="sync_sites_button">Upload locations\nto registry</string>
+    <string name="select_offline_button">Download map for offline use</string>
+    <string name="view_offline_button">View offline map</string>
+    <string name="settings_button">Settings</string>
+    <string name="sync_sites_button">Upload locations to registry</string>
     
     
     <!-- Offline Download -->
