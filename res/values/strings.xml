@@ -8,6 +8,8 @@
     <string name="title_site_detail">Site Detail</string>
     <string name="title_site_map_list">Select Site</string>
     <string name="title_add_site">Add Site</string>
+    <string name="title_select_offline">Download Map</string>    
+    <string name="title_splash">Revisit</string>
     
     <string name="action_search">Search</string>
     <string name="action_mylocation">My Location</string>
@@ -22,10 +24,22 @@
     <string name="add_site_name">Name</string>
     <string name="add_site_type">Type</string>
     <string name="add_site_sector">Sector</string>
-    <string name="add_site_location">Location</string>    
+    <string name="add_site_location">Location</string>
+
     
-    <string name="download_button">Download Region</string>
-    <string name="view_offline_button">View Offline Map</string>
+    <!-- Splash -->
+    <string name="splash_welcome">Thanks for visiting</string>
+    <string name="select_offline_button">Download map\nfor offline use</string>
+    <string name="view_offline_button">View offline map\n</string>
+    <string name="settings_button">Settings\n</string>
+    <string name="sync_sites_button">Upload locations\nto registry</string>
+    
+    
+    <!-- Offline Download -->
+    <string name="download_map_instructions_1">Drag and zoom to adjust map</string>
+    <string name="download_map_instructions_2">Anything outside window will not be downloaded</string>
+    <string name="download_button">Download map</string>
+    
     
     <string-array name="sectors_array">
         <item>health</item>

@@ -32,25 +32,28 @@ import android.widget.Toast;
 public class LocationService extends Service implements LocationListener {
 	public String TAG = this.getClass().getCanonicalName();
 
-	boolean isGPSEnabled = false;
-
-	boolean isNetworkEnabled = false;
-
-	final static long MIN_TIME_INTERVAL = 60 * 1000L;
-
-	private static Location mCurrentLocation;
-
 	@Inject
 	Bus bus;
-
+	
 	@Inject
 	LocationManager mLocationManager;
 
+	private boolean isGPSEnabled = false;
+
+	private boolean isNetworkEnabled = false;
+
+	private final static long MIN_TIME_INTERVAL = 60 * 1000L;
+
+	private static Location mCurrentLocation;
+
 	// The minimum distance to change Updates in meters
 	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
-
+	
 	// The minimum time between updates in milliseconds
 	private static final long MIN_TIME_BW_UPDATES = 0;
+	
+	
+	
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -58,6 +61,7 @@ public class LocationService extends Service implements LocationListener {
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
+	
 	@Override
 	public void onCreate() {
 		Log.i(TAG, "LocationService created");
@@ -112,9 +116,10 @@ public class LocationService extends Service implements LocationListener {
 								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 						Log.d(TAG, "Network Provider Enabled");
 						tempLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation))
+						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation)) {							
 							Log.i(TAG, "-------> NETWORK: " + tempLocation.toString());
 							mCurrentLocation = tempLocation;
+						}
 					}
 				}
 
@@ -125,9 +130,10 @@ public class LocationService extends Service implements LocationListener {
 								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 						Log.d(TAG, "GPS Provider Enabled");
 						tempLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation))
+						if (tempLocation != null && isBetterLocation(tempLocation, mCurrentLocation)) {
 							Log.i(TAG, "-------> GPS: " + tempLocation.toString());
-							mCurrentLocation = tempLocation;
+							mCurrentLocation = tempLocation;							
+						}
 					}
 				}
 //				bus.post(new LocationChangedEvent(mCurrentLocation));

@@ -26,10 +26,8 @@ public class SiteMarker extends Drawable {
 	private Paint mBackgroundPaint;
 	private Paint mTextPaint;
 	private String text;
-	private int backgroundColor = Color.argb(200, 18, 74, 255);
 	private int width = 30;
 	private int height = 30;
-	private static int radius = 10;
 	private static float textHeight = 14; 
 	
 	public SiteMarker(Resources resources, String text) {

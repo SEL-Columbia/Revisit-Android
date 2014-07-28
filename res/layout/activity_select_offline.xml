@@ -4,12 +4,33 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:gravity="center"
+        android:text="@string/download_map_instructions_1"
+        android:background="@color/white"
+        android:textSize="18sp" />
+    
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/white"
+        android:text="@string/download_map_instructions_2"
+        android:textStyle="italic"
+        android:paddingBottom="10dp"
+        android:textSize="14sp" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6"
-        android:background="@color/deep_blue"
-        android:padding="10dp" >
+        android:layout_weight="8"
+        android:background="@color/white"
+        android:paddingBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
 
         <org.osmdroid.views.MapView
             android:id="@+id/mapview"
@@ -17,59 +38,11 @@
             android:layout_height="match_parent" />
     </RelativeLayout>
 
-    <RelativeLayout
+    <Button
+        android:id="@+id/download_button"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="6"
-        android:background="@color/black"
-        android:padding="10dp" >
-
-        <Button
-            android:id="@+id/download_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:drawable/btn_default"
-            android:text="@string/download_button" />
-
-        <Button
-            android:id="@+id/map_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/download_button"
-            android:background="@android:drawable/btn_default"
-            android:text="@string/view_offline_button" />
-
-        <Button
-            android:id="@+id/clear_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/map_button"
-            android:background="@android:drawable/btn_default"
-            android:text="Clear Tiles" />
-
-        <Button
-            android:id="@+id/sync_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/clear_button"
-            android:background="@android:drawable/btn_default"
-            android:text="Sync Sites" />
-        <!--
-		    <Button
-		        android:id="@+id/zip_button"
-		        android:layout_width="match_parent"
-		        android:layout_height="0dp"
-		        android:layout_weight="1"
-		        android:text="Create Zip" />
-		
-		    <Button
-		        android:id="@+id/gemf_button"
-		        android:layout_width="match_parent"
-		        android:layout_height="0dp"
-		        android:layout_weight="1"
-		        android:text="Create GEMF" />
-        -->
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:background="@drawable/blue_button"
+        android:text="@string/download_button" />
 
 </LinearLayout>

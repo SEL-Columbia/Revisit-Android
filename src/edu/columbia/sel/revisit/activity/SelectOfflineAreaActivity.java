@@ -107,6 +107,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		}
 
 		mGrout = new Grout();
+		mGrout.setThreadCount(4);
 		mGrout.setMaxzoom(17);
 		// For now we're just using raw tiles on the file system... seems
 		// fastest, and the archives
@@ -307,10 +308,10 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	 * 
 	 * @param view
 	 */
-	@OnClick(R.id.clear_button)
-	public void clearOfflineTiles(View view) {
-		clearOfflineTiles();
-	}
+//	@OnClick(R.id.clear_button)
+//	public void clearOfflineTiles(View view) {
+//		clearOfflineTiles();
+//	}
 
 	/**
 	 * Show the Delete progress dialog, then begin clearing the tiles.
@@ -329,12 +330,12 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mDeleteProgressBar.show();
 	}
 
-	@OnClick(R.id.sync_button)
-	public void onSyncSites(View view) {
-		SiteList sitesForSync = this.mSiteRepository.getSitesForSync();
-		Toast.makeText(this, "Total Sites Marked for Sync: " + sitesForSync.size(), Toast.LENGTH_SHORT).show();
-		this.mSiteRepository.syncSites();
-	}
+//	@OnClick(R.id.sync_button)
+//	public void onSyncSites(View view) {
+//		SiteList sitesForSync = this.mSiteRepository.getSitesForSync();
+//		Toast.makeText(this, "Total Sites Marked for Sync: " + sitesForSync.size(), Toast.LENGTH_SHORT).show();
+//		this.mSiteRepository.syncSites();
+//	}
 
 	//
 	// @OnClick(R.id.zip_button)
@@ -353,12 +354,12 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	// // Toast.LENGTH_SHORT).show();
 	// }
 
-	@OnClick(R.id.map_button)
-	public void gotoOfflineMap(View view) {
-		Intent i = new Intent(this, SiteMapListActivity.class);
-		// finish();
-		startActivity(i);
-	}
+//	@OnClick(R.id.map_button)
+//	public void gotoOfflineMap(View view) {
+//		Intent i = new Intent(this, SiteMapListActivity.class);
+//		// finish();
+//		startActivity(i);
+//	}
 
 	private void zoomToMyLocation() {
 		if (mMyLocation == null) {

@@ -10,6 +10,7 @@ import edu.columbia.sel.revisit.activity.BaseActivity;
 import edu.columbia.sel.revisit.activity.SiteDetailActivity;
 import edu.columbia.sel.revisit.activity.SiteMapListActivity;
 import edu.columbia.sel.revisit.activity.SelectOfflineAreaActivity;
+import edu.columbia.sel.revisit.activity.SplashActivity;
 import edu.columbia.sel.revisit.annotation.ForApplication;
 import edu.columbia.sel.revisit.annotation.ForLogging;
 import edu.columbia.sel.revisit.api.SiteRetrofitSpiceService;
@@ -40,6 +41,7 @@ import static android.content.Context.LOCATION_SERVICE;
 		
 		// Activities
 		BaseActivity.class,
+		SplashActivity.class,
 		SelectOfflineAreaActivity.class,
 		SiteDetailActivity.class,
 		SiteMapListActivity.class,

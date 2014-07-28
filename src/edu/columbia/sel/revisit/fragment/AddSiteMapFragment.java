@@ -61,6 +61,8 @@ public class AddSiteMapFragment extends BaseMapFragment {
 		
 		this.setupMapEventOverlay();
 		
+//		this.placeNewSite
+		
 		return view;
     }
 
