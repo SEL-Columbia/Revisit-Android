@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 import edu.columbia.sel.revisit.R;
+import edu.columbia.sel.revisit.model.SiteList;
 
 public class SplashActivity extends BaseActivity {
 //	@InjectView (R.id.goto_offline_activity) Button mGotoOfflineButton;
@@ -41,5 +43,12 @@ public class SplashActivity extends BaseActivity {
 		Log.i(TAG, "openOfflineMap()");
 		Intent i = new Intent(this, SiteMapListActivity.class);
 		startActivity(i);
+	}
+	
+	@OnClick(R.id.sync_button)
+	public void onSyncSites(View view) {
+		SiteList sitesForSync = this.mSiteRepository.getSitesForSync();
+		Toast.makeText(this, "Total Sites Marked for Sync: " + sitesForSync.size(), Toast.LENGTH_SHORT).show();
+		this.mSiteRepository.syncSites();
 	}
 }

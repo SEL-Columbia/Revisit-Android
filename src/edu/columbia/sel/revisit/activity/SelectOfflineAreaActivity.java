@@ -23,13 +23,9 @@ import edu.columbia.sel.grout.event.FetchingErrorEvent;
 import edu.columbia.sel.grout.event.FetchingProgressEvent;
 import edu.columbia.sel.grout.event.FetchingStartEvent;
 import edu.columbia.sel.grout.util.DeleterListener;
-import edu.columbia.sel.revisit.api.AddSiteRetrofitSpiceRequest;
 import edu.columbia.sel.revisit.api.SitesWithinRetrofitSpiceRequest;
-import edu.columbia.sel.revisit.api.UpdateSiteRetrofitSpiceRequest;
 import edu.columbia.sel.revisit.event.LocationChangedEvent;
-import edu.columbia.sel.revisit.model.Site;
 import edu.columbia.sel.revisit.model.SiteList;
-import edu.columbia.sel.revisit.model.JsonFileSiteRepository;
 import edu.columbia.sel.revisit.service.LocationService;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -107,7 +103,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		}
 
 		mGrout = new Grout();
-		mGrout.setThreadCount(4);
+		mGrout.setThreadCount(10);
 		mGrout.setMaxzoom(17);
 		// For now we're just using raw tiles on the file system... seems
 		// fastest, and the archives
@@ -330,12 +326,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mDeleteProgressBar.show();
 	}
 
-//	@OnClick(R.id.sync_button)
-//	public void onSyncSites(View view) {
-//		SiteList sitesForSync = this.mSiteRepository.getSitesForSync();
-//		Toast.makeText(this, "Total Sites Marked for Sync: " + sitesForSync.size(), Toast.LENGTH_SHORT).show();
-//		this.mSiteRepository.syncSites();
-//	}
 
 	//
 	// @OnClick(R.id.zip_button)
@@ -354,12 +344,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	// // Toast.LENGTH_SHORT).show();
 	// }
 
-//	@OnClick(R.id.map_button)
-//	public void gotoOfflineMap(View view) {
-//		Intent i = new Intent(this, SiteMapListActivity.class);
-//		// finish();
-//		startActivity(i);
-//	}
 
 	private void zoomToMyLocation() {
 		if (mMyLocation == null) {
@@ -389,7 +373,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	 */
 	@Subscribe
 	public void handleLocationChanged(LocationChangedEvent event) {
-		Log.i(TAG, "handleLocationChanged");
+		Log.i(TAG, "handleLocationChanged - DO NOTHING");
 		mMyLocation = event.getLocation();
 		this.zoomToMyLocation();
 

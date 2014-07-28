@@ -72,7 +72,7 @@ public class AddSiteActivity extends BaseActivity {
 //	private AddSiteRetrofitSpiceRequest mAddSiteRequest;
 
 	// The GET request that retrieves known Sites within the map bounds
-	private SitesWithinRetrofitSpiceRequest mSitesWithinRequest;
+//	private SitesWithinRetrofitSpiceRequest mSitesWithinRequest;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +97,12 @@ public class AddSiteActivity extends BaseActivity {
 		// Grab a reference to the map fragment.
 		FragmentManager fragmentManager = getFragmentManager();
 		mMapFragment = (AddSiteMapFragment) fragmentManager.findFragmentById(R.id.fragment_map);
+		
+		this.zoomToMyLocation();
+		
+		GeoPoint gp = new GeoPoint(mMyLocation);
+		mMapFragment.addNewSiteToMap(gp);
+		bus.post(new SitePlacedEvent(gp));
 	}
 
 	@Override
@@ -277,12 +283,8 @@ public class AddSiteActivity extends BaseActivity {
 		double w = (bb.getLonWestE6() / 1E6);
 		Log.i(TAG, n + ", " + w + ", " + s + ", " + e);
 
-		// cacheKey uses lat/lng so as to be unique
-		String cacheKey = "facs" + n + "," + w + "," + s + "," + e;
-		mSitesWithinRequest = new SitesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),
-				String.valueOf(n), String.valueOf(e));
-		getSpiceManager().execute(mSitesWithinRequest, cacheKey, DurationInMillis.ONE_SECOND,
-				new SitesRequestListener());
+		SiteList facs = mSiteRepository.getSitesWithin(n, s, e, w);
+		bus.post(new SitesLoadedEvent(facs));
 	}
 
 	/**
@@ -295,7 +297,6 @@ public class AddSiteActivity extends BaseActivity {
 	public void handleSitePlaced(SitePlacedEvent event) {
 		Log.i(TAG, "handleSitePlaced");
 		mSiteGeoPoint = event.getGeoPoint();
-//		mLocationEditText.setText(mSiteGeoPoint.getLatitude() + ", " + mSiteGeoPoint.getLongitude());
 	}
 
 	/**
@@ -315,31 +316,6 @@ public class AddSiteActivity extends BaseActivity {
 		if (mFirstRun) {
 			mFirstRun = false;
 			this.zoomToMyLocation();
-		}
-	}
-
-	// ============================================================================================
-	// INNER CLASSES
-	// ============================================================================================
-
-	/**
-	 * Used by RoboSpice to handle the response for known Sites.
-	 * 
-	 * @author Jonathan Wohl
-	 * 
-	 */
-	public final class SitesRequestListener implements RequestListener<SiteList> {
-
-		@Override
-		public void onRequestFailure(SpiceException spiceException) {
-			Log.e(TAG, spiceException.toString());
-			Toast.makeText(AddSiteActivity.this, "Failed to load Sites.", Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onRequestSuccess(final SiteList result) {
-			Log.i(TAG, "Sites Loaded: " + result.size());
-			bus.post(new SitesLoadedEvent(result));
 		}
 	}
 }

@@ -17,6 +17,7 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
+import com.squareup.otto.Bus;
 
 import edu.columbia.sel.revisit.RevisitApplication;
 import edu.columbia.sel.revisit.annotation.ForApplication;
@@ -39,6 +40,9 @@ public class JsonFileSiteRepository implements ISiteRepository {
 
 	@Inject
 	SpiceManager mSpiceManager;
+	
+	@Inject
+	Bus mBus;
 
 	@Inject
 	@ForApplication

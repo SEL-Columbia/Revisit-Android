@@ -137,7 +137,12 @@ public class AddSiteMapFragment extends BaseMapFragment {
                 }, mResourceProxy);
         
         // Add the overlays to the map
-        this.mMapView.getOverlays().add(this.mSiteOverlay);
+        this.refreshNewSiteOverlay();
+	}
+	
+	public void refreshNewSiteOverlay() {
+		this.mMapView.getOverlays().remove(this.mSiteOverlay);
+		this.mMapView.getOverlays().add(this.mSiteOverlay);
         this.mMapView.invalidate();
 	}
 	
@@ -206,6 +211,8 @@ public class AddSiteMapFragment extends BaseMapFragment {
         // Add the overlays to the map
         this.mMapView.getOverlays().add(this.mSitesOverlay);
         this.mMapView.invalidate();
+        
+        this.refreshNewSiteOverlay();
 	}
 	
 	/**
