@@ -8,12 +8,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="3"
+        android:layout_weight="2"
         android:gravity="center"
         android:text="@string/splash_welcome"
         android:textSize="24sp" />
 
-    <Button
+    <edu.columbia.sel.revisit.view.IconWithTextButton
         android:id="@+id/select_offline"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -22,12 +22,12 @@
         android:paddingBottom="5dp"
         android:paddingTop="10dp"
         android:background="@drawable/blue_button"
-        android:drawableTop="@drawable/ic_downloadoffline"
+        android:drawableStart="@drawable/ic_downloadoffline"
         android:text="@string/select_offline_button"
         android:textColor="@color/white"
         android:textSize="13sp" />
 
-    <Button
+    <edu.columbia.sel.revisit.view.IconWithTextButton
         android:id="@+id/map_button"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -36,12 +36,12 @@
         android:paddingBottom="5dp"
         android:paddingTop="8dp"
         android:background="@drawable/green_button"
-        android:drawableTop="@drawable/ic_viewmap"
+        android:drawableStart="@drawable/ic_viewmap"
         android:text="@string/view_offline_button"
         android:textColor="@color/white"
         android:textSize="13sp" />
 
-    <Button
+    <edu.columbia.sel.revisit.view.IconWithTextButton
         android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -50,12 +50,12 @@
         android:paddingBottom="5dp"
         android:paddingTop="8dp"
         android:background="@drawable/purple_button"
-        android:drawableTop="@drawable/ic_settings"
+        android:drawableStart="@drawable/ic_settings"
         android:text="@string/settings_button"
         android:textColor="@color/white"
         android:textSize="13sp" />
     
-    <Button
+    <edu.columbia.sel.revisit.view.IconWithTextButton
         android:id="@+id/tour_button"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -64,7 +64,7 @@
         android:paddingBottom="5dp"
         android:paddingTop="8dp"
         android:background="@drawable/orange_button"
-        android:drawableTop="@drawable/ic_tour"
+        android:drawableStart="@drawable/ic_tour"
         android:text="@string/tour_button"
         android:textColor="@color/white"
         android:textSize="13sp" />
