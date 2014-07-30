@@ -32,6 +32,7 @@ import butterknife.OnClick;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -63,15 +64,15 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	private MapController mMapCon;
 	private Grout mGrout;
 
-	BoundingBoxE6 mBoundingBox;
-	boolean mDoDownload = false;
+	private BoundingBoxE6 mBoundingBox;
+	private boolean mDoDownload = false;
 
 	// RoboSpice request object to handle fetching of Sites within the
 	// bounds of the map view
 	private SitesWithinRetrofitSpiceRequest mSitesWithinRequest;
 
-	ProgressDialog mProgressBar;
-	ProgressDialog mDeleteProgressBar;
+	private ProgressDialog mProgressBar;
+	private ProgressDialog mDeleteProgressBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +157,10 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 				// go get the Sites
 				fetchSites();
 
+				if (!mIsRunning) {
+					return;
+				}
+
 				// Alert the user that the download has completed successfully.
 				AlertDialog.Builder builder = new AlertDialog.Builder(SelectOfflineAreaActivity.this);
 				builder.setMessage(
@@ -180,9 +185,12 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 			@Override
 			public void onFetchingError(FetchingErrorEvent fee) {
-				// TODO Auto-generated method stub
+				if (!mIsRunning) {
+					return;
+				}
+
 				if (fee.cause == FetchingErrorEvent.ALREADY_RUNNING) {
-					Toast.makeText(SelectOfflineAreaActivity.this, "Region download in progress. Please wait.",
+					Toast.makeText(SelectOfflineAreaActivity.this, "Download in progress. Please wait.",
 							Toast.LENGTH_SHORT).show();
 				}
 				if (fee.cause == FetchingErrorEvent.INVALID_REGION) {
@@ -201,7 +209,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	protected void onStart() {
 		super.onStart();
 		Log.i(TAG, "------------> onStart()");
-
 		// start location service
 		startService(new Intent(this, LocationService.class));
 	}
@@ -211,6 +218,11 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		super.onStop();
 		Log.i(TAG, "------------> onStop()");
 	}
+
+//	@Override
+//	public void onBackPressed() {
+//		
+//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -249,8 +261,8 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		Double w = (mBoundingBox.getLonWestE6() / 1E6);
 		mSitesWithinRequest = new SitesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),
 				String.valueOf(n), String.valueOf(e));
-		getSpiceManager().execute(mSitesWithinRequest, "sites", DurationInMillis.ONE_SECOND,
-				new SitesRequestListener());
+		getSpiceManager()
+				.execute(mSitesWithinRequest, "sites", DurationInMillis.ONE_SECOND, new SitesRequestListener());
 	}
 
 	@OnClick(R.id.download_button)
@@ -258,7 +270,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		Log.i(TAG, "------------> download initiated");
 		// prepare a progress bar dialog
 		mProgressBar = new ProgressDialog(this);
-		mProgressBar.setCancelable(true);
+		mProgressBar.setCancelable(false);
 		mProgressBar.setCanceledOnTouchOutside(false);
 		mProgressBar.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel Download",
 				new DialogInterface.OnClickListener() {
@@ -304,10 +316,10 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	 * 
 	 * @param view
 	 */
-//	@OnClick(R.id.clear_button)
-//	public void clearOfflineTiles(View view) {
-//		clearOfflineTiles();
-//	}
+	// @OnClick(R.id.clear_button)
+	// public void clearOfflineTiles(View view) {
+	// clearOfflineTiles();
+	// }
 
 	/**
 	 * Show the Delete progress dialog, then begin clearing the tiles.
@@ -326,7 +338,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mDeleteProgressBar.show();
 	}
 
-
 	//
 	// @OnClick(R.id.zip_button)
 	// public void createZip(View view) {
@@ -343,7 +354,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	// // Toast.makeText(this, "Total Tiles Cached: " + numTiles,
 	// // Toast.LENGTH_SHORT).show();
 	// }
-
 
 	private void zoomToMyLocation() {
 		if (mMyLocation == null) {
@@ -384,8 +394,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	// ============================================================================================
 
 	/**
-	 * Used by RoboSpice to handle the response from the sites "within"
-	 * request.
+	 * Used by RoboSpice to handle the response from the sites "within" request.
 	 * 
 	 * @author Jonathan Wohl
 	 * 

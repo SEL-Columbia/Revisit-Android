@@ -43,6 +43,9 @@ public abstract class BaseActivity extends Activity {
 	
 	@Inject
 	JsonFileSiteRepository mSiteRepository;
+	
+	// This is used to ensure we don't attempt to open dialogs if the activity is in the background.
+	protected boolean mIsRunning = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +67,14 @@ public abstract class BaseActivity extends Activity {
 			mSpiceManager.start(this);	
 		}
         super.onStart();
+
+		mIsRunning = true;
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+		mIsRunning = false;
     }
 
 	@Override
