@@ -32,7 +32,7 @@
     <string name="select_offline_button">Download map for offline use</string>
     <string name="view_offline_button">View offline map</string>
     <string name="settings_button">Settings</string>
-    <string name="sync_sites_button">Upload locations to registry</string>
+    <string name="sync_sites_button">Upload sites to registry</string>
     
     
     <!-- Offline Download -->

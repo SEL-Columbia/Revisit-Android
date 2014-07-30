@@ -109,4 +109,10 @@ public class DIModule {
 	SpiceManager provideSpiceManager() {
 		return new SpiceManager(SiteRetrofitSpiceService.class);
 	}
+	
+//	@Provides
+//	@Singleton
+//	JsonFileSiteRepository provideSiteRepository(Bus bus) {
+//		JsonFileSiteRepository
+//	}
 }

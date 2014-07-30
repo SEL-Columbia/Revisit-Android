@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
+    
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -23,6 +23,7 @@
         android:background="@drawable/blue_button"
         android:drawableTop="@drawable/ic_download_offline_map"
         android:text="@string/select_offline_button"
+        android:textColor="@color/white"
         android:textSize="12sp" />
 
     <Button
@@ -35,6 +36,7 @@
         android:background="@drawable/green_button"
         android:drawableTop="@drawable/ic_download_offline_map"
         android:text="@string/view_offline_button"
+        android:textColor="@color/white"
         android:textSize="12sp" />
 
     <Button
@@ -47,6 +49,7 @@
         android:background="@drawable/orange_button"
         android:drawableTop="@drawable/ic_sync_sites"
         android:text="@string/sync_sites_button"
+        android:textColor="@color/white"
         android:textSize="12sp" />
 
     <Button
@@ -59,6 +62,7 @@
         android:background="@drawable/purple_button"
         android:drawableTop="@drawable/ic_settings"
         android:text="@string/settings_button"
+        android:textColor="@color/white"
         android:textSize="12sp" />
 
 </LinearLayout>
