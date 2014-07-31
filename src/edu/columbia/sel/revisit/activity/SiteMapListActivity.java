@@ -322,17 +322,16 @@ public class SiteMapListActivity extends BaseActivity {
 	}
 
 	/**
-	 * Handle LocationChangedEvent, fired when the application detects a new
-	 * user location.
+	 * Handle DeviceOfflineEvent. Currently not used in this view.
 	 * 
 	 * @param event
 	 */
-	@Subscribe
-	public void handleDeviceOfflineEvent(DeviceOfflineEvent event) {
-		Log.i(TAG, "handleDeviceOfflineEvent");
-		Toast.makeText(this, "The device is not currently online.", Toast.LENGTH_SHORT).show();
-		progressDialog.dismiss();
-	}
+//	@Subscribe
+//	public void handleDeviceOfflineEvent(DeviceOfflineEvent event) {
+//		Log.i(TAG, "handleDeviceOfflineEvent");
+////		Toast.makeText(this, "The device is not currently online.", Toast.LENGTH_SHORT).show();
+////		progressDialog.dismiss();
+//	}
 
 	// ============================================================================================
 	// INNER CLASSES

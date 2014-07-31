@@ -24,6 +24,7 @@ import edu.columbia.sel.grout.event.FetchingProgressEvent;
 import edu.columbia.sel.grout.event.FetchingStartEvent;
 import edu.columbia.sel.grout.util.DeleterListener;
 import edu.columbia.sel.revisit.api.SitesWithinRetrofitSpiceRequest;
+import edu.columbia.sel.revisit.event.DeviceOfflineEvent;
 import edu.columbia.sel.revisit.event.LocationChangedEvent;
 import edu.columbia.sel.revisit.model.SiteList;
 import edu.columbia.sel.revisit.service.LocationService;
@@ -387,6 +388,32 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		mMyLocation = event.getLocation();
 		this.zoomToMyLocation();
 
+	}
+	
+	/**
+	 * Handle LocationChangedEvent, fired when the application detects a new
+	 * user location.
+	 * 
+	 * @param event
+	 */
+	@Subscribe
+	public void handleDeviceOfflineEvent(DeviceOfflineEvent event) {
+		Log.i(TAG, "handleDeviceOfflineEvent");
+		
+		// Alert the user that the download has completed successfully.
+		AlertDialog.Builder builder = new AlertDialog.Builder(SelectOfflineAreaActivity.this);
+		builder.setMessage("Please connect to a network and try again.")
+				.setTitle("Device Offline");
+		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				// User clicked OK button
+				SelectOfflineAreaActivity.this.finish();
+			}
+		});
+		AlertDialog dialog = builder.create();
+		dialog.show();
+		
+//		Toast.makeText(this, "The device is not currently online.", Toast.LENGTH_SHORT).show();
 	}
 
 	// ============================================================================================
