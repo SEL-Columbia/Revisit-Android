@@ -46,14 +46,11 @@ public class SiteArrayAdapter extends ArrayAdapter<Site> {
 		
 		String sector = (String) f.getProperties().getSector();
 		
-		ImageView icon = (ImageView) itemView.findViewById(R.id.site_type_icon);
-		if (sector.equals("health")) {
-			icon.setImageResource(R.drawable.hospital);				
-		} else if (sector.equals("power")) {
-			icon.setImageResource(R.drawable.power);
-		} else if (sector.equals("education")) {
-			icon.setImageResource(R.drawable.education);
-		}
+		int red = this.getContext().getResources().getColor(R.color.sel_red);
+		int blue = this.getContext().getResources().getColor(R.color.sel_blue);
+		int green = this.getContext().getResources().getColor(R.color.sel_green);
+		int orange = this.getContext().getResources().getColor(R.color.sel_orange);
+		
 		
 		TextView index = (TextView) itemView.findViewById(R.id.site_list_item_index);
 		index.setText(String.valueOf(pos+1));
@@ -63,6 +60,27 @@ public class SiteArrayAdapter extends ArrayAdapter<Site> {
 		
 		TextView desc = (TextView) itemView.findViewById(R.id.site_list_item_description);
 		desc.setText(f.getProperties().getVisits() + " Visits");
+
+		ImageView icon = (ImageView) itemView.findViewById(R.id.site_type_icon);
+		if (sector.equals("health")) {
+			icon.setImageResource(R.drawable.ic_health);
+			index.setTextColor(red);
+			desc.setTextColor(red);
+		} else if (sector.equals("energy")) {
+			icon.setImageResource(R.drawable.ic_energy);
+			// text already green
+			index.setTextColor(green);
+			desc.setTextColor(green);
+		} else if (sector.equals("education")) {
+			icon.setImageResource(R.drawable.ic_education);
+			index.setTextColor(orange);
+			desc.setTextColor(orange);
+		} else if (sector.equals("water")) {
+			icon.setImageResource(R.drawable.ic_water);
+			index.setTextColor(blue);
+			desc.setTextColor(blue);
+		}
+		
 		
 		return itemView;
 		

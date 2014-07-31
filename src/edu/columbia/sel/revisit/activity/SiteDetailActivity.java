@@ -119,13 +119,16 @@ public class SiteDetailActivity extends BaseActivity {
 		
 		if (sector.equals("health")) {
 			Log.i(TAG, " -----------> health! <-----------");
-			this.mSiteSectorIconView.setImageResource(R.drawable.hospital);				
+			this.mSiteSectorIconView.setImageResource(R.drawable.ic_health);				
 		} else if (sector.equals("power")) {
-			Log.i(TAG, " -----------> power! <-----------");
-			this.mSiteSectorIconView.setImageResource(R.drawable.power);
+			Log.i(TAG, " -----------> energy! <-----------");
+			this.mSiteSectorIconView.setImageResource(R.drawable.ic_energy);
 		} else if (sector.equals("education")) {
 			Log.i(TAG, " -----------> education! <-----------");
-			this.mSiteSectorIconView.setImageResource(R.drawable.education);
+			this.mSiteSectorIconView.setImageResource(R.drawable.ic_education);
+		} else if (sector.equals("water")) {
+			Log.i(TAG, " -----------> water! <-----------");
+			this.mSiteSectorIconView.setImageResource(R.drawable.ic_water);
 		}
 		this.mSiteImageView.invalidate();
 		this.mSiteTypeView.setText(site.getProperties().getType());
