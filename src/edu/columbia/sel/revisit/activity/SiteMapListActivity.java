@@ -72,10 +72,13 @@ public class SiteMapListActivity extends BaseActivity {
 	private Toast noSitesToast;
 
 	// Filter by sector
-	String mSectorFilter = null;
+	private String mSectorFilter = null;
 
 	// Stores the currently loaded list of Sites
-	SiteList mSites;
+	private SiteList mSites;
+	
+	// Whether or not we should zoom to my location when a LocationChangedEvent is handled.
+	private boolean mDoZoomToMyLocation = true;
 
 	// Not currently used
 	// private SitesNearRetrofitSpiceRequest sitesNearRequest;
@@ -314,10 +317,10 @@ public class SiteMapListActivity extends BaseActivity {
 
 		mMyLocation = event.getLocation();
 
-		if (mSites == null) {
-			// We only want to zoom to our location if this is the first
-			// location change
+		// We only want to zoom to our location if this is the first location change
+		if (mDoZoomToMyLocation) {
 			this.zoomToMyLocation();
+			mDoZoomToMyLocation = false;
 		}
 	}
 

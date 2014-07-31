@@ -11,6 +11,7 @@ import edu.columbia.sel.revisit.model.JsonFileSiteRepository;
 import edu.columbia.sel.revisit.service.LocationService;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 //import android.support.v7.app.ActionBarActivity;
 
@@ -50,6 +51,9 @@ public abstract class BaseActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// For the moment, let's only worry about Portrait orientation.
+		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		// Set the tag to the class name of the instance.
 		TAG = this.getClass().getCanonicalName();

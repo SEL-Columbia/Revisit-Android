@@ -40,6 +40,8 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -67,6 +69,8 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 	private BoundingBoxE6 mBoundingBox;
 	private boolean mDoDownload = false;
+	
+	private boolean mDoZoomToMyLocation = true;
 
 	// RoboSpice request object to handle fetching of Sites within the
 	// bounds of the map view
@@ -96,13 +100,6 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 						"http://otile4.mqcdn.com/tiles/1.0.0/map/" });
 		mMapView.setTileSource(MAPQUESTOSM);
 		mMapCon = (MapController) mMapView.getController();
-
-		// TODO: remove this.
-		mMyLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-		if (mMyLocation != null) {
-			this.zoomToMyLocation();
-		}
 
 		mGrout = new Grout();
 		mGrout.setThreadCount(10);
@@ -219,6 +216,20 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		super.onStop();
 		Log.i(TAG, "------------> onStop()");
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// TODO: this doesn't work.
+//		mMyLocation = LocationService.getCurrentLocation();
+////		Log.i(TAG, "mMyLocation ------- " + mMyLocation.toString());
+//		
+//		
+////		mMyLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//		if (mMyLocation != null) {
+//			this.zoomToMyLocation();
+//		}
+	}
 
 //	@Override
 //	public void onBackPressed() {
@@ -239,6 +250,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		switch (item.getItemId()) {
 		case R.id.action_settings:
 			openSettings();
+			return true;
+		case R.id.action_mylocation:
+			zoomToMyLocation();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -360,9 +374,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		if (mMyLocation == null) {
 			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
 		} else {
+			Log.i(TAG, "zoomToMyLocation ----> " + mMyLocation.toString());
 			this.zoomToLocation(mMyLocation);
 		}
-
 	}
 
 	private void zoomToLocation(Location loc) {
@@ -372,8 +386,20 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 			throw new RuntimeException("Location can not be null.");
 		}
 
-		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-		mMapCon.animateTo(point);
+		final GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+//		mMapCon.animateTo(point);
+		
+		// HACK! See https://github.com/osmdroid/osmdroid/issues/22
+		// TODO: This should be removed when osmdroid is updated.
+		new Handler(Looper.getMainLooper()).post(
+		    new Runnable() {
+		        public void run() {
+		        	mMapCon.animateTo(point);
+		        }
+		    }
+		);
+		
+//		mMapCon.setCenter(point);
 	}
 
 	/**
@@ -384,9 +410,16 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	 */
 	@Subscribe
 	public void handleLocationChanged(LocationChangedEvent event) {
-		Log.i(TAG, "handleLocationChanged - DO NOTHING");
+		Log.i(TAG, "handleLocationChanged - SELECT OFFLINE AREA ACTIVITY");
+		
+		// always set the current location so that the user can zoom back to it
 		mMyLocation = event.getLocation();
-		this.zoomToMyLocation();
+		
+		// but only automatically zoom to the user's location when the activity first loads.
+		if (this.mDoZoomToMyLocation) {
+			this.zoomToMyLocation();
+			mDoZoomToMyLocation = false;
+		}
 
 	}
 	

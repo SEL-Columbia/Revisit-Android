@@ -136,13 +136,13 @@ public class LocationService extends Service implements LocationListener {
 						}
 					}
 				}
-//				bus.post(new LocationChangedEvent(mCurrentLocation));
+				bus.post(new LocationChangedEvent(mCurrentLocation));
 			} catch (Exception e) {
 				Log.e(TAG, e.toString());
 				e.printStackTrace();
 			}
 		} else {
-			// The device is offline. Let's see if we have a last known location, and post it along with the 
+			// The device is offline. Let's see if we have a last known location, and post it before the 
 			// DeviceOfflineEvent.
 			Log.e(TAG, "ERROR: Device not online.");
 			mCurrentLocation = getLastKnownLocation();
@@ -151,29 +151,6 @@ public class LocationService extends Service implements LocationListener {
 			}
 			bus.post(new DeviceOfflineEvent());
 		}
-	}
-	
-	private Location getLastKnownLocation() {
-		Location tempNetworkLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		Location tempGpsLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		
-		// if we have last known locs from both providers, see which is better and return it
-		if (tempNetworkLocation != null && tempGpsLocation != null) {
-			if (isBetterLocation(tempNetworkLocation, tempGpsLocation)) {
-				return tempNetworkLocation;
-			} else {
-				return tempGpsLocation;
-			}
-		}
-		
-		// if we only have one of the two, return the one we have
-		if (tempNetworkLocation != null) {
-			return tempNetworkLocation;
-		} else if (tempGpsLocation != null) {
-			return tempGpsLocation;
-		}
-		
-		return null;
 	}
 
 	/**
@@ -232,6 +209,29 @@ public class LocationService extends Service implements LocationListener {
 	 */
 	public static Location getCurrentLocation() {
 		return mCurrentLocation;
+	}
+	
+	public Location getLastKnownLocation() {
+		Location tempNetworkLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		Location tempGpsLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		// if we have last known locs from both providers, see which is better and return it
+		if (tempNetworkLocation != null && tempGpsLocation != null) {
+			if (isBetterLocation(tempNetworkLocation, tempGpsLocation)) {
+				return tempNetworkLocation;
+			} else {
+				return tempGpsLocation;
+			}
+		}
+		
+		// if we only have one of the two, return the one we have
+		if (tempNetworkLocation != null) {
+			return tempNetworkLocation;
+		} else if (tempGpsLocation != null) {
+			return tempGpsLocation;
+		}
+		
+		return null;
 	}
 
 	/**
