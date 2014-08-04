@@ -114,7 +114,7 @@
         android:id="@+id/finish_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/green_button"
+        android:background="@drawable/gray_button"
         android:drawableStart="@drawable/select_site_icon"
         android:text="@string/checkin_button"
         android:textAppearance="?android:attr/textAppearanceLarge"

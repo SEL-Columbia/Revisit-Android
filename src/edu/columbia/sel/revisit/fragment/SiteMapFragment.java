@@ -40,6 +40,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -87,7 +89,20 @@ public class SiteMapFragment extends BaseMapFragment {
 			Log.i(TAG, site.getCoordinates().get(1) + ", " + site.getCoordinates().get(0));
 			GeoPoint point = new GeoPoint(site.getCoordinates().get(1), site.getCoordinates().get(0));
 			SiteOverlayItem item = new SiteOverlayItem(site, point, i);
-			Drawable background = this.getResources().getDrawable(R.drawable.ic_location_green); 
+			
+			String sector = (String) site.getProperties().getSector();
+			Drawable background = this.getResources().getDrawable(R.drawable.ic_mylocationmarker);
+			
+			if (sector.equals("health")) {
+				background = this.getResources().getDrawable(R.drawable.ic_healthsitemarker);
+			} else if (sector.equals("energy")) {
+				background = this.getResources().getDrawable(R.drawable.ic_energysitemarker);
+			} else if (sector.equals("education")) {
+				background = this.getResources().getDrawable(R.drawable.ic_educationsitemarker);
+			} else if (sector.equals("water")) {
+				background = this.getResources().getDrawable(R.drawable.ic_watersitemarker);
+			}
+			
 			BitmapDrawable bmd = SiteMarker.createSiteMarker(getResources(), String.valueOf(i+1), background);
 			item.setMarker(bmd);
 			item.setMarkerHotspot(HotspotPlace.CENTER);

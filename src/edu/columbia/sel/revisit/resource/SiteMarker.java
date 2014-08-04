@@ -23,12 +23,11 @@ import android.util.Log;
  */
 public class SiteMarker extends Drawable {
 	private String TAG = this.getClass().getCanonicalName();
-	private Paint mBackgroundPaint;
 	private Paint mTextPaint;
 	private String text;
 	private int width = 30;
 	private int height = 30;
-	private static float textHeight = 14; 
+	private static float textHeight = 18; 
 	
 	public SiteMarker(Resources resources, String text) {
 		this.mTextPaint = new Paint();
@@ -86,15 +85,14 @@ public class SiteMarker extends Drawable {
 	public void draw(Canvas canvas) {
 		Log.i(TAG, "\\\\\\\\\\\\\\\\\\     DRAWING     //////////////////");
 
-		mTextPaint.setARGB(255, 0, 0, 0);
+		mTextPaint.setARGB(255, 255, 255, 255);
 		mTextPaint.setTextAlign(Align.CENTER);
 		mTextPaint.setAntiAlias(true);
 		mTextPaint.setFakeBoldText(true);
-		
 		mTextPaint.setTextSize(textHeight);
 		
 		float markerCenterX = this.width/2;
-		float markerCenterY = this.height/2;
+		float markerCenterY = this.height/2 - 2;
 		
 		canvas.drawText(text, markerCenterX, markerCenterY, mTextPaint);
 	}

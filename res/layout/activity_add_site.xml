@@ -79,7 +79,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:background="@drawable/blue_button"
+        android:background="@drawable/gray_button"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:onClick="onAddNewSite"
         android:text="@string/submit_add_button_text" />
 

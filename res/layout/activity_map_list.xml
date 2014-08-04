@@ -47,11 +47,10 @@
         android:id="@+id/add_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/blue_button"
+        android:background="@drawable/gray_button"
         android:text="@string/add_button_text"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:drawableStart="@drawable/add_site_icon"
-        android:gravity="center"
         android:textColor="@color/white"
         android:onClick="onAddNewSite" />
 

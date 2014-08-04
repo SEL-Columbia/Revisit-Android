@@ -42,7 +42,9 @@
         android:id="@+id/download_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/blue_button"
+        android:textColor="@color/white"
+        android:background="@drawable/gray_button"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/download_button" />
 
 </LinearLayout>

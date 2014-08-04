@@ -1,72 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-    
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="3"
-        android:gravity="center"
-        android:text="@string/splash_welcome"
-        android:textSize="24sp" />
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
 
-    <Button
-        android:id="@+id/select_offline"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_weight="2"
-        android:paddingBottom="5dp"
-        android:paddingTop="10dp"
-        android:background="@drawable/blue_button"
-        android:drawableTop="@drawable/ic_downloadoffline"
-        android:text="@string/select_offline_button"
-        android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/map_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_weight="2"
-        android:paddingBottom="5dp"
-        android:paddingTop="8dp"
-        android:background="@drawable/green_button"
-        android:drawableTop="@drawable/ic_viewmap"
-        android:text="@string/view_offline_button"
-        android:textColor="@color/white"
-        android:textSize="13sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="3"
+            android:paddingTop="50dp"
+            android:paddingBottom="50dp"
+            android:gravity="center"
+            android:text="@string/splash_welcome"
+            android:textSize="24sp" />
 
-    <Button
-        android:id="@+id/settings"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_weight="2"
-        android:paddingBottom="5dp"
-        android:paddingTop="8dp"
-        android:background="@drawable/purple_button"
-        android:drawableTop="@drawable/ic_settings"
-        android:text="@string/settings_button"
-        android:textColor="@color/white"
-        android:textSize="13sp" />
-    
-    <Button
-        android:id="@+id/tour_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_weight="2"
-        android:paddingBottom="5dp"
-        android:paddingTop="8dp"
-        android:background="@drawable/orange_button"
-        android:drawableTop="@drawable/ic_tour"
-        android:text="@string/tour_button"
-        android:textColor="@color/white"
-        android:textSize="13sp" />
+        <Button
+            android:id="@+id/select_offline"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_weight="2"
+            android:background="@drawable/blue_button"
+            android:drawableTop="@drawable/ic_downloadoffline"
+            android:paddingBottom="5dp"
+            android:paddingTop="10dp"
+            android:text="@string/select_offline_button"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/map_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_weight="2"
+            android:background="@drawable/green_button"
+            android:drawableTop="@drawable/ic_viewmap"
+            android:paddingBottom="5dp"
+            android:paddingTop="8dp"
+            android:text="@string/view_offline_button"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/settings"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_weight="2"
+            android:background="@drawable/purple_button"
+            android:drawableTop="@drawable/ic_settings"
+            android:paddingBottom="5dp"
+            android:paddingTop="8dp"
+            android:text="@string/settings_button"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/tour_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_weight="2"
+            android:background="@drawable/orange_button"
+            android:drawableTop="@drawable/ic_tour"
+            android:paddingBottom="5dp"
+            android:paddingTop="8dp"
+            android:text="@string/tour_button"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+</ScrollView>

@@ -22,6 +22,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,8 +106,18 @@ public class BaseMapFragment extends BaseFragment {
 			throw new RuntimeException("Location can not be null.");
 		}
 
-		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-		mMapCon.animateTo(point);
+		final GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+//		mMapCon.animateTo(point);
+		
+		// HACK! See https://github.com/osmdroid/osmdroid/issues/22
+		// TODO: This should be removed when osmdroid is updated.
+		new Handler(Looper.getMainLooper()).post(
+		    new Runnable() {
+		        public void run() {
+		        	mMapCon.animateTo(point);
+		        }
+		    }
+		);
 	}
 	
 	/**
@@ -119,8 +131,17 @@ public class BaseMapFragment extends BaseFragment {
 			throw new RuntimeException("Location can not be null.");
 		}
 
-		GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-		mMapCon.setCenter(point);
+		final GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
+//		mMapCon.setCenter(point);
+		// HACK! See https://github.com/osmdroid/osmdroid/issues/22
+		// TODO: This should be removed when osmdroid is updated.
+		new Handler(Looper.getMainLooper()).post(
+		    new Runnable() {
+		        public void run() {
+		        	mMapCon.animateTo(point);
+		        }
+		    }
+		);
 	}
 	
 	/**
