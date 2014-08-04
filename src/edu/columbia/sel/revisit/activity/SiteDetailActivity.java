@@ -120,7 +120,7 @@ public class SiteDetailActivity extends BaseActivity {
 		if (sector.equals("health")) {
 			Log.i(TAG, " -----------> health! <-----------");
 			this.mSiteSectorIconView.setImageResource(R.drawable.ic_health);				
-		} else if (sector.equals("power")) {
+		} else if (sector.equals("energy")) {
 			Log.i(TAG, " -----------> energy! <-----------");
 			this.mSiteSectorIconView.setImageResource(R.drawable.ic_energy);
 		} else if (sector.equals("education")) {

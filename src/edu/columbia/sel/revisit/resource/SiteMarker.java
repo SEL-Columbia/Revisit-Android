@@ -19,7 +19,7 @@ import android.util.Log;
  * A Drawable for use as a marker on the Site map.
  * 
  * @author Jonathan Wohl
- *
+ * 
  */
 public class SiteMarker extends Drawable {
 	private String TAG = this.getClass().getCanonicalName();
@@ -27,8 +27,8 @@ public class SiteMarker extends Drawable {
 	private String text;
 	private int width = 30;
 	private int height = 30;
-	private static float textHeight = 18; 
-	
+	private static float textHeight = 18;
+
 	public SiteMarker(Resources resources, String text) {
 		this.mTextPaint = new Paint();
 		this.text = text;
@@ -40,9 +40,11 @@ public class SiteMarker extends Drawable {
 		this.width = w;
 		this.height = h;
 	}
-	
+
 	/**
-	 * Factory method for generating new SiteMarkers, using the passed in drawable as a background.
+	 * Factory method for generating new SiteMarkers, using the passed in
+	 * drawable as a background.
+	 * 
 	 * @param resources
 	 * @param text
 	 * @return BitmapDrawable
@@ -52,34 +54,37 @@ public class SiteMarker extends Drawable {
 		SiteMarker sm = new SiteMarker(resources, text, background.getIntrinsicWidth(), background.getIntrinsicHeight());
 
 		// Output bitmap and canvas
-		Bitmap bmpOverlay = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Config.ARGB_8888);
+		Bitmap bmpOverlay = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(),
+				Config.ARGB_8888);
 		Canvas canvasOverlay = new Canvas(bmpOverlay);
-		
+
 		// Convert background to bitmap
-		Bitmap bmpBackground = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Config.ARGB_8888); 
-	    Canvas canvas = new Canvas(bmpBackground);
-	    background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
-	    background.draw(canvas);
-	    
-	    // Convert text to bitmap
-	    Bitmap bmpText = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Config.ARGB_8888); 
-	    Canvas canvasText = new Canvas(bmpText);
-	    sm.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
-	    sm.draw(canvasText);
-	    
-	    // Overlay two components
-	    canvasOverlay.drawBitmap(bmpBackground, new Matrix(), null);
-	    canvasOverlay.drawBitmap(bmpText, new Matrix(), null);
-	    
-	    return new BitmapDrawable(resources, bmpOverlay);
+		Bitmap bmpBackground = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(),
+				Config.ARGB_8888);
+		Canvas canvas = new Canvas(bmpBackground);
+		background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+		background.draw(canvas);
+
+		// Convert text to bitmap
+		Bitmap bmpText = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(),
+				Config.ARGB_8888);
+		Canvas canvasText = new Canvas(bmpText);
+		sm.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+		sm.draw(canvasText);
+
+		// Overlay two components
+		canvasOverlay.drawBitmap(bmpBackground, new Matrix(), null);
+		canvasOverlay.drawBitmap(bmpText, new Matrix(), null);
+
+		return new BitmapDrawable(resources, bmpOverlay);
 	}
-	
+
 	/**
 	 * This is where the icon magic happens.
 	 * 
-	 * TODO: Probably doesn't make much difference as long as we're not drawing many Sites,
-	 * but it would be a bit better to move static calculations out of here so they aren't 
-	 * being done on every draw.
+	 * TODO: Probably doesn't make much difference as long as we're not drawing
+	 * many Sites, but it would be a bit better to move static calculations out
+	 * of here so they aren't being done on every draw.
 	 */
 	@Override
 	public void draw(Canvas canvas) {
@@ -90,10 +95,10 @@ public class SiteMarker extends Drawable {
 		mTextPaint.setAntiAlias(true);
 		mTextPaint.setFakeBoldText(true);
 		mTextPaint.setTextSize(textHeight);
-		
-		float markerCenterX = this.width/2;
-		float markerCenterY = this.height/2 - 2;
-		
+
+		float markerCenterX = this.width / 2;
+		float markerCenterY = this.height / 2 - 2;
+
 		canvas.drawText(text, markerCenterX, markerCenterY, mTextPaint);
 	}
 

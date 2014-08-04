@@ -167,6 +167,14 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 				builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						// User clicked OK button
+						SelectOfflineAreaActivity.this.finish();
+					}
+				});
+				builder.setNeutralButton("View Offline Map", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent i = new Intent(SelectOfflineAreaActivity.this, SiteMapListActivity.class);
+						startActivity(i);
+						SelectOfflineAreaActivity.this.finish();
 					}
 				});
 				AlertDialog dialog = builder.create();
