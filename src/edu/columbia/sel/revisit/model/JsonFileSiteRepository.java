@@ -59,6 +59,8 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	
 	private int mNumTotalSitesForSync;
 	private int mNumSitesRemainingForSync;
+	
+	private String mFilterString;
 
 	/**
 	 * Injectable constructor. Receives bus via DIModule's @Provide of the event bus.
@@ -89,6 +91,9 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		this.mFilePath = mFilePath;
 	}
 
+	public void setFilterString(String filter) {
+		this.mFilterString = filter;
+	}
 	/**
 	 * Get the list of sites. If the in-memory list is present, use it, otherwise pull from disk and stick it in
 	 * memory for future access.
@@ -137,6 +142,29 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		SiteList filteredList = new SiteList();
 		if (fullList != null) {
 			for (Site f : fullList) {
+				// if there's a filter set, let's use it
+//				if (mFilterString != null && mFilterString != "") {
+//					String name = f.getName().toLowerCase();
+//					String[] nameSplit = name.split(" ");
+//					Boolean match = false;
+//					// First match against the whole, non-split value
+//					if (name.startsWith(mFilterString)) {
+//						match = true;
+//					} else {
+//						// Here we'll test against the tokenized name
+//						final int wordCount = nameSplit.length;
+//						for (int k = 0; k < wordCount; k++) {
+//							if (nameSplit[k].startsWith(mFilterString)) {
+//								match = true;
+//								break;
+//							}
+//						}
+//					}
+//					if (!match) {
+//						continue;
+//					}
+//				}
+				
 				Log.i(TAG, "Site Coords: " + f.getCoordinates().toString());
 				if (s <= f.getCoordinates().get(1) && f.getCoordinates().get(1) <= n) {
 					// we're within lats

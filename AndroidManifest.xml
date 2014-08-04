@@ -42,6 +42,7 @@
             android:label="@string/title_splash" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -58,8 +59,16 @@
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="edu.columbia.sel.revisit.COLLECT" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name="edu.columbia.sel.revisit.activity.AddSiteActivity"
@@ -69,15 +78,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.columbia.sel.revisit.activity.SiteMapListActivity" />
         </activity>
-        
-        
         <activity
             android:name="edu.columbia.sel.revisit.activity.SettingsActivity"
             android:label="@string/action_settings" >
         </activity>
 
-        
-        
         <service
             android:name="edu.columbia.sel.revisit.api.SiteRetrofitSpiceService"
             android:exported="false" />

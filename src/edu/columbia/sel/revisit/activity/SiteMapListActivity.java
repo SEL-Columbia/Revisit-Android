@@ -27,10 +27,15 @@ import edu.columbia.sel.revisit.service.LocationService;
 import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -118,6 +123,7 @@ public class SiteMapListActivity extends BaseActivity {
 		mAdapter = new SiteArrayAdapter(this, R.layout.site_list_item);
 		mListFragment.setListAdapter(mAdapter);
 		ListView listView = mListFragment.getListView();
+//		listView.setTextFilterEnabled(true);
 
 		// Setup click listener for items in the ListView
 		// TODO: look at how AdapterView<?> might be replaced
@@ -165,6 +171,32 @@ public class SiteMapListActivity extends BaseActivity {
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.maplist_menu, menu);
+		
+		// Get the SearchView and set the searchable configuration
+	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+	    SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+	    // Assumes current activity is the searchable activity
+	    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+	    searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+	    searchView.setOnQueryTextListener(new OnQueryTextListener() {
+
+			@Override
+			public boolean onQueryTextChange(String text) {
+				mAdapter.getFilter().filter(text);
+//				SiteMapListActivity.this.mSiteRepository.setFilterString(text);
+				
+				return false;
+			}
+
+			@Override
+			public boolean onQueryTextSubmit(String arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+	    	
+	    });
+
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -227,6 +259,10 @@ public class SiteMapListActivity extends BaseActivity {
 		Intent i = new Intent(SiteMapListActivity.this, AddSiteActivity.class);
 		startActivityForResult(i, 1);
 	}
+	
+	public void filterSites(String constraint) {
+		
+	}
 
 	/**
 	 * Handle SitesLoadedEvent, fired when the sites are ready for
@@ -257,7 +293,7 @@ public class SiteMapListActivity extends BaseActivity {
 
 		// this reloads the Site list via the SiteArrayAdaptor
 		mAdapter.clear();
-		mAdapter.addAll(mSites);
+		mAdapter.addSites(mSites);
 		mAdapter.notifyDataSetChanged();
 	}
 
@@ -296,8 +332,8 @@ public class SiteMapListActivity extends BaseActivity {
 		double w = (bb.getLonWestE6() / 1E6);
 		Log.i(TAG, n + ", " + w + ", " + s + ", " + e + ": " + mSectorFilter);
 
-		SiteList facs = mSiteRepository.getSitesWithin(n, s, e, w);
-		bus.post(new SitesLoadedEvent(facs));
+		SiteList sites = mSiteRepository.getSitesWithin(n, s, e, w);
+		bus.post(new SitesLoadedEvent(sites));
 
 //		sitesWithinRequest = new SitesWithinRetrofitSpiceRequest(String.valueOf(s), String.valueOf(w),
 //				String.valueOf(n), String.valueOf(e), mSectorFilter);
