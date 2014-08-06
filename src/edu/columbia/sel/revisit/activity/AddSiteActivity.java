@@ -7,6 +7,7 @@ import org.osmdroid.util.GeoPoint;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -23,6 +24,10 @@ import edu.columbia.sel.revisit.fragment.AddSiteMapFragment;
 import edu.columbia.sel.revisit.model.Site;
 import edu.columbia.sel.revisit.model.SiteList;
 import edu.columbia.sel.revisit.service.LocationService;
+import android.animation.LayoutTransition;
+import android.animation.LayoutTransition.TransitionListener;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.location.Location;
@@ -33,11 +38,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Transformation;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+//import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 /**
  * The AddSiteActivity provides the interface for adding a new Site.
  * 
@@ -54,6 +67,24 @@ public class AddSiteActivity extends BaseActivity {
 	@InjectView(R.id.type)
 	EditText mTypeEditText;
 
+	@InjectView(R.id.accept_button)
+	Button mAcceptButton;
+	
+	@InjectView(R.id.root_layout)
+	LinearLayout mRootLayout;
+
+	@InjectView(R.id.add_header_text_wrap)
+	LinearLayout mAddHeaderText;
+
+	@InjectView(R.id.map_wrap)
+	RelativeLayout mMapWrapView;
+
+	@InjectView(R.id.add_properties)
+	RelativeLayout mAddPropertiesView;
+
+	@InjectView(R.id.add_button)
+	Button mSubmitButton;
+
 //	@InjectView(R.id.location)
 //	EditText mLocationEditText;
 
@@ -67,6 +98,12 @@ public class AddSiteActivity extends BaseActivity {
 
 	// Provides the map view and related functionality
 	private AddSiteMapFragment mMapFragment;
+	
+	// The center of the map
+	private GeoPoint mMapCenter;
+	
+	// State variable to determine whether the 'Accept location' button has been pressed
+	private boolean mLocationAccepted = false;
 
 	// The POST request that submits the new Site
 //	private AddSiteRetrofitSpiceRequest mAddSiteRequest;
@@ -84,6 +121,28 @@ public class AddSiteActivity extends BaseActivity {
 
 		// Inject view member variables
 		ButterKnife.inject(this);
+		
+		LayoutTransition lt = mRootLayout.getLayoutTransition();
+		lt.addTransitionListener(new TransitionListener() {
+
+			@Override
+			public void endTransition(LayoutTransition arg0, ViewGroup arg1, View arg2, int arg3) {
+				// TODO Auto-generated method stub
+				if (mMapCenter != null) {
+					mMapFragment.goToLocation(mMapCenter);					
+				}
+			}
+
+			@Override
+			public void startTransition(LayoutTransition arg0, ViewGroup arg1, View arg2, int arg3) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+				
+		
+//		mAddPropertiesView.setVisibility(View.INVISIBLE);
 
 		// Create an ArrayAdapter using the string array and a default spinner
 		// layout
@@ -100,6 +159,7 @@ public class AddSiteActivity extends BaseActivity {
 		
 		this.zoomToMyLocation();
 		
+		// the mMyLocation member gets set in zoomToMyLocation
 		GeoPoint gp = new GeoPoint(mMyLocation);
 		mMapFragment.addNewSiteToMap(gp);
 		bus.post(new SitePlacedEvent(gp));
@@ -151,6 +211,77 @@ public class AddSiteActivity extends BaseActivity {
 			mMapFragment.scrollToLocation(mMyLocation);
 		}
 	}
+	
+	/**
+	 * Handler for user click on the "Accept location" button.
+	 * @param view
+	 */
+	@OnClick(R.id.accept_button)
+	public void onAcceptLocation(View view) {
+		Log.i(TAG, "onAcceptLocation");
+		
+		this.mLocationAccepted = true;
+		
+		int padding_in_dp = 20;
+		final float scale = getResources().getDisplayMetrics().density;
+		int padding_in_px = (int) (padding_in_dp * scale + 0.5f);
+		mMapWrapView.setPadding(padding_in_px, padding_in_px, padding_in_px, padding_in_px);
+
+//		ValueAnimator va = ValueAnimator.ofInt(padding_in_px, 0);
+//		va.setDuration(1000);
+//		va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//			public void onAnimationUpdate(ValueAnimator animation) {
+//				Integer value = (Integer) animation.getAnimatedValue();
+//				Log.i(TAG, "updating value: " + value);
+//				mMapWrapView.setPadding(value.intValue(), 0, value.intValue(), value.intValue());
+//				mMapWrapView.invalidate();
+//			}
+//		});
+//		va.start();
+		
+		mMapCenter = (GeoPoint) this.mMapFragment.getMapView().getMapCenter();
+//		Animation slideInAnim = AnimationUtils.loadAnimation(this, R.anim.add_properties_show);
+//		mAddPropertiesView.startAnimation(slideInAnim);
+		mAddPropertiesView.setAlpha(0);
+		mAddPropertiesView.setVisibility(View.VISIBLE);
+		mAddPropertiesView.animate().alpha(1).setDuration(500);
+		
+		mAddHeaderText.setVisibility(View.GONE);
+		mAcceptButton.setVisibility(View.GONE);
+		mSubmitButton.setVisibility(View.VISIBLE);
+	}
+	
+	/**
+	 * Override the back button press so that we can return to the previous state
+	 * within the activity.
+	 */
+	@Override
+	public void onBackPressed() {
+		if (this.mLocationAccepted) {
+			returnToAccept();
+		} else {
+			super.onBackPressed();
+		}
+	}
+	
+	/**
+	 * Return to the map-only pin dropping view.
+	 */
+	public void returnToAccept() {
+		Log.i(TAG, "onBackToAccept");
+		
+		mLocationAccepted = false;
+		
+		mMapCenter = (GeoPoint) this.mMapFragment.getMapView().getMapCenter();
+		int padding_in_dp = 20;
+	    final float scale = getResources().getDisplayMetrics().density;
+	    int padding_in_px = (int) (padding_in_dp * scale + 0.5f);
+		mMapWrapView.setPadding(padding_in_px, 0, padding_in_px, padding_in_px);
+		mAddPropertiesView.setVisibility(View.GONE);
+		mAddHeaderText.setVisibility(View.VISIBLE);
+		mAcceptButton.setVisibility(View.VISIBLE);
+		mSubmitButton.setVisibility(View.GONE);
+	}
 
 	/**
 	 * Click handler for "Add New Site" Button.
@@ -161,6 +292,7 @@ public class AddSiteActivity extends BaseActivity {
 	 * 
 	 * @param view
 	 */
+	@OnClick(R.id.add_button)
 	public void onAddNewSite(View view) {
 		Log.i(TAG, "Adding new site.");
 

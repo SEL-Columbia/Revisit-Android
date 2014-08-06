@@ -1,22 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:orientation="vertical" >
 
-    <fragment
-        android:id="@+id/fragment_map"
-        android:name="edu.columbia.sel.revisit.fragment.AddSiteMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/add_header_text_wrap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:text="@string/add_instructions_1"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:text="@string/add_instructions_2"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/map_wrap"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        android:background="@color/white"
+        android:paddingBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
+
+        <fragment
+            android:id="@+id/fragment_map"
+            android:name="edu.columbia.sel.revisit.fragment.AddSiteMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/add_properties"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
-        android:padding="10dp" >
+        android:padding="10dp"
+        android:visibility="gone" >
 
         <EditText
             android:id="@+id/name"
@@ -47,7 +88,8 @@
             android:textColorHint="@color/black"
             android:textSize="16sp" />
 
-        <!-- <LinearLayout
+        <!--
+        <LinearLayout
             android:id="@+id/location_wrap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,17 +113,27 @@
                 android:contentDescription="Use current location"
                 android:onClick="onPopulateLocationClick"
                 android:src="@drawable/ic_action_location_found" />
-        </LinearLayout> -->
+        </LinearLayout>
+        -->
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/accept_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gray_button"
+        android:text="@string/accept_location_button_text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/add_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
         android:background="@drawable/gray_button"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:onClick="onAddNewSite"
-        android:text="@string/submit_add_button_text" />
+        android:text="@string/submit_add_button_text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
 </LinearLayout>

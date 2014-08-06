@@ -107,9 +107,9 @@ public class AddSiteMapFragment extends BaseMapFragment {
 		
 		OverlayItem item = new OverlayItem("New Site", "Description", point);
 
-		Drawable background = this.getResources().getDrawable(R.drawable.ic_location_blue);
+		Drawable background = this.getResources().getDrawable(R.drawable.ic_mylocationmarker);
 		BitmapDrawable bmd = SiteMarker.createSiteMarker(
-				getResources(), "+", background);
+				getResources(), "", background);
 		item.setMarker(bmd);
 		item.setMarkerHotspot(HotspotPlace.CENTER);
 		mNewSiteMarkers.clear();

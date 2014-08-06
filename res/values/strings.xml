@@ -18,11 +18,15 @@
     
     
     <string name="add_button_text">Add new site</string>
-    <string name="submit_add_button_text">Submit</string>
+    <string name="submit_add_button_text">Submit site</string>
+    <string name="back_to_accept_button_text">Adjust location</string>
+    <string name="accept_location_button_text">Accept location</string>
     <string name="checkin_button">Select site</string>
     
     <string name="site_icon_desc">Site Type</string>
     <string name="add_site_title">Add New Site</string>
+    <string name="add_instructions_1">Your current location</string>
+    <string name="add_instructions_2">Tap map to move pin</string>
     <string name="add_site_name">Name</string>
     <string name="add_site_type">Type</string>
     <string name="add_site_sector">Sector</string>

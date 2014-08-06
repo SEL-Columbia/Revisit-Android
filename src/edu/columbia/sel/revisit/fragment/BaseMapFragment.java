@@ -125,7 +125,7 @@ public class BaseMapFragment extends BaseFragment {
 	 * @param loc
 	 */
 	public void goToLocation(Location loc) {
-		Log.i(TAG, "scrollToLocation");
+		Log.i(TAG, "goToLocation");
 		
 		if (loc == null) {
 			throw new RuntimeException("Location can not be null.");
@@ -133,6 +133,28 @@ public class BaseMapFragment extends BaseFragment {
 
 		final GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
 //		mMapCon.setCenter(point);
+		// HACK! See https://github.com/osmdroid/osmdroid/issues/22
+		// TODO: This should be removed when osmdroid is updated.
+		new Handler(Looper.getMainLooper()).post(
+		    new Runnable() {
+		        public void run() {
+		        	mMapCon.animateTo(point);
+		        }
+		    }
+		);
+	}
+	
+	/**
+	 * Change the map to the specified location immediately, specified by GeoPoint.
+	 * @param GeoPoint
+	 */
+	public void goToLocation(final GeoPoint point) {
+		Log.i(TAG, "goToLocation");
+		
+		if (point == null) {
+			throw new RuntimeException("GeoPoint can not be null.");
+		}
+
 		// HACK! See https://github.com/osmdroid/osmdroid/issues/22
 		// TODO: This should be removed when osmdroid is updated.
 		new Handler(Looper.getMainLooper()).post(
