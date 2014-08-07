@@ -184,6 +184,7 @@ public class AddSiteActivity extends BaseActivity {
 			return true;
 		case R.id.action_mylocation:
 			placePinAtMyLocation();
+			zoomToMyLocation();
 			return true;
 		case R.id.action_settings:
 			// openSettings();

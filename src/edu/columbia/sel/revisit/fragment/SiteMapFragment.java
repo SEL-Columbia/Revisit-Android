@@ -30,12 +30,14 @@ import edu.columbia.sel.revisit.osm.SiteOverlayItem;
 import edu.columbia.sel.revisit.resource.SiteMarker;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -120,6 +122,10 @@ public class SiteMapFragment extends BaseMapFragment {
         				// Grab the S associated with this marker
         				SiteOverlayItem facItem = (SiteOverlayItem) item;
         				Log.i(TAG, "CLICKED -------> " + facItem.getSite().getName());
+        				
+        				getActivity();
+						Vibrator myVib = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        				myVib.vibrate(100);
         				
         				// Post an event containing the clicked Site
         				bus.post(new SiteSelectedEvent(facItem.getSite()));

@@ -20,6 +20,7 @@ import edu.columbia.sel.revisit.model.SiteList;
 import edu.columbia.sel.revisit.osm.SiteIconOverlay;
 import edu.columbia.sel.revisit.osm.SiteOverlayItem;
 import edu.columbia.sel.revisit.resource.SiteMarker;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -186,10 +187,11 @@ public class AddSiteMapFragment extends BaseMapFragment {
                     public boolean onItemSingleTapUp(final int index,
                             final OverlayItem item) {
         				
-        				// Haptic response... added because it's hard to tell exactly when your finger
+        				getActivity();
+						// Haptic response... added because it's hard to tell exactly when your finger
         				// hits the marker.
-        				Vibrator myVib = (Vibrator) getActivity().getSystemService(getActivity().VIBRATOR_SERVICE);
-        				myVib.vibrate(50);
+        				Vibrator myVib = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        				myVib.vibrate(100);
         				
         				// Grab the Site associated with this marker
         				SiteOverlayItem facItem = (SiteOverlayItem) item;
