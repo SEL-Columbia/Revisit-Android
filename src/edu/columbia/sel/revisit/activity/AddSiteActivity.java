@@ -159,10 +159,6 @@ public class AddSiteActivity extends BaseActivity {
 		
 		this.zoomToMyLocation();
 		
-		// the mMyLocation member gets set in zoomToMyLocation
-		GeoPoint gp = new GeoPoint(mMyLocation);
-		mMapFragment.addNewSiteToMap(gp);
-		bus.post(new SitePlacedEvent(gp));
 	}
 
 	@Override
@@ -175,7 +171,7 @@ public class AddSiteActivity extends BaseActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.maplist_menu, menu);
+		inflater.inflate(R.menu.add_menu, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -209,6 +205,10 @@ public class AddSiteActivity extends BaseActivity {
 			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
 		} else {
 			mMapFragment.scrollToLocation(mMyLocation);
+			// the mMyLocation member gets set in zoomToMyLocation
+			GeoPoint gp = new GeoPoint(mMyLocation);
+			mMapFragment.addNewSiteToMap(gp);
+			bus.post(new SitePlacedEvent(gp));
 		}
 	}
 	

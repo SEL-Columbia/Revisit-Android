@@ -147,7 +147,8 @@ public class SiteMapFragment extends BaseMapFragment {
 	 * @param event
 	 */
 	@Subscribe public void handleSitesLoaded(SitesLoadedEvent event) {
-		Log.i(TAG, "handleSitesLoaded");
+		SiteList sites = event.getSites();
+		Log.i(TAG, "handleSitesLoaded: " + sites.size());
 		this.clearSitesFromMap();
 		this.addSitesToMap(event.getSites());
 	}

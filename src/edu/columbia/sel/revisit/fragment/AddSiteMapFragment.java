@@ -215,6 +215,12 @@ public class AddSiteMapFragment extends BaseMapFragment {
         this.refreshNewSiteOverlay();
 	}
 	
+	
+	
+	
+	
+	
+	
 	/**
 	 * When the known Sites have loaded, clear the map then draw them. 
 	 * @param event

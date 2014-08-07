@@ -272,11 +272,12 @@ public class SiteMapListActivity extends BaseActivity {
 	 */
 	@Subscribe
 	public void handleSitesLoaded(SitesLoadedEvent event) {
-		Log.i(TAG, "handleSitesLoaded");
+		mSites = event.getSites();
+
+		Log.i(TAG, "handleSitesLoaded: " + mSites.size());
 
 		progressDialog.dismiss();
 
-		mSites = event.getSites();
 
 		if (mSites.size() == 0) {
 			// no sites were found, notify user
