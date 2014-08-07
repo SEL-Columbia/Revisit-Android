@@ -17,6 +17,7 @@ import edu.columbia.sel.revisit.event.SitesLoadedEvent;
 import edu.columbia.sel.revisit.event.SitePlacedEvent;
 import edu.columbia.sel.revisit.model.Site;
 import edu.columbia.sel.revisit.model.SiteList;
+import edu.columbia.sel.revisit.osm.SiteIconOverlay;
 import edu.columbia.sel.revisit.osm.SiteOverlayItem;
 import edu.columbia.sel.revisit.resource.SiteMarker;
 import android.graphics.Canvas;
@@ -74,12 +75,12 @@ public class AddSiteMapFragment extends BaseMapFragment {
 			
 			@Override
 			public boolean onSingleTapConfirmed(MotionEvent event, MapView mapView) {
-				int x = (int) event.getX();
-				int y = (int) event.getY();
-				Projection projection = mapView.getProjection();
-				GeoPoint tappedGeoPoint = (GeoPoint) projection.fromPixels(x, y);
-				bus.post(new SitePlacedEvent(tappedGeoPoint));
-				addNewSiteToMap(tappedGeoPoint);
+//				int x = (int) event.getX();
+//				int y = (int) event.getY();
+//				Projection projection = mapView.getProjection();
+//				GeoPoint tappedGeoPoint = (GeoPoint) projection.fromPixels(x, y);
+//				bus.post(new SitePlacedEvent(tappedGeoPoint));
+//				addNewSiteToMap(tappedGeoPoint);
 				return true;
 			}
 
@@ -111,13 +112,13 @@ public class AddSiteMapFragment extends BaseMapFragment {
 		BitmapDrawable bmd = SiteMarker.createSiteMarker(
 				getResources(), "", background);
 		item.setMarker(bmd);
-		item.setMarkerHotspot(HotspotPlace.CENTER);
+		item.setMarkerHotspot(HotspotPlace.BOTTOM_CENTER);
 		mNewSiteMarkers.clear();
 		mNewSiteMarkers.add(item);
 		
 		/* OnTapListener for the Markers, shows a simple Toast. */
-        this.mSiteOverlay = new ItemizedIconOverlay<OverlayItem>(mNewSiteMarkers,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+        this.mSiteOverlay = new SiteIconOverlay(mNewSiteMarkers,
+                new SiteIconOverlay.OnItemGestureListener<OverlayItem>() {
                     
         			@Override
                     public boolean onItemSingleTapUp(final int index,
@@ -134,7 +135,7 @@ public class AddSiteMapFragment extends BaseMapFragment {
                         return false;
                     }
                     
-                }, mResourceProxy);
+                }, mResourceProxy, this.getActivity());
         
         // Add the overlays to the map
         this.refreshNewSiteOverlay();
@@ -173,7 +174,7 @@ public class AddSiteMapFragment extends BaseMapFragment {
 			Drawable background = this.getResources().getDrawable(R.drawable.ic_location_green);
 			BitmapDrawable bmd = SiteMarker.createSiteMarker(getResources(), "", background);
 			item.setMarker(bmd);
-			item.setMarkerHotspot(HotspotPlace.CENTER);
+			item.setMarkerHotspot(HotspotPlace.BOTTOM_CENTER);
 			markers.add(item);
 		}
 		

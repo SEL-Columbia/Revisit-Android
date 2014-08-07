@@ -190,7 +190,11 @@ public class BaseMapFragment extends BaseFragment {
 	}
 
 	public void postMapChangedEvent() {
-		BoundingBoxE6 bb = mMapView.getBoundingBox();
-		bus.post(new MapChangedEvent(bb));
+		if (mMapView != null) {
+			BoundingBoxE6 bb = mMapView.getBoundingBox();			
+			if (bb != null) {
+				bus.post(new MapChangedEvent(bb));			
+			}
+		}
 	}
 }

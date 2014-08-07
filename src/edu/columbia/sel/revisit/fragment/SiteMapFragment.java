@@ -105,7 +105,7 @@ public class SiteMapFragment extends BaseMapFragment {
 			
 			BitmapDrawable bmd = SiteMarker.createSiteMarker(getResources(), String.valueOf(i+1), background);
 			item.setMarker(bmd);
-			item.setMarkerHotspot(HotspotPlace.CENTER);
+			item.setMarkerHotspot(HotspotPlace.BOTTOM_CENTER);
 			markers.add(item);
 		}
 		

@@ -158,7 +158,7 @@ public class AddSiteActivity extends BaseActivity {
 		mMapFragment = (AddSiteMapFragment) fragmentManager.findFragmentById(R.id.fragment_map);
 		
 		this.zoomToMyLocation();
-		
+		this.placePinAtMyLocation();
 	}
 
 	@Override
@@ -183,7 +183,7 @@ public class AddSiteActivity extends BaseActivity {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.action_mylocation:
-			zoomToMyLocation();
+			placePinAtMyLocation();
 			return true;
 		case R.id.action_settings:
 			// openSettings();
@@ -205,11 +205,17 @@ public class AddSiteActivity extends BaseActivity {
 			Toast.makeText(this, "Current location cannot be determined.", Toast.LENGTH_SHORT).show();
 		} else {
 			mMapFragment.scrollToLocation(mMyLocation);
-			// the mMyLocation member gets set in zoomToMyLocation
-			GeoPoint gp = new GeoPoint(mMyLocation);
-			mMapFragment.addNewSiteToMap(gp);
-			bus.post(new SitePlacedEvent(gp));
 		}
+	}
+	
+	/**
+	 * Place the site location pin at my current location
+	 */
+	private void placePinAtMyLocation() {
+		// the mMyLocation member gets set in zoomToMyLocation
+		GeoPoint gp = new GeoPoint(mMyLocation);
+		mMapFragment.addNewSiteToMap(gp);
+		bus.post(new SitePlacedEvent(gp));
 	}
 	
 	/**

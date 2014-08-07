@@ -70,7 +70,7 @@ public class SiteDetailActivity extends BaseActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    // Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.maplist_menu, menu);
+	    inflater.inflate(R.menu.details_menu, menu);
 	    return super.onCreateOptionsMenu(menu);
 	}
 	

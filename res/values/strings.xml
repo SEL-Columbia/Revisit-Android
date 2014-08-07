@@ -26,7 +26,7 @@
     <string name="site_icon_desc">Site Type</string>
     <string name="add_site_title">Add New Site</string>
     <string name="add_instructions_1">Your current location</string>
-    <string name="add_instructions_2">Tap map to move pin</string>
+    <string name="add_instructions_2">Drag pin to adjust location</string>
     <string name="add_site_name">Name</string>
     <string name="add_site_type">Type</string>
     <string name="add_site_sector">Sector</string>
