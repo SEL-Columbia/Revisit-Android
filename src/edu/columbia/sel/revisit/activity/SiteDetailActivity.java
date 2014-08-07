@@ -55,27 +55,27 @@ import android.support.v4.view.ViewPager;
 public class SiteDetailActivity extends BaseActivity {
 
 	// Use ButterKnife to inject views
-//	@InjectView(R.id.detail_image_progress)
-//	ProgressBar mSiteImageProgressView;
-	
+	// @InjectView(R.id.detail_image_progress)
+	// ProgressBar mSiteImageProgressView;
+
 	@InjectView(R.id.detail_image_frame)
 	LinearLayout mImageLayout;
-	
+
 	@InjectView(R.id.image_pager)
 	ViewPager mImagePager;
-	
+
 	@InjectView(R.id.detail_site_sector)
 	TextView mSiteSectorView;
 
 	@InjectView(R.id.no_images_text)
 	TextView mNoImagesTextView;
-	
+
 	@InjectView(R.id.site_sector_icon)
 	ImageView mSiteSectorIconView;
-	
+
 	@InjectView(R.id.detail_site_type)
 	TextView mSiteTypeView;
-	
+
 	@InjectView(R.id.detail_site_visits)
 	TextView mSiteVisitsView;
 
@@ -196,24 +196,40 @@ public class SiteDetailActivity extends BaseActivity {
 		if (mStorageDir.isDirectory() && mStorageDir.listFiles().length > 0) {
 			// presumably we have images of this place.
 			File[] listing = mStorageDir.listFiles();
-			mPagerAdapter.clearImages();
-			
-//			ArrayList<String> images = new ArrayList<String>();
 			
 			for (File child : listing) {
-//				images.add(child.getAbsolutePath());
-				mPagerAdapter.addImage(child.getAbsolutePath());
+				// images.add(child.getAbsolutePath());
+				addImageToPager(child.getAbsolutePath(), false);
 			}
-//			mPagerAdapter.reverseImages();
-//			Collections.reverse(images);
-//			mPagerAdapter.setImages(images);
-			mPagerAdapter.notifyDataSetChanged();
+			mImagePager.setCurrentItem(0, false);
 			mNoImagesTextView.setVisibility(View.GONE);
 			mImagePager.setVisibility(View.VISIBLE);
 		} else {
 			Log.i(TAG, "No photos found for this Site.");
 			mNoImagesTextView.setVisibility(View.VISIBLE);
 			mImagePager.setVisibility(View.GONE);
+		}
+
+	}
+	
+	/**
+	 * Add a single image view to the pager view.
+	 * @param path
+	 */
+	private void addImageToPager(String path, Boolean setToCurrent) {
+		ImageView imageView = new ImageView(this);
+		int padding = 0;
+		imageView.setPadding(padding, padding, padding, padding);
+		imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+				
+		Bitmap bitmap = preparePhoto(path);
+		imageView.setImageBitmap(bitmap);
+		
+		int pageIndex = mPagerAdapter.prependView(imageView);
+		mPagerAdapter.notifyDataSetChanged();
+		
+		if (setToCurrent) {
+			mImagePager.setCurrentItem (pageIndex, false);			
 		}
 
 	}
@@ -245,7 +261,7 @@ public class SiteDetailActivity extends BaseActivity {
 			// The Intent is empty, but we can assume success...
 			// setPic();
 			// galleryAddPic();
-			this.displayImages();
+			this.addImageToPager(mCurrentPhotoPath, true);
 		}
 		// File img = new File(mCurrentPhotoUri);
 		// sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
@@ -364,38 +380,115 @@ public class SiteDetailActivity extends BaseActivity {
 
 	private class ImagePagerAdapter extends PagerAdapter {
 		private ArrayList<String> mImages = new ArrayList<String>();
-//		private ArrayDeque<String> mImages = new ArrayDeque<String>();
 
-		public void reverseImages() {
-			Collections.reverse(mImages);
-		}
-		
-		public void clearImages() {
-			mImages.clear();
-		}
-		
-		public void prependImage(String first) {
-			mImages.add(0, first);
-		}
-		
-		public void addImage(String path) {
-			mImages.add(path);
-		}
+		private ArrayList<View> mImageViews = new ArrayList<View>();
 
-		public void removeImage(String path) {
-			mImages.remove(path);
+		// private ArrayDeque<String> mImages = new ArrayDeque<String>();
+
+		@Override
+		public int getItemPosition(Object object) {
+			int index = mImageViews.indexOf(object);
+			if (index == -1)
+				return POSITION_NONE;
+			else
+				return index;
+		}
+		
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+			View v = mImageViews.get(position);
+			container.addView(v);
+			return v;
+		}
+		
+		// -----------------------------------------------------------------------------
+		// Used by ViewPager. Called when ViewPager no longer needs a page to
+		// display; it
+		// is our job to remove the page from the container, which is normally
+		// the
+		// ViewPager itself. Since all our pages are persistent, we do nothing
+		// to the
+		// contents of our "views" ArrayList.
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			container.removeView(mImageViews.get(position));
 		}
 
 		@Override
 		public int getCount() {
-			return mImages.size();
+			return mImageViews.size();
 		}
 
 		@Override
 		public boolean isViewFromObject(View view, Object object) {
 			return view == ((ImageView) object);
 		}
+		
+		// -----------------------------------------------------------------------------
+		// Add "view" to right end of "views".
+		// Returns the position of the new view.
+		// The app should call this to add pages; not used by ViewPager.
+		public int addView(View v) {
+			return addView(v, mImageViews.size());
+		}
+		
+		/**
+		 * Add view to the front of the list.
+		 * @param v
+		 * @return
+		 */
+		public int prependView(View v) {
+			return addView(v, 0);
+		}
+		
+		// -----------------------------------------------------------------------------
+		// Add "view" at "position" to "views".
+		// Returns position of new view.
+		// The app should call this to add pages; not used by ViewPager.
+		public int addView(View v, int position) {
+			mImageViews.add(position, v);
+			return position;
+		}
 
+		// -----------------------------------------------------------------------------
+		// Removes "view" from "views".
+		// Retuns position of removed view.
+		// The app should call this to remove pages; not used by ViewPager.
+		public int removeView(ViewPager pager, View v) {
+			return removeView(pager, mImageViews.indexOf(v));
+		}
+
+		// -----------------------------------------------------------------------------
+		// Removes the "view" at "position" from "views".
+		// Retuns position of removed view.
+		// The app should call this to remove pages; not used by ViewPager.
+		public int removeView(ViewPager pager, int position) {
+			// ViewPager doesn't have a delete method; the closest is to set the
+			// adapter
+			// again. When doing so, it deletes all its views. Then we can
+			// delete the view
+			// from from the adapter and finally set the adapter to the pager
+			// again. Note
+			// that we set the adapter to null before removing the view from
+			// "views" - that's
+			// because while ViewPager deletes all its views, it will call
+			// destroyItem which
+			// will in turn cause a null pointer ref.
+			pager.setAdapter(null);
+			mImageViews.remove(position);
+			pager.setAdapter(this);
+
+			return position;
+		}
+
+		// -----------------------------------------------------------------------------
+		// Returns the "view" at "position".
+		// The app should call this to retrieve a view; not used by ViewPager.
+		public View getView(int position) {
+			return mImageViews.get(position);
+		}
+		
+		/*
 		@Override
 		public Object instantiateItem(ViewGroup container, int position) {
 			Context context = SiteDetailActivity.this;
@@ -412,11 +505,8 @@ public class SiteDetailActivity extends BaseActivity {
 			((ViewPager) container).addView(imageView, position);
 			return imageView;
 		}
+		 */
 
-		@Override
-		public void destroyItem(ViewGroup container, int position, Object object) {
-			((ViewPager) container).removeView((ImageView) object);
-		}
 
 		/**
 		 * TODO: We should cache these rather than having them generated on
