@@ -31,6 +31,10 @@
     <string name="add_site_type">Type</string>
     <string name="add_site_sector">Sector</string>
     <string name="add_site_location">Location</string>
+    
+    <string name="capture_image">Add photo</string>
+    <string name="no_images">No images are available for this site.</string>
+    
 
     
     <!-- Splash -->

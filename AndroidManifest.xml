@@ -19,6 +19,10 @@
     <!-- <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" /> -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <application
         android:name="edu.columbia.sel.revisit.RevisitApplication"
         android:allowBackup="true"
