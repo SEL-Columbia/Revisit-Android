@@ -16,9 +16,11 @@ import edu.columbia.sel.revisit.R;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import edu.columbia.sel.revisit.api.UpdateSiteRetrofitSpiceRequest;
 import edu.columbia.sel.revisit.model.Site;
+import edu.columbia.sel.revisit.resource.util.BitmapUtils;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -191,8 +193,11 @@ public class SiteDetailActivity extends BaseActivity {
 		this.mSiteVisitsView.setText(site.getProperties().getVisits() + " Visits");
 	}
 
+	/**
+	 * If there is a storage directory for this Site, grab the files therein
+	 * and add them to the image Pager. 
+	 */
 	private void displayImages() {
-		// Picasso is a nifty library for downloading and caching images.
 		if (mStorageDir.isDirectory() && mStorageDir.listFiles().length > 0) {
 			// presumably we have images of this place.
 			File[] listing = mStorageDir.listFiles();
@@ -221,11 +226,14 @@ public class SiteDetailActivity extends BaseActivity {
 		int padding = 0;
 		imageView.setPadding(padding, padding, padding, padding);
 		imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-				
-		Bitmap bitmap = preparePhoto(path);
-		imageView.setImageBitmap(bitmap);
 		
-		int pageIndex = mPagerAdapter.prependView(imageView);
+		Log.i(TAG, "Adding Image: " + path);
+		
+//		Bitmap bitmap = preparePhoto(path);
+//		imageView.setImageBitmap(
+//				BitmapUtils.decodeSampledBitmapFromFile(path, 100, 100));
+//		
+		int pageIndex = mPagerAdapter.prependView(imageView, path);
 		mPagerAdapter.notifyDataSetChanged();
 		
 		if (setToCurrent) {
@@ -378,10 +386,15 @@ public class SiteDetailActivity extends BaseActivity {
 		finish();
 	}
 
+	
+	
+	
+	
 	private class ImagePagerAdapter extends PagerAdapter {
-		private ArrayList<String> mImages = new ArrayList<String>();
 
 		private ArrayList<View> mImageViews = new ArrayList<View>();
+		
+		private ArrayList<String> mImagePaths = new ArrayList<String>();
 
 		// private ArrayDeque<String> mImages = new ArrayDeque<String>();
 
@@ -396,8 +409,11 @@ public class SiteDetailActivity extends BaseActivity {
 		
 		@Override
 		public Object instantiateItem(ViewGroup container, int position) {
-			View v = mImageViews.get(position);
-			container.addView(v);
+			ImageView v = (ImageView) mImageViews.get(position);
+	        loadImage(v, mImagePaths.get(position));
+	        container.addView(v);
+//	        return pagerItem;
+//			container.addView(v);
 			return v;
 		}
 		
@@ -428,25 +444,27 @@ public class SiteDetailActivity extends BaseActivity {
 		// Add "view" to right end of "views".
 		// Returns the position of the new view.
 		// The app should call this to add pages; not used by ViewPager.
-		public int addView(View v) {
-			return addView(v, mImageViews.size());
-		}
+//		public int addView(View v) {
+//			return addView(v, mImageViews.size());
+//		}
 		
 		/**
 		 * Add view to the front of the list.
 		 * @param v
 		 * @return
 		 */
-		public int prependView(View v) {
-			return addView(v, 0);
+		public int prependView(View v, String path) {
+//			loadImage((ImageView) v, path);
+			return addView(v, path, 0);
 		}
 		
 		// -----------------------------------------------------------------------------
 		// Add "view" at "position" to "views".
 		// Returns position of new view.
 		// The app should call this to add pages; not used by ViewPager.
-		public int addView(View v, int position) {
+		public int addView(View v, String path, int position) {
 			mImageViews.add(position, v);
+			mImagePaths.add(position, path);
 			return position;
 		}
 
@@ -507,6 +525,51 @@ public class SiteDetailActivity extends BaseActivity {
 		}
 		 */
 
+		private void loadImage(ImageView imageView, String path) {
+			Log.i(TAG, "loading image: " + path);
+			Picasso.with(SiteDetailActivity.this)
+			    .load(new File(path))
+			    .transform(getFitHeightTransformation())
+//			    .placeholder(R.drawable.user_placeholder)
+//			    .error(R.drawable.user_placeholder_error)
+			    .into(imageView, new Callback() {
+			    	
+			    	@Override
+			    	public void onSuccess() {
+			    		Log.i(TAG, "Successfully loaded image.");
+			    	}
+
+					@Override
+					public void onError() {
+						// TODO Auto-generated method stub
+						Log.i(TAG, "Gall darnit!");
+					}
+			    });
+		}
+		
+		private Transformation getFitHeightTransformation() {
+			Transformation transformation = new Transformation() {
+
+                @Override public Bitmap transform(Bitmap source) {
+                    int targetHeight = mImagePager.getHeight();
+
+                    double aspectRatio = (double) source.getHeight() / (double) source.getWidth();
+                    int targetWidth = (int) (targetHeight / aspectRatio);
+                    Bitmap result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false);
+                    if (result != source) {
+                        // Same bitmap is returned if sizes are the same
+                        source.recycle();
+                    }
+                    return result;
+                }
+
+                @Override public String key() {
+                    return "transformation" + " desiredWidth";
+                }
+            };
+            
+            return transformation;
+		}
 
 		/**
 		 * TODO: We should cache these rather than having them generated on
