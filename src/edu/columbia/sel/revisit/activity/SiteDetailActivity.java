@@ -169,21 +169,29 @@ public class SiteDetailActivity extends BaseActivity {
 		this.setTitle(site.getName());
 
 		String sector = site.getProperties().getSector();
+		int red = getResources().getColor(R.color.sel_red);
+		int blue = getResources().getColor(R.color.sel_blue);
+		int green = getResources().getColor(R.color.sel_green);
+		int orange = getResources().getColor(R.color.sel_orange);
 
 		Log.i(TAG, "sector -----------> " + sector + " <-----------");
 
 		if (sector.equals("health")) {
 			Log.i(TAG, " -----------> health! <-----------");
 			this.mSiteSectorIconView.setImageResource(R.drawable.ic_health);
+			mSiteVisitsView.setTextColor(red);
 		} else if (sector.equals("energy")) {
 			Log.i(TAG, " -----------> energy! <-----------");
 			this.mSiteSectorIconView.setImageResource(R.drawable.ic_energy);
+			mSiteVisitsView.setTextColor(green);
 		} else if (sector.equals("education")) {
 			Log.i(TAG, " -----------> education! <-----------");
 			this.mSiteSectorIconView.setImageResource(R.drawable.ic_education);
+			mSiteVisitsView.setTextColor(orange);
 		} else if (sector.equals("water")) {
 			Log.i(TAG, " -----------> water! <-----------");
 			this.mSiteSectorIconView.setImageResource(R.drawable.ic_water);
+			mSiteVisitsView.setTextColor(blue);
 		}
 		// this.mSiteImageView.invalidate();
 		this.mSiteTypeView.setText(site.getProperties().getType());
@@ -267,13 +275,10 @@ public class SiteDetailActivity extends BaseActivity {
 		Log.i(TAG, "onActivityResult() : " + requestCode + ", " + resultCode);
 		if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
 			// The Intent is empty, but we can assume success...
-			// setPic();
-			// galleryAddPic();
+			mNoImagesTextView.setVisibility(View.GONE);
+			mImagePager.setVisibility(View.VISIBLE);
 			this.addImageToPager(mCurrentPhotoPath, true);
 		}
-		// File img = new File(mCurrentPhotoUri);
-		// sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-		// Uri.fromFile(img)));
 	}
 
 	/**
