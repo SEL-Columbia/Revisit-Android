@@ -1,5 +1,9 @@
 package edu.columbia.sel.revisit.activity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 import edu.columbia.sel.revisit.R;
@@ -16,6 +20,9 @@ import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Picasso.LoadedFrom;
+import com.squareup.picasso.Target;
 
 import edu.columbia.sel.grout.Grout;
 import edu.columbia.sel.grout.TileFetchingListener;
@@ -26,7 +33,10 @@ import edu.columbia.sel.grout.util.DeleterListener;
 import edu.columbia.sel.revisit.api.SitesWithinRetrofitSpiceRequest;
 import edu.columbia.sel.revisit.event.DeviceOfflineEvent;
 import edu.columbia.sel.revisit.event.LocationChangedEvent;
+import edu.columbia.sel.revisit.model.Site;
 import edu.columbia.sel.revisit.model.SiteList;
+import edu.columbia.sel.revisit.resource.PhotoManager;
+import edu.columbia.sel.revisit.resource.util.BitmapUtils;
 import edu.columbia.sel.revisit.service.LocationService;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -37,9 +47,12 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -69,7 +82,7 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 	private BoundingBoxE6 mBoundingBox;
 	private boolean mDoDownload = false;
-	
+
 	private boolean mDoZoomToMyLocation = true;
 
 	// RoboSpice request object to handle fetching of Sites within the
@@ -224,25 +237,26 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		super.onStop();
 		Log.i(TAG, "------------> onStop()");
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		// TODO: this doesn't work.
-//		mMyLocation = LocationService.getCurrentLocation();
-////		Log.i(TAG, "mMyLocation ------- " + mMyLocation.toString());
-//		
-//		
-////		mMyLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//		if (mMyLocation != null) {
-//			this.zoomToMyLocation();
-//		}
+		// mMyLocation = LocationService.getCurrentLocation();
+		// // Log.i(TAG, "mMyLocation ------- " + mMyLocation.toString());
+		//
+		//
+		// // mMyLocation =
+		// lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		// if (mMyLocation != null) {
+		// this.zoomToMyLocation();
+		// }
 	}
 
-//	@Override
-//	public void onBackPressed() {
-//		
-//	}
+	// @Override
+	// public void onBackPressed() {
+	//
+	// }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -286,6 +300,51 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 				String.valueOf(n), String.valueOf(e));
 		getSpiceManager()
 				.execute(mSitesWithinRequest, "sites", DurationInMillis.ONE_SECOND, new SitesRequestListener());
+	}
+
+	private void fetchPhotos(SiteList sites) {
+		// TODO Auto-generated method stub
+		if (sites == null) {
+			return;
+		}
+		for (final Site s : sites) {
+			ArrayList<String> urls = (ArrayList<String>) s.getProperties().getPhotoUrls();
+			for (int i = 0; i < urls.size(); i++) {
+				String url = urls.get(i);
+				final int pos = i;
+				if (url != null) {
+					Log.i(TAG, "downloading image: " + url);
+					Picasso.with(this).load(url).into(new Target() {
+
+						@Override
+						public void onBitmapFailed(Drawable arg0) {
+							Toast.makeText(SelectOfflineAreaActivity.this, "Error downloading Site photo.",
+									Toast.LENGTH_SHORT).show();
+						}
+
+						@Override
+						public void onBitmapLoaded(Bitmap photo, LoadedFrom from) {
+							String dirPath = Environment.getExternalStorageDirectory().toString() + File.separator
+									+ "revisit" + File.separator + "photos" + File.separator + s.get_id();
+							File dir = new File(dirPath);
+							if (!dir.mkdirs()) {
+								Log.e(TAG, "Directory might already exist.");
+							}
+							String path = dirPath + File.separator + pos + ".jpg";
+							
+							BitmapUtils.saveBitmapToFile(photo, path);
+						}
+
+						@Override
+						public void onPrepareLoad(Drawable arg0) {
+							// TODO Auto-generated method stub
+
+						}
+
+					});
+				}
+			}
+		}
 	}
 
 	@OnClick(R.id.download_button)
@@ -395,19 +454,17 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		}
 
 		final GeoPoint point = new GeoPoint(loc.getLatitude(), loc.getLongitude());
-//		mMapCon.animateTo(point);
-		
+		// mMapCon.animateTo(point);
+
 		// HACK! See https://github.com/osmdroid/osmdroid/issues/22
 		// TODO: This should be removed when osmdroid is updated.
-		new Handler(Looper.getMainLooper()).post(
-		    new Runnable() {
-		        public void run() {
-		        	mMapCon.animateTo(point);
-		        }
-		    }
-		);
-		
-//		mMapCon.setCenter(point);
+		new Handler(Looper.getMainLooper()).post(new Runnable() {
+			public void run() {
+				mMapCon.animateTo(point);
+			}
+		});
+
+		// mMapCon.setCenter(point);
 	}
 
 	/**
@@ -419,18 +476,19 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	@Subscribe
 	public void handleLocationChanged(LocationChangedEvent event) {
 		Log.i(TAG, "handleLocationChanged - SELECT OFFLINE AREA ACTIVITY");
-		
+
 		// always set the current location so that the user can zoom back to it
 		mMyLocation = event.getLocation();
-		
-		// but only automatically zoom to the user's location when the activity first loads.
+
+		// but only automatically zoom to the user's location when the activity
+		// first loads.
 		if (this.mDoZoomToMyLocation) {
 			this.zoomToMyLocation();
 			mDoZoomToMyLocation = false;
 		}
 
 	}
-	
+
 	/**
 	 * Handle LocationChangedEvent, fired when the application detects a new
 	 * user location.
@@ -440,11 +498,10 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	@Subscribe
 	public void handleDeviceOfflineEvent(DeviceOfflineEvent event) {
 		Log.i(TAG, "handleDeviceOfflineEvent");
-		
+
 		// Alert the user that the download has completed successfully.
 		AlertDialog.Builder builder = new AlertDialog.Builder(SelectOfflineAreaActivity.this);
-		builder.setMessage("Please connect to a network and try again.")
-				.setTitle("Device Offline");
+		builder.setMessage("Please connect to a network and try again.").setTitle("Device Offline");
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				// User clicked OK button
@@ -453,8 +510,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		});
 		AlertDialog dialog = builder.create();
 		dialog.show();
-		
-//		Toast.makeText(this, "The device is not currently online.", Toast.LENGTH_SHORT).show();
+
+		// Toast.makeText(this, "The device is not currently online.",
+		// Toast.LENGTH_SHORT).show();
 	}
 
 	// ============================================================================================
@@ -479,7 +537,8 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		public void onRequestSuccess(final SiteList result) {
 			Log.i(TAG, "00000000000 Sites Loaded: " + result.size());
 			mSiteRepository.persistSites(result);
+
+			fetchPhotos(result);
 		}
-		// bus.post(new SitesLoadedEvent(result));
 	}
 }

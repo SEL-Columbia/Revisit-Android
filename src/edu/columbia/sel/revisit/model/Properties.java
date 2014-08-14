@@ -1,7 +1,10 @@
 package edu.columbia.sel.revisit.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,6 +27,8 @@ public class Properties {
 	private String type;
 	@JsonProperty("visits")
 	private Integer visits;
+	@JsonProperty("photoUrls")
+	private List<String> photoUrls; 
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	@JsonProperty("sector")
@@ -54,6 +59,16 @@ public class Properties {
 	@JsonProperty("visits")
 	public void setVisits(Integer visits) {
 		this.visits = visits;
+	}
+	
+	@JsonProperty("photoUrls")
+	public List<String> getPhotoUrls() {
+		return photoUrls;
+	}
+
+	@JsonProperty("photoUrls")
+	public void setPhotoUrls(List<String> photoUrls) {
+		this.photoUrls = photoUrls;
 	}
 
 	@JsonAnyGetter

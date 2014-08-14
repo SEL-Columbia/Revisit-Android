@@ -13,6 +13,8 @@ import com.octo.android.robospice.retrofit.RetrofitJackson2SpiceService;
  */
 public class SiteRetrofitSpiceService extends RetrofitJackson2SpiceService {
 
+	// Default server 
+	// TODO: set the final default base url, if one exists
 	private static String BASE_URL = "http://23.21.86.131:3000/api/v1";
 
     @Override

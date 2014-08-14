@@ -93,7 +93,7 @@ public abstract class BaseActivity extends Activity {
 		}
 		
 		// we should persist our in-memory Site list
-		mSiteRepository.persistSites();
+		mSiteRepository.persistInMemorySitesToDisk();
 		
 		bus.unregister(this);
 	}

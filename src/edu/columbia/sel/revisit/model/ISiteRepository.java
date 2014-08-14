@@ -6,7 +6,7 @@ public interface ISiteRepository {
 	 * Persists the list of Sites currently in memory.
 	 * @param sites
 	 */
-	public boolean persistSites();
+	public boolean persistInMemorySitesToDisk();
 	
 	/**
 	 * Persists a list of Sites.

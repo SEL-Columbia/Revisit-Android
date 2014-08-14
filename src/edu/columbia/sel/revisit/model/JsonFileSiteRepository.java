@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,6 +24,7 @@ import com.squareup.otto.Bus;
 
 import edu.columbia.sel.revisit.RevisitApplication;
 import edu.columbia.sel.revisit.annotation.ForApplication;
+import edu.columbia.sel.revisit.api.AddSitePhotoRetrofitSpiceRequest;
 import edu.columbia.sel.revisit.api.AddSiteRetrofitSpiceRequest;
 import edu.columbia.sel.revisit.api.UpdateSiteRetrofitSpiceRequest;
 import edu.columbia.sel.revisit.event.ExternalStorageNotReadableEvent;
@@ -45,8 +47,8 @@ public class JsonFileSiteRepository implements ISiteRepository {
 
 	@Inject
 	SpiceManager mSpiceManager;
-	
-//	@Inject
+
+	// @Inject
 	Bus mBus;
 
 	@Inject
@@ -56,30 +58,30 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	private String mFilePath = "locations.json";
 	private SiteList mSites;
 	private File mStorageDir;
-	
+
 	private int mNumTotalSitesForSync;
 	private int mNumSitesRemainingForSync;
-	
-	private String mFilterString;
 
 	/**
-	 * Injectable constructor. Receives bus via DIModule's @Provide of the event bus.
+	 * Injectable constructor. Receives bus via DIModule's @Provide of the event
+	 * bus.
+	 * 
 	 * @param bus
 	 */
 	@Inject
 	public JsonFileSiteRepository(Bus bus) {
 		mBus = bus;
-		
+
 		if (!this.isExternalStorageWritable()) {
 			mBus.post(new ExternalStorageNotWritableEvent());
 			return;
 		}
-		
+
 		if (!this.isExternalStorageReadable()) {
 			mBus.post(new ExternalStorageNotReadableEvent());
 			return;
 		}
-		
+
 		this.setStorageDir(DEFAULT_DIR);
 	}
 
@@ -92,11 +94,11 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	}
 
 	public void setFilterString(String filter) {
-		this.mFilterString = filter;
 	}
+
 	/**
-	 * Get the list of sites. If the in-memory list is present, use it, otherwise pull from disk and stick it in
-	 * memory for future access.
+	 * Get the list of sites. If the in-memory list is present, use it,
+	 * otherwise pull from disk and stick it in memory for future access.
 	 */
 	@Override
 	public SiteList getSites() {
@@ -116,9 +118,10 @@ public class JsonFileSiteRepository implements ISiteRepository {
 			SiteList sites = mapper.readValue(fis, SiteList.class);
 			fis.close();
 			Log.i(TAG, "...From DISK.");
-			// Sites should not be null here, but just as an extra safety precaution
+			// Sites should not be null here, but just as an extra safety
+			// precaution
 			if (sites != null) {
-				this.mSites = sites;				
+				this.mSites = sites;
 				return sites;
 			}
 		} catch (JsonProcessingException e) {
@@ -142,29 +145,7 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		SiteList filteredList = new SiteList();
 		if (fullList != null) {
 			for (Site f : fullList) {
-				// if there's a filter set, let's use it
-//				if (mFilterString != null && mFilterString != "") {
-//					String name = f.getName().toLowerCase();
-//					String[] nameSplit = name.split(" ");
-//					Boolean match = false;
-//					// First match against the whole, non-split value
-//					if (name.startsWith(mFilterString)) {
-//						match = true;
-//					} else {
-//						// Here we'll test against the tokenized name
-//						final int wordCount = nameSplit.length;
-//						for (int k = 0; k < wordCount; k++) {
-//							if (nameSplit[k].startsWith(mFilterString)) {
-//								match = true;
-//								break;
-//							}
-//						}
-//					}
-//					if (!match) {
-//						continue;
-//					}
-//				}
-				
+
 				Log.i(TAG, "Site Coords: " + f.getCoordinates().toString());
 				if (s <= f.getCoordinates().get(1) && f.getCoordinates().get(1) <= n) {
 					// we're within lats
@@ -195,36 +176,22 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	 * Persists the current in-memory list of sites to disk.
 	 */
 	@Override
-	public boolean persistSites() {
+	public boolean persistInMemorySitesToDisk() {
 		Log.i(TAG, "Persisting Sites...");
-		
+		boolean success = true;
+
 		if (!this.isExternalStorageWritable()) {
 			mBus.post(new ExternalStorageNotWritableEvent());
-			return false;
+			success = false;
+		}
+
+		if (mSites != null) {
+			success = false;
 		}
 		
-		if (mSites != null) {
-			return false;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		File file = new File(mStorageDir, mFilePath);
-		try {
-			String json = mapper.writeValueAsString(mSites);
-			FileOutputStream fos = new FileOutputStream(file);
-			fos.write(json.getBytes());
-			fos.close();
-			Log.i(TAG, "Sites Persisted.");
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		// save this to memory within this instance for faster access
-		// this.mSites = sites;
-		mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-		return true;
+		pojoToFile(mSites);
+	
+		return success;
 	}
 
 	/**
@@ -233,52 +200,71 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	@Override
 	public boolean persistSites(SiteList sites) {
 		Log.i(TAG, "Persisting Sites...");
+		boolean success = true;
+
 		if (!this.isExternalStorageWritable()) {
 			mBus.post(new ExternalStorageNotWritableEvent());
-			return false;
+			success = false;
 		}
 		
+		pojoToFile(sites);
+
+		// replace the in-memory list of Sites with the newly persisted list
+		this.mSites = sites;
+		return success;
+	}
+
+	/**
+	 * Performs the actual serialization and saving to disk.
+	 * @param o
+	 * @return
+	 */
+	public boolean pojoToFile(Object o) {
+		boolean success = true;
+		
 		ObjectMapper mapper = new ObjectMapper();
+		File file = new File(mStorageDir, mFilePath);
 		try {
-			String json = mapper.writeValueAsString(sites);
-			File file = new File(mStorageDir, mFilePath);
+			String json = mapper.writeValueAsString(o);
 			FileOutputStream fos = new FileOutputStream(file);
 			fos.write(json.getBytes());
 			fos.close();
-			Log.i(TAG, sites.size() + " Sites Persisted.");
+			Log.i(TAG, ((ArrayList) o).size() + " Sites Persisted.");
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			return false;
+			success = false;
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
+			success = false;
 		}
+		// TODO: HACK! This is to refresh the Android File Transfer
+		// application's list... doesn't seem to work consistently
+		mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
 		
-		// replace the in-memory list of Sites with the newly persisted list
-		this.mSites = sites;
-		return true;
+		return success;
 	}
 
 	/**
 	 * Persist a site, defaulting to markForSync = true
+	 * 
 	 * @param site
 	 * @return
 	 */
 	public boolean persistSite(Site site) {
 		return this.persistSite(site, true);
 	}
-	
+
 	@Override
 	public boolean persistSite(Site site, boolean markForSync) {
 		if (!this.isExternalStorageWritable()) {
 			mBus.post(new ExternalStorageNotWritableEvent());
 			return false;
 		}
-		
+
 		SiteList fullList = this.getSites();
 
 		site.setRequestSync(markForSync);
-		
+
 		// is the site already in our list?
 		if (fullList.indexOf(site) != -1) {
 			// yes, replace it with the specified Site
@@ -323,7 +309,8 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	}
 
 	/**
-	 * Updates a site in the central in-memory store, marking it for sync request.
+	 * Updates a site in the central in-memory store, marking it for sync
+	 * request.
 	 */
 	@Override
 	public boolean updateSite(Site site) {
@@ -340,7 +327,7 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		Log.i(TAG, "Site not found, not updating...");
 		return false;
 	}
-	
+
 	/**
 	 * Saves the passed site to central in-memory store.
 	 */
@@ -360,11 +347,13 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	}
 
 	/**
-	 * Perform the syncing of the marked sites with the server. Sites with no server-generated _id field are added,
-	 * while sites with an existing _id are updated.
+	 * Perform the syncing of the marked sites with the server. Sites with no
+	 * server-generated _id field are added, while sites with an existing _id
+	 * are updated.
 	 * 
-	 * Requests are tracked manually via the success callbacks in the listeners. Once all requests have completed, the
-	 * onSyncComplete() method is called, which persists the updated list of Sites.
+	 * Requests are tracked manually via the success callbacks in the listeners.
+	 * Once all requests have completed, the onSyncComplete() method is called,
+	 * which persists the updated list of Sites.
 	 */
 	@Override
 	public boolean syncSites() {
@@ -375,19 +364,32 @@ public class JsonFileSiteRepository implements ISiteRepository {
 			// no sync required, we consider this a success
 			return true;
 		}
-		for (Site f : sitesForSync) {
-			if (f.get_id() == null) {
-				Log.i(TAG, "                 ---> ADDING SITE.");
-				AddSiteRetrofitSpiceRequest addSiteRequest = new AddSiteRetrofitSpiceRequest(f);
-				// Note that cache key (second arg) includes uuid in order to avoid returning cached result
-				mSpiceManager.execute(addSiteRequest, "addsite"+f.getUuid(), DurationInMillis.ONE_SECOND,
+		for (Site s : sitesForSync) {
+			if (s.get_id() == null) {
+				Log.i(TAG, "                 ---> ADDING SITE: " + s.getName());
+				AddSiteRetrofitSpiceRequest addSiteRequest = new AddSiteRetrofitSpiceRequest(s);
+				// Note that cache key (second arg) includes uuid in order to
+				// avoid returning cached result
+				mSpiceManager.execute(addSiteRequest, "addsite" + s.getUuid(), DurationInMillis.ONE_SECOND,
 						new AddSiteRequestListener());
 			} else {
-				Log.i(TAG, "                 ---> UPDATING SITE: " + f.getName());
-				UpdateSiteRetrofitSpiceRequest updateSiteRequest = new UpdateSiteRetrofitSpiceRequest(f);
-				// Note that cache key (second arg) includes _id in order to avoid returning cached result
-				mSpiceManager.execute(updateSiteRequest, "updatesite"+f.get_id(), DurationInMillis.ONE_SECOND,
+				Log.i(TAG, "                 ---> UPDATING SITE: " + s.getName());
+				UpdateSiteRetrofitSpiceRequest updateSiteRequest = new UpdateSiteRetrofitSpiceRequest(s);
+				// Note that cache key (second arg) includes _id in order to
+				// avoid returning cached result
+				mSpiceManager.execute(updateSiteRequest, "updatesite" + s.get_id(), DurationInMillis.ONE_SECOND,
 						new UpdateSiteRequestListener());
+
+				ArrayList<String> newImages = (ArrayList<String>) s.getAdditionalProperties().get("newImages");
+				
+				if (newImages != null) {
+					for (String path : newImages) {
+						Log.i(TAG, "//////    about to upload photo: " + path);
+						File photo = new File(path);
+						AddSitePhotoRetrofitSpiceRequest addPhotoRequest = new AddSitePhotoRetrofitSpiceRequest(photo, s.get_id());
+						mSpiceManager.execute(addPhotoRequest, "addphoto" + path, DurationInMillis.ONE_SECOND, new AddSitePhotoRequestListener());
+					}
+				}
 			}
 		}
 		return false;
@@ -399,7 +401,7 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		SiteList sites = this.getSites();
 		return sites.remove(site);
 	}
-	
+
 	/**
 	 * Check if external storage is writable.
 	 * 
@@ -414,7 +416,7 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Check if external storage is at least readable.
 	 * 
@@ -424,23 +426,22 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	 */
 	public boolean isExternalStorageReadable() {
 		String state = Environment.getExternalStorageState();
-		if (Environment.MEDIA_MOUNTED.equals(state) ||
-				Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+		if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	public void setStorageDir(String dirName) {
 		File file = new File(Environment.getExternalStorageDirectory().toString() + File.separator + dirName);
-	    if (!file.mkdirs()) {
-	        Log.e(TAG, "Directory not created");
-	    }
-	    mStorageDir = file;
+		if (!file.mkdirs()) {
+			Log.e(TAG, "Directory not created");
+		}
+		mStorageDir = file;
 	}
-	
+
 	public File getStorageDir() {
-	    return mStorageDir;
+		return mStorageDir;
 	}
 
 	/**
@@ -448,10 +449,10 @@ public class JsonFileSiteRepository implements ISiteRepository {
 	 */
 	public void onSyncComplete() {
 		Log.i(TAG, "Sync is Complete.");
-		this.persistSites();
+		this.persistInMemorySitesToDisk();
 		mBus.post(new SitesSyncCompleteEvent());
 	}
-	
+
 	/**
 	 * Called when a single site finishes syncing.
 	 */
@@ -462,20 +463,18 @@ public class JsonFileSiteRepository implements ISiteRepository {
 			this.onSyncComplete();
 		}
 	}
-	
+
 	/**
 	 * Cancel all pending sync requests.
 	 */
 	public void cancelSync() {
 		mSpiceManager.cancelAllRequests();
 	}
-	
+
 	/**
 	 * INTERNAL CLASSES
 	 */
 
-	
-	
 	/**
 	 * Used by RoboSpice to handle the response for adding a Site.
 	 * 
@@ -525,6 +524,34 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		@Override
 		public void onRequestSuccess(final Site site) {
 			Log.i(TAG, "                 ---> Site Updated: " + site.getName());
+			saveSite(site);
+			updateSyncStatus();
+		}
+	}
+	
+	
+	/**
+	 * Used by RoboSpice to handle the response for adding a Site.
+	 * 
+	 * @author Jonathan Wohl
+	 * 
+	 */
+	public final class AddSitePhotoRequestListener implements RequestListener<Site> {
+
+		@Override
+		public void onRequestFailure(SpiceException spiceException) {
+			Log.e(TAG, spiceException.toString());
+//			mBus.post(new SiteSyncErrorEvent());
+			// Toast.makeText(SelectOfflineAreaActivity.this,
+			// "Failed to add new Site.", Toast.LENGTH_SHORT).show();
+		}
+
+		/**
+		 * On Success, we finish the activity and start the Detail activity.
+		 */
+		@Override
+		public void onRequestSuccess(final Site site) {
+			Log.i(TAG, "                 ---> Photo Uploaded for site: " + site.getName());
 			saveSite(site);
 			updateSyncStatus();
 		}

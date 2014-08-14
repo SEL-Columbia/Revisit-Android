@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Queue;
 
 import javax.inject.Inject;
@@ -88,9 +89,6 @@ public class SiteDetailActivity extends BaseActivity {
 
 	// Path to the storage dir
 	File mStorageDir;
-
-	// Absolute URI to the current photo (i.e. the photo just taken)
-	String mCurrentPhotoUri;
 
 	// Path to the current photo (i.e. the photo just taken)
 	String mCurrentPhotoPath;
@@ -237,15 +235,11 @@ public class SiteDetailActivity extends BaseActivity {
 		
 		Log.i(TAG, "Adding Image: " + path);
 		
-//		Bitmap bitmap = preparePhoto(path);
-//		imageView.setImageBitmap(
-//				BitmapUtils.decodeSampledBitmapFromFile(path, 100, 100));
-//		
 		int pageIndex = mPagerAdapter.prependView(imageView, path);
 		mPagerAdapter.notifyDataSetChanged();
 		
 		if (setToCurrent) {
-			mImagePager.setCurrentItem (pageIndex, false);			
+			mImagePager.setCurrentItem (pageIndex, false);	
 		}
 
 	}
@@ -260,7 +254,7 @@ public class SiteDetailActivity extends BaseActivity {
 				photoFile = createImageFile();
 			} catch (IOException ex) {
 				// Error occurred while creating the File
-
+				Log.e(TAG, ex.toString());
 			}
 			// Continue only if the File was successfully created
 			if (photoFile != null) {
@@ -270,14 +264,30 @@ public class SiteDetailActivity extends BaseActivity {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.i(TAG, "onActivityResult() : " + requestCode + ", " + resultCode);
 		if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-			// The Intent is empty, but we can assume success...
+			
+			// Immediately resize the image
+			// TODO: since this is happening one pop at a time it shouldn't be too slow, but might be.
+			BitmapUtils.reduceBitmapInPlace(mCurrentPhotoPath, 800, 800);
+			
+			// Success, add the image to the pager 
 			mNoImagesTextView.setVisibility(View.GONE);
 			mImagePager.setVisibility(View.VISIBLE);
 			this.addImageToPager(mCurrentPhotoPath, true);
+			
+			// and store the path on the object to be used for syncing
+			ArrayList<String> newImages;			
+			if (!mSite.getAdditionalProperties().containsKey("newImages")) {
+				mSite.setAdditionalProperty("newImages", new ArrayList<String>());
+			}
+			newImages = (ArrayList<String>) mSite.getAdditionalProperties().get("newImages");
+			newImages.add(mCurrentPhotoPath);
+			
+			mSite.setRequestSync(true);
 		}
 	}
 
@@ -302,19 +312,19 @@ public class SiteDetailActivity extends BaseActivity {
 	 */
 	private File createImageFile() throws IOException {
 		// Create an image file name
-		Calendar c = Calendar.getInstance();
-		String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(c.getTime());
+		String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(new Date());
 		Log.i(TAG, "Timestamp: " + timeStamp);
-		String imageFileName = "Site_" + mSite.get_id() + "_" + timeStamp + "_";
+		String imageFileName = "Site_" + mSite.get_id() + "_" + timeStamp;
 
-		File image = File.createTempFile(imageFileName, /* prefix */
-				".jpg", /* suffix */
-				mStorageDir /* directory */
-		);
+//		File image = File.createTempFile(imageFileName, /* prefix */
+//				".jpg", /* suffix */
+//				mStorageDir /* directory */
+//		);
+		
+		File image = new File(mStorageDir, imageFileName + ".jpg");
 
-		// Save a file: path for use with ACTION_VIEW intents
 		Log.i(TAG, "image.getAbsolutePath() : " + image.getAbsolutePath());
-		mCurrentPhotoUri = "file:" + image.getAbsolutePath();
+		
 		mCurrentPhotoPath = image.getAbsolutePath();
 
 		return image;
@@ -329,40 +339,6 @@ public class SiteDetailActivity extends BaseActivity {
 		Uri contentUri = Uri.fromFile(f);
 		mediaScanIntent.setData(contentUri);
 		this.sendBroadcast(mediaScanIntent);
-	}
-
-	/**
-	 * Scale the photo appropriately for better memory management
-	 * 
-	 * @param path
-	 * @return
-	 */
-	private Bitmap preparePhoto(String path) {
-		Log.i(TAG, "preparePic() : " + path);
-		// Get the dimensions of the View
-		int targetW = mImagePager.getWidth();
-		int targetH = mImagePager.getHeight();
-
-		String uri = "file:" + path;
-		// Get the dimensions of the bitmap
-		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-		bmOptions.inJustDecodeBounds = true;
-		BitmapFactory.decodeFile(uri, bmOptions);
-		int photoW = bmOptions.outWidth;
-		int photoH = bmOptions.outHeight;
-
-		Log.i(TAG, "widths: " + targetW + ", " + targetH + ", " + photoW + ", " + photoH);
-
-		// Determine how much to scale down the image
-		int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-		// Decode the image file into a Bitmap sized to fill the View
-		bmOptions.inJustDecodeBounds = false;
-		bmOptions.inSampleSize = scaleFactor;
-		bmOptions.inPurgeable = true;
-
-		Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
-		return bitmap;
 	}
 
 	@OnClick(R.id.capture_image)
@@ -397,11 +373,11 @@ public class SiteDetailActivity extends BaseActivity {
 	
 	private class ImagePagerAdapter extends PagerAdapter {
 
+		// list to hold the ImageViews that will be paged
 		private ArrayList<View> mImageViews = new ArrayList<View>();
 		
+		// list to hold the paths for each image
 		private ArrayList<String> mImagePaths = new ArrayList<String>();
-
-		// private ArrayDeque<String> mImages = new ArrayDeque<String>();
 
 		@Override
 		public int getItemPosition(Object object) {
@@ -417,19 +393,9 @@ public class SiteDetailActivity extends BaseActivity {
 			ImageView v = (ImageView) mImageViews.get(position);
 	        loadImage(v, mImagePaths.get(position));
 	        container.addView(v);
-//	        return pagerItem;
-//			container.addView(v);
 			return v;
 		}
 		
-		// -----------------------------------------------------------------------------
-		// Used by ViewPager. Called when ViewPager no longer needs a page to
-		// display; it
-		// is our job to remove the page from the container, which is normally
-		// the
-		// ViewPager itself. Since all our pages are persistent, we do nothing
-		// to the
-		// contents of our "views" ArrayList.
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
 			container.removeView(mImageViews.get(position));
@@ -445,57 +411,53 @@ public class SiteDetailActivity extends BaseActivity {
 			return view == ((ImageView) object);
 		}
 		
-		// -----------------------------------------------------------------------------
-		// Add "view" to right end of "views".
-		// Returns the position of the new view.
-		// The app should call this to add pages; not used by ViewPager.
-//		public int addView(View v) {
-//			return addView(v, mImageViews.size());
-//		}
-		
 		/**
 		 * Add view to the front of the list.
 		 * @param v
 		 * @return
 		 */
 		public int prependView(View v, String path) {
-//			loadImage((ImageView) v, path);
 			return addView(v, path, 0);
 		}
 		
-		// -----------------------------------------------------------------------------
-		// Add "view" at "position" to "views".
-		// Returns position of new view.
-		// The app should call this to add pages; not used by ViewPager.
+		/**
+		 * Add {view} to be loaded with file at {path} into position {position} within ViewPager
+		 * Not used by ViewPager directly.
+		 * @param v
+		 * @param path
+		 * @param position
+		 * @return
+		 */
 		public int addView(View v, String path, int position) {
 			mImageViews.add(position, v);
 			mImagePaths.add(position, path);
 			return position;
 		}
 
-		// -----------------------------------------------------------------------------
-		// Removes "view" from "views".
-		// Retuns position of removed view.
-		// The app should call this to remove pages; not used by ViewPager.
+		/**
+		 * Used by external components to remove a view {v} from {pager}.
+		 * Not used by ViewPager directly.
+		 * @param pager
+		 * @param v
+		 * @return
+		 */
 		public int removeView(ViewPager pager, View v) {
 			return removeView(pager, mImageViews.indexOf(v));
 		}
 
-		// -----------------------------------------------------------------------------
-		// Removes the "view" at "position" from "views".
-		// Retuns position of removed view.
-		// The app should call this to remove pages; not used by ViewPager.
+		/**
+		 * Used by external components to remove a view at {position} from {pager}.
+		 * Not used by ViewPager directly.
+		 * @param pager
+		 * @param position
+		 * @return
+		 */
 		public int removeView(ViewPager pager, int position) {
-			// ViewPager doesn't have a delete method; the closest is to set the
-			// adapter
-			// again. When doing so, it deletes all its views. Then we can
-			// delete the view
-			// from from the adapter and finally set the adapter to the pager
-			// again. Note
-			// that we set the adapter to null before removing the view from
-			// "views" - that's
-			// because while ViewPager deletes all its views, it will call
-			// destroyItem which
+			// ViewPager doesn't have a delete method; the closest is to set the adapter
+			// again. When doing so, it deletes all its views. Then we can delete the view
+			// from from the adapter and finally set the adapter to the pager again. Note
+			// that we set the adapter to null before removing the view from "views" - that's
+			// because while ViewPager deletes all its views, it will call destroyItem which
 			// will in turn cause a null pointer ref.
 			pager.setAdapter(null);
 			mImageViews.remove(position);
@@ -504,32 +466,24 @@ public class SiteDetailActivity extends BaseActivity {
 			return position;
 		}
 
-		// -----------------------------------------------------------------------------
-		// Returns the "view" at "position".
-		// The app should call this to retrieve a view; not used by ViewPager.
+		/**
+		 * Used by external components that want to access the view at {position}
+		 * from the ViewPager. Not used by ViewPager directly.
+		 * @param position
+		 * @return
+		 */
 		public View getView(int position) {
 			return mImageViews.get(position);
 		}
-		
-		/*
-		@Override
-		public Object instantiateItem(ViewGroup container, int position) {
-			Context context = SiteDetailActivity.this;
-			ImageView imageView = new ImageView(context);
-			int padding = 0;
-			imageView.setPadding(padding, padding, padding, padding);
-			imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-			if (mImages.get(position) != null) {
-				Bitmap bitmap = prepareImage(mImages.get(position));
-				// Bitmap bitmap =
-				// BitmapFactory.decodeFile(mImages.get(position));
-				imageView.setImageBitmap(bitmap);
-			}
-			((ViewPager) container).addView(imageView, position);
-			return imageView;
-		}
-		 */
 
+		/**
+		 * Load the image at {path} into {imageView} with Picasso.
+		 * 
+		 * TODO: add placeholders
+		 * 
+		 * @param imageView
+		 * @param path
+		 */
 		private void loadImage(ImageView imageView, String path) {
 			Log.i(TAG, "loading image: " + path);
 			Picasso.with(SiteDetailActivity.this)
@@ -552,6 +506,11 @@ public class SiteDetailActivity extends BaseActivity {
 			    });
 		}
 		
+		/**
+		 * Custom transform to fit the image to the height of the view without
+		 * distorting.
+		 * @return
+		 */
 		private Transformation getFitHeightTransformation() {
 			Transformation transformation = new Transformation() {
 
@@ -574,41 +533,6 @@ public class SiteDetailActivity extends BaseActivity {
             };
             
             return transformation;
-		}
-
-		/**
-		 * TODO: We should cache these rather than having them generated on
-		 * every swipe
-		 * 
-		 * @param path
-		 * @return
-		 */
-		private Bitmap prepareImage(String path) {
-			Log.i(TAG, "preparePic() : " + path);
-			// Get the dimensions of the View
-			int targetW = mImagePager.getWidth();
-			int targetH = mImagePager.getHeight();
-
-			String uri = "file:" + path;
-			// Get the dimensions of the bitmap
-			BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-			bmOptions.inJustDecodeBounds = true;
-			BitmapFactory.decodeFile(path, bmOptions);
-			int photoW = bmOptions.outWidth;
-			int photoH = bmOptions.outHeight;
-
-			Log.i(TAG, "widths: " + targetW + ", " + targetH + ", " + photoW + ", " + photoH);
-
-			// Determine how much to scale down the image
-			int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-			// Decode the image file into a Bitmap sized to fill the View
-			bmOptions.inJustDecodeBounds = false;
-			bmOptions.inSampleSize = scaleFactor;
-			bmOptions.inPurgeable = true;
-
-			Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
-			return bitmap;
 		}
 	}
 }
