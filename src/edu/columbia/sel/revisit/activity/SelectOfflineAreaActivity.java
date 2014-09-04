@@ -82,6 +82,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 	private BoundingBoxE6 mBoundingBox;
 	private boolean mDoDownload = false;
+	
+	private Picasso mPicasso;
+	private ArrayList<CustomTarget> mImageDownloadTargets;
 
 	private boolean mDoZoomToMyLocation = true;
 
@@ -101,6 +104,8 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 		// Injection for views and onclick handlers
 		ButterKnife.inject(this);
+		
+		mPicasso = Picasso.with(this);
 
 		mMapView = (MapView) this.findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
@@ -252,6 +257,23 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		// this.zoomToMyLocation();
 		// }
 	}
+	
+	/**
+	 * Perform a bit of clean up -- clear out lingering targets.
+	 */
+	@Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing()) {
+        	if (mImageDownloadTargets != null) {        	
+	            for (CustomTarget target : mImageDownloadTargets) {
+	            	mPicasso.cancelRequest(target);            	
+	            }
+            	mImageDownloadTargets.clear();
+            	mImageDownloadTargets = null;            	
+            }
+        }
+    }
 
 	// @Override
 	// public void onBackPressed() {
@@ -303,45 +325,22 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 	}
 
 	private void fetchPhotos(SiteList sites) {
-		// TODO Auto-generated method stub
 		if (sites == null) {
 			return;
 		}
+		
+		this.mImageDownloadTargets = new ArrayList<CustomTarget>();
+		
 		for (final Site s : sites) {
 			ArrayList<String> urls = (ArrayList<String>) s.getProperties().getPhotoUrls();
 			for (int i = 0; i < urls.size(); i++) {
-				String url = urls.get(i);
+				final String url = urls.get(i);
 				final int pos = i;
 				if (url != null) {
 					Log.i(TAG, "downloading image: " + url);
-					Picasso.with(this).load(url).into(new Target() {
-
-						@Override
-						public void onBitmapFailed(Drawable arg0) {
-							Toast.makeText(SelectOfflineAreaActivity.this, "Error downloading Site photo.",
-									Toast.LENGTH_SHORT).show();
-						}
-
-						@Override
-						public void onBitmapLoaded(Bitmap photo, LoadedFrom from) {
-							String dirPath = Environment.getExternalStorageDirectory().toString() + File.separator
-									+ "revisit" + File.separator + "photos" + File.separator + s.get_id();
-							File dir = new File(dirPath);
-							if (!dir.mkdirs()) {
-								Log.e(TAG, "Directory might already exist.");
-							}
-							String path = dirPath + File.separator + pos + ".jpg";
-							
-							BitmapUtils.saveBitmapToFile(photo, path);
-						}
-
-						@Override
-						public void onPrepareLoad(Drawable arg0) {
-							// TODO Auto-generated method stub
-
-						}
-
-					});
+					CustomTarget target = new CustomTarget(url, s, pos);
+					mImageDownloadTargets.add(target);
+					mPicasso.load(url).into(target);
 				}
 			}
 		}
@@ -540,5 +539,52 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 
 			fetchPhotos(result);
 		}
+	}
+	
+	public class CustomTarget implements Target {
+
+		private String url;
+		private Site site;
+		private int index = -1;
+		
+		public CustomTarget(String url, Site site, int index) {
+			this.url = url;
+			this.site = site;
+			this.index = index;
+		}
+		
+		@Override
+		public void onBitmapFailed(Drawable arg0) {
+			Log.i(TAG, "image failed to download: " + url);
+			Toast.makeText(SelectOfflineAreaActivity.this, "Error downloading Site photo.",
+					Toast.LENGTH_SHORT).show();
+		}
+
+		@Override
+		public void onBitmapLoaded(Bitmap photo, LoadedFrom from) {
+			Log.i(TAG, "image downloaded: " + url);
+			String dirPath = Environment.getExternalStorageDirectory().toString() + File.separator
+					+ "revisit" + File.separator + "photos" + File.separator + site.get_id();
+			File dir = new File(dirPath);
+			if (!dir.mkdirs()) {
+				Log.e(TAG, "Directory might already exist.");
+			}
+			String path = dirPath + File.separator + index + ".jpg";
+			
+			BitmapUtils.saveBitmapToFile(photo, path);
+			releaseTargetReference();
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable arg0) {
+			// TODO Auto-generated method stub
+
+		}
+		
+		// release the target reference so it can be GC'd
+		private void releaseTargetReference() {
+            if (index != -1)
+                mImageDownloadTargets.remove(index);
+        }
 	}
 }

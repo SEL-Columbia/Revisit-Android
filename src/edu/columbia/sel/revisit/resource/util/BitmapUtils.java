@@ -136,9 +136,12 @@ public class BitmapUtils {
 	}
 
 	/**
-	 * Essentially like mkdir -p
+	 * Recursively create directories. 
+	 * 
+	 * (Essentially like mkdir -p)
+	 * 
 	 * @param dirName
-	 * @return
+	 * @return boolean success or failure
 	 */
 	public static boolean createDirs(String dirName) {
 		File file = new File(Environment.getExternalStorageDirectory().toString() + File.separator + dirName);

@@ -379,17 +379,8 @@ public class JsonFileSiteRepository implements ISiteRepository {
 				// avoid returning cached result
 				mSpiceManager.execute(updateSiteRequest, "updatesite" + s.get_id(), DurationInMillis.ONE_SECOND,
 						new UpdateSiteRequestListener());
-
-				ArrayList<String> newImages = (ArrayList<String>) s.getAdditionalProperties().get("newImages");
 				
-				if (newImages != null) {
-					for (String path : newImages) {
-						Log.i(TAG, "//////    about to upload photo: " + path);
-						File photo = new File(path);
-						AddSitePhotoRetrofitSpiceRequest addPhotoRequest = new AddSitePhotoRetrofitSpiceRequest(photo, s.get_id());
-						mSpiceManager.execute(addPhotoRequest, "addphoto" + path, DurationInMillis.ONE_SECOND, new AddSitePhotoRequestListener());
-					}
-				}
+				uploadPhotos(s);
 			}
 		}
 		return false;
@@ -400,6 +391,22 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		// TODO Auto-generated method stub
 		SiteList sites = this.getSites();
 		return sites.remove(site);
+	}
+	
+	public boolean uploadPhotos(Site site) {
+		@SuppressWarnings("unchecked")
+		ArrayList<String> newImages = (ArrayList<String>) site.getAdditionalProperties().get("newPhotos");
+		
+		if (newImages != null) {
+			for (String path : newImages) {
+				Log.i(TAG, "//////    about to upload photo: " + path);
+				File photo = new File(path);
+				AddSitePhotoRetrofitSpiceRequest addPhotoRequest = new AddSitePhotoRetrofitSpiceRequest(photo, site.get_id());
+				mSpiceManager.execute(addPhotoRequest, "addphoto" + photo.getName(), DurationInMillis.ALWAYS_EXPIRED, new AddSitePhotoRequestListener());
+			}
+		}
+		
+		return true;
 	}
 
 	/**
@@ -498,6 +505,7 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		public void onRequestSuccess(final Site site) {
 			Log.i(TAG, "                 ---> Site Added: " + site.getName());
 			saveSite(site);
+			uploadPhotos(site);
 			updateSyncStatus();
 		}
 	}
@@ -525,6 +533,7 @@ public class JsonFileSiteRepository implements ISiteRepository {
 		public void onRequestSuccess(final Site site) {
 			Log.i(TAG, "                 ---> Site Updated: " + site.getName());
 			saveSite(site);
+			uploadPhotos(site);
 			updateSyncStatus();
 		}
 	}

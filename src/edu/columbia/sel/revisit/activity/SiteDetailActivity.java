@@ -92,6 +92,7 @@ public class SiteDetailActivity extends BaseActivity {
 
 	// Path to the current photo (i.e. the photo just taken)
 	String mCurrentPhotoPath;
+	String mCurrentPhotoName;
 
 	ImagePagerAdapter mPagerAdapter;
 
@@ -244,6 +245,10 @@ public class SiteDetailActivity extends BaseActivity {
 
 	}
 
+	/**
+	 * Create and dispatch the Intent that launches the Camera app. The Intent includes a URI to a temp file which 
+	 * stores the captured image.
+	 */
 	private void dispatchTakePictureIntent() {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		// Ensure that there's a camera activity to handle the intent
@@ -264,6 +269,10 @@ public class SiteDetailActivity extends BaseActivity {
 		}
 	}
 
+	/**
+	 * Receive the result from the Camera app. Upon receipt, the file created in {@link dispatchTakePictureIntent}, 
+	 * which now stores the image, is reduced in size.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -271,23 +280,31 @@ public class SiteDetailActivity extends BaseActivity {
 		if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
 			
 			// Immediately resize the image
-			// TODO: since this is happening one pop at a time it shouldn't be too slow, but might be.
+			// TODO: since this is happening one pop at a time it shouldn't be too slow... but keep an eye on
+			// performance issues here
 			BitmapUtils.reduceBitmapInPlace(mCurrentPhotoPath, 800, 800);
 			
-			// Success, add the image to the pager 
+			// Success, add the image to the pager
 			mNoImagesTextView.setVisibility(View.GONE);
 			mImagePager.setVisibility(View.VISIBLE);
 			this.addImageToPager(mCurrentPhotoPath, true);
 			
 			// and store the path on the object to be used for syncing
 			ArrayList<String> newImages;			
-			if (!mSite.getAdditionalProperties().containsKey("newImages")) {
-				mSite.setAdditionalProperty("newImages", new ArrayList<String>());
+			if (!mSite.getAdditionalProperties().containsKey("newPhotos")) {
+				mSite.setAdditionalProperty("newPhotos", new ArrayList<String>());
 			}
-			newImages = (ArrayList<String>) mSite.getAdditionalProperties().get("newImages");
+			newImages = (ArrayList<String>) mSite.getAdditionalProperties().get("newPhotos");
 			newImages.add(mCurrentPhotoPath);
 			
-			mSite.setRequestSync(true);
+			// and store the path on the object to be used for syncing
+			if (mSite.getProperties().getPhotoUrls() == null) {
+				mSite.getProperties().setPhotoUrls(new ArrayList<String>());
+			}
+			mSite.getProperties().getPhotoUrls().add("tmp/" + mCurrentPhotoName);
+			
+			// update the site in the local store, marking for sync
+			mSiteRepository.updateSite(mSite);
 		}
 	}
 
@@ -314,24 +331,22 @@ public class SiteDetailActivity extends BaseActivity {
 		// Create an image file name
 		String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US).format(new Date());
 		Log.i(TAG, "Timestamp: " + timeStamp);
-		String imageFileName = "Site_" + mSite.get_id() + "_" + timeStamp;
-
-//		File image = File.createTempFile(imageFileName, /* prefix */
-//				".jpg", /* suffix */
-//				mStorageDir /* directory */
-//		);
+		String imageFileName = "Site_" + mSite.get_id() + "_" + timeStamp + ".jpg";
 		
-		File image = new File(mStorageDir, imageFileName + ".jpg");
+		File image = new File(mStorageDir, imageFileName);
 
 		Log.i(TAG, "image.getAbsolutePath() : " + image.getAbsolutePath());
 		
 		mCurrentPhotoPath = image.getAbsolutePath();
+		mCurrentPhotoName = imageFileName;
 
 		return image;
 	}
 
 	/**
 	 * Add the photo to the android gallery as well as to our app.
+	 * 
+	 * NOTE: Not currently in use. Could be implemented if we want the images to show up in the gallery.
 	 */
 	private void galleryAddPic() {
 		Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -353,7 +368,6 @@ public class SiteDetailActivity extends BaseActivity {
 		visits += 1;
 		mSite.getProperties().setVisits(visits);
 
-		// JsonFileSiteRepository sr = new JsonFileSiteRepository(this);
 		mSiteRepository.updateSite(mSite);
 
 		Intent i = new Intent();
