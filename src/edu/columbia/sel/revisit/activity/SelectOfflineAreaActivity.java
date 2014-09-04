@@ -583,8 +583,9 @@ public class SelectOfflineAreaActivity extends BaseActivity {
 		
 		// release the target reference so it can be GC'd
 		private void releaseTargetReference() {
-            if (index != -1)
-                mImageDownloadTargets.remove(index);
+            if (index != -1) {
+            	mImageDownloadTargets.remove(this);            	
+            }
         }
 	}
 }
