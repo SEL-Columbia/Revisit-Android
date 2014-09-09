@@ -57,9 +57,9 @@ android {
 
 dependencies {
 	// spring libs
-    compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
-    compile 'org.springframework.android:spring-android-auth:1.0.1.RELEASE'
-    compile 'org.springframework.android:spring-android-core:1.0.1.RELEASE'
+    // compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
+    // compile 'org.springframework.android:spring-android-auth:1.0.1.RELEASE'
+    // compile 'org.springframework.android:spring-android-core:1.0.1.RELEASE'
 	
 	// square libs
 	compile 'com.squareup:otto:1.3.2'

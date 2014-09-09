@@ -20,7 +20,6 @@ import edu.columbia.sel.revisit.fragment.BaseMapFragment;
 import edu.columbia.sel.revisit.fragment.SiteMapFragment;
 import edu.columbia.sel.revisit.model.JsonFileSiteRepository;
 import edu.columbia.sel.revisit.service.LocationService;
-import edu.columbia.sel.revisit.task.SiteRequestTask;
 
 import javax.inject.Singleton;
 
@@ -39,7 +38,7 @@ import static android.content.Context.LOCATION_SERVICE;
 	injects = {
 		RevisitApplication.class,
 		
-		// Activities
+		// Activities	
 		BaseActivity.class,
 		SplashActivity.class,
 		SelectOfflineAreaActivity.class,
@@ -54,7 +53,7 @@ import static android.content.Context.LOCATION_SERVICE;
 		AddSiteMapFragment.class,
 		
 		// Other Components
-		SiteRequestTask.class,
+//		SiteRequestTask.class,
 		LocationService.class,
 		JsonFileSiteRepository.class
 	}
