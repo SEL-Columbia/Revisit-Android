@@ -27,11 +27,11 @@
             android:layout_weight="2"
             android:background="@drawable/blue_button"
             android:drawableTop="@drawable/ic_downloadoffline"
-            android:paddingBottom="5dp"
-            android:paddingTop="10dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="20dp"
             android:text="@string/select_offline_button"
             android:textColor="@color/white"
-            android:textSize="13sp" />
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/map_button"
@@ -41,11 +41,11 @@
             android:layout_weight="2"
             android:background="@drawable/green_button"
             android:drawableTop="@drawable/ic_viewmap"
-            android:paddingBottom="5dp"
-            android:paddingTop="8dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="18dp"
             android:text="@string/view_offline_button"
             android:textColor="@color/white"
-            android:textSize="13sp" />
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/settings"
@@ -55,11 +55,11 @@
             android:layout_weight="2"
             android:background="@drawable/purple_button"
             android:drawableTop="@drawable/ic_settings"
-            android:paddingBottom="5dp"
-            android:paddingTop="8dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="18dp"
             android:text="@string/settings_button"
             android:textColor="@color/white"
-            android:textSize="13sp" />
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/tour_button"
@@ -69,11 +69,11 @@
             android:layout_weight="2"
             android:background="@drawable/orange_button"
             android:drawableTop="@drawable/ic_tour"
-            android:paddingBottom="5dp"
-            android:paddingTop="8dp"
+            android:paddingBottom="15dp"
+            android:paddingTop="18dp"
             android:text="@string/tour_button"
             android:textColor="@color/white"
-            android:textSize="13sp" />
+            android:textSize="15sp" />
     </LinearLayout>
 
 </ScrollView>
